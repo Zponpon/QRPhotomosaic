@@ -30,15 +30,21 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.label1 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
+            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.BlockcomboBox = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.FolderComboBox = new System.Windows.Forms.ComboBox();
             this.QRAndPhotmosaicBtn = new System.Windows.Forms.Button();
             this.QRPhotomosaicBtn = new System.Windows.Forms.Button();
             this.SaveImageBtn = new System.Windows.Forms.Button();
             this.LoadImageBtn = new System.Windows.Forms.Button();
             this.OutputPhotomosaicPicBox = new System.Windows.Forms.PictureBox();
             this.InputPicBox = new System.Windows.Forms.PictureBox();
-            this.QRCodePhotomosaicPicBox = new System.Windows.Forms.PictureBox();
+            this.PhotomosaicPicBox = new System.Windows.Forms.PictureBox();
             this.QRCodePicBox = new System.Windows.Forms.PictureBox();
             this.QRCodeContentBox = new System.Windows.Forms.TextBox();
             this.InputQRCodeLabel = new System.Windows.Forms.Label();
@@ -49,13 +55,18 @@
             this.StateLabel = new System.Windows.Forms.Label();
             this.CalcAvgBtn = new System.Windows.Forms.Button();
             this.TileFolderBtnAvg = new System.Windows.Forms.Button();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.CalcAvgWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
+            this.CreateWorker = new System.ComponentModel.BackgroundWorker();
+            this.label1 = new System.Windows.Forms.Label();
+            this.SavingBtnBasic = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OutputPhotomosaicPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.QRCodePhotomosaicPicBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PhotomosaicPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.QRCodePicBox)).BeginInit();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -69,53 +80,150 @@
             this.tabControl.Location = new System.Drawing.Point(1, 1);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(1526, 860);
+            this.tabControl.Size = new System.Drawing.Size(1537, 921);
             this.tabControl.TabIndex = 0;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.SavingBtnBasic);
+            this.tabPage1.Controls.Add(this.label5);
+            this.tabPage1.Controls.Add(this.numericUpDown3);
+            this.tabPage1.Controls.Add(this.label4);
+            this.tabPage1.Controls.Add(this.numericUpDown2);
+            this.tabPage1.Controls.Add(this.BlockcomboBox);
+            this.tabPage1.Controls.Add(this.label3);
+            this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.label1);
-            this.tabPage1.Controls.Add(this.comboBox1);
+            this.tabPage1.Controls.Add(this.FolderComboBox);
             this.tabPage1.Controls.Add(this.QRAndPhotmosaicBtn);
             this.tabPage1.Controls.Add(this.QRPhotomosaicBtn);
             this.tabPage1.Controls.Add(this.SaveImageBtn);
             this.tabPage1.Controls.Add(this.LoadImageBtn);
             this.tabPage1.Controls.Add(this.OutputPhotomosaicPicBox);
             this.tabPage1.Controls.Add(this.InputPicBox);
-            this.tabPage1.Controls.Add(this.QRCodePhotomosaicPicBox);
+            this.tabPage1.Controls.Add(this.PhotomosaicPicBox);
             this.tabPage1.Controls.Add(this.QRCodePicBox);
             this.tabPage1.Controls.Add(this.QRCodeContentBox);
             this.tabPage1.Controls.Add(this.InputQRCodeLabel);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1518, 834);
+            this.tabPage1.Size = new System.Drawing.Size(1529, 895);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // label5
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(303, 91);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(33, 12);
-            this.label1.TabIndex = 12;
-            this.label1.Text = "label1";
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(319, 287);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(87, 23);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "Version";
             // 
-            // comboBox1
+            // numericUpDown3
             // 
-            this.comboBox1.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(308, 576);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(135, 31);
-            this.comboBox1.TabIndex = 11;
+            this.numericUpDown3.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.numericUpDown3.Location = new System.Drawing.Point(296, 318);
+            this.numericUpDown3.Maximum = new decimal(new int[] {
+            40,
+            0,
+            0,
+            0});
+            this.numericUpDown3.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown3.Name = "numericUpDown3";
+            this.numericUpDown3.Size = new System.Drawing.Size(140, 29);
+            this.numericUpDown3.TabIndex = 18;
+            this.numericUpDown3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.numericUpDown3.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(308, 762);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(109, 23);
+            this.label4.TabIndex = 17;
+            this.label4.Text = "Tile Size";
+            // 
+            // numericUpDown2
+            // 
+            this.numericUpDown2.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.numericUpDown2.Location = new System.Drawing.Point(305, 797);
+            this.numericUpDown2.Maximum = new decimal(new int[] {
+            64,
+            0,
+            0,
+            0});
+            this.numericUpDown2.Minimum = new decimal(new int[] {
+            8,
+            0,
+            0,
+            0});
+            this.numericUpDown2.Name = "numericUpDown2";
+            this.numericUpDown2.Size = new System.Drawing.Size(140, 29);
+            this.numericUpDown2.TabIndex = 16;
+            this.numericUpDown2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.numericUpDown2.Value = new decimal(new int[] {
+            64,
+            0,
+            0,
+            0});
+            this.numericUpDown2.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
+            // 
+            // BlockcomboBox
+            // 
+            this.BlockcomboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BlockcomboBox.FormattingEnabled = true;
+            this.BlockcomboBox.Location = new System.Drawing.Point(305, 711);
+            this.BlockcomboBox.Name = "BlockcomboBox";
+            this.BlockcomboBox.Size = new System.Drawing.Size(135, 31);
+            this.BlockcomboBox.TabIndex = 15;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(308, 674);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(120, 23);
+            this.label3.TabIndex = 14;
+            this.label3.Text = "Block Size";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(308, 583);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(131, 23);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "Tile folder";
+            // 
+            // FolderComboBox
+            // 
+            this.FolderComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FolderComboBox.FormattingEnabled = true;
+            this.FolderComboBox.Location = new System.Drawing.Point(305, 609);
+            this.FolderComboBox.Name = "FolderComboBox";
+            this.FolderComboBox.Size = new System.Drawing.Size(135, 31);
+            this.FolderComboBox.TabIndex = 11;
             // 
             // QRAndPhotmosaicBtn
             // 
             this.QRAndPhotmosaicBtn.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.QRAndPhotmosaicBtn.Location = new System.Drawing.Point(455, 731);
+            this.QRAndPhotmosaicBtn.Location = new System.Drawing.Point(558, 700);
             this.QRAndPhotmosaicBtn.Name = "QRAndPhotmosaicBtn";
             this.QRAndPhotmosaicBtn.Size = new System.Drawing.Size(339, 72);
             this.QRAndPhotmosaicBtn.TabIndex = 10;
@@ -126,7 +234,7 @@
             // QRPhotomosaicBtn
             // 
             this.QRPhotomosaicBtn.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.QRPhotomosaicBtn.Location = new System.Drawing.Point(1069, 731);
+            this.QRPhotomosaicBtn.Location = new System.Drawing.Point(1180, 700);
             this.QRPhotomosaicBtn.Name = "QRPhotomosaicBtn";
             this.QRPhotomosaicBtn.Size = new System.Drawing.Size(211, 72);
             this.QRPhotomosaicBtn.TabIndex = 8;
@@ -142,10 +250,11 @@
             this.SaveImageBtn.TabIndex = 7;
             this.SaveImageBtn.Text = "SaveImage";
             this.SaveImageBtn.UseVisualStyleBackColor = true;
+            this.SaveImageBtn.Click += new System.EventHandler(this.SaveImageBtn_Click);
             // 
             // LoadImageBtn
             // 
-            this.LoadImageBtn.Location = new System.Drawing.Point(625, 576);
+            this.LoadImageBtn.Location = new System.Drawing.Point(654, 576);
             this.LoadImageBtn.Name = "LoadImageBtn";
             this.LoadImageBtn.Size = new System.Drawing.Size(124, 41);
             this.LoadImageBtn.TabIndex = 6;
@@ -171,14 +280,14 @@
             this.InputPicBox.TabIndex = 4;
             this.InputPicBox.TabStop = false;
             // 
-            // QRCodePhotomosaicPicBox
+            // PhotomosaicPicBox
             // 
-            this.QRCodePhotomosaicPicBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.QRCodePhotomosaicPicBox.Location = new System.Drawing.Point(38, 576);
-            this.QRCodePhotomosaicPicBox.Name = "QRCodePhotomosaicPicBox";
-            this.QRCodePhotomosaicPicBox.Size = new System.Drawing.Size(250, 250);
-            this.QRCodePhotomosaicPicBox.TabIndex = 3;
-            this.QRCodePhotomosaicPicBox.TabStop = false;
+            this.PhotomosaicPicBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.PhotomosaicPicBox.Location = new System.Drawing.Point(38, 553);
+            this.PhotomosaicPicBox.Name = "PhotomosaicPicBox";
+            this.PhotomosaicPicBox.Size = new System.Drawing.Size(250, 250);
+            this.PhotomosaicPicBox.TabIndex = 3;
+            this.PhotomosaicPicBox.TabStop = false;
             // 
             // QRCodePicBox
             // 
@@ -298,33 +407,66 @@
             this.TileFolderBtnAvg.UseVisualStyleBackColor = true;
             this.TileFolderBtnAvg.Click += new System.EventHandler(this.TileFolderBtn_Click);
             // 
-            // backgroundWorker1
+            // CalcAvgWorker
             // 
-            this.backgroundWorker1.WorkerReportsProgress = true;
-            this.backgroundWorker1.WorkerSupportsCancellation = true;
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
-            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            this.CalcAvgWorker.WorkerReportsProgress = true;
+            this.CalcAvgWorker.WorkerSupportsCancellation = true;
+            this.CalcAvgWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CalcAvgWorker_DoWork);
+            this.CalcAvgWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.CalcAvgWorker_ProgressChanged);
+            this.CalcAvgWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.CalcAvgWorker_RunWorkerCompleted);
             // 
             // EmbeddingWorker
             // 
             this.EmbeddingWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.EmbeddingWorker_DoWork);
             // 
+            // CreateWorker
+            // 
+            this.CreateWorker.WorkerReportsProgress = true;
+            this.CreateWorker.WorkerSupportsCancellation = true;
+            this.CreateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CreateWorker_DoWork);
+            //this.CreateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(firstStep.CreateWorker_DoWork);
+            this.CreateWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.CreateWorker_ProgressChanged);
+            this.CreateWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.CreateWorker_RunWorkerCompleted);
+
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(303, 91);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(33, 12);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "label1";
+            // 
+            // SavingBtnBasic
+            // 
+            this.SavingBtnBasic.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SavingBtnBasic.Location = new System.Drawing.Point(23, 839);
+            this.SavingBtnBasic.Name = "SavingBtnBasic";
+            this.SavingBtnBasic.Size = new System.Drawing.Size(281, 32);
+            this.SavingBtnBasic.TabIndex = 20;
+            this.SavingBtnBasic.Text = "Save QR and Photomosaic";
+            this.SavingBtnBasic.UseVisualStyleBackColor = true;
+            this.SavingBtnBasic.Click += new System.EventHandler(this.SavingBtnBasic_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1523, 861);
+            this.ClientSize = new System.Drawing.Size(1536, 924);
             this.Controls.Add(this.tabControl);
             this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.MainForm_Load_1);
             this.tabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OutputPhotomosaicPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.QRCodePhotomosaicPicBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PhotomosaicPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.QRCodePicBox)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
@@ -342,12 +484,12 @@
         private System.Windows.Forms.Label InputQRCodeLabel;
         private System.Windows.Forms.TextBox QRCodeContentBox;
         private System.Windows.Forms.PictureBox QRCodePicBox;
-        private System.Windows.Forms.PictureBox QRCodePhotomosaicPicBox;
+        private System.Windows.Forms.PictureBox PhotomosaicPicBox;
         private System.Windows.Forms.Button LoadImageBtn;
         private System.Windows.Forms.PictureBox OutputPhotomosaicPicBox;
         private System.Windows.Forms.PictureBox InputPicBox;
         private System.Windows.Forms.Button SaveImageBtn;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.ComponentModel.BackgroundWorker CalcAvgWorker;
         private System.Windows.Forms.Button QRPhotomosaicBtn;
         private System.Windows.Forms.Button TileFolderBtnAvg;
         private System.Windows.Forms.Button CalcAvgBtn;
@@ -355,10 +497,19 @@
         public System.Windows.Forms.Label SrcPathLabel;
         private System.Windows.Forms.PictureBox TilePicBox;
         private System.Windows.Forms.Button QRAndPhotmosaicBtn;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox FolderComboBox;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.ComponentModel.BackgroundWorker EmbeddingWorker;
+        private System.Windows.Forms.ComboBox BlockcomboBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.ComponentModel.BackgroundWorker CreateWorker;
+        private System.Windows.Forms.NumericUpDown numericUpDown2;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.NumericUpDown numericUpDown3;
+        private System.Windows.Forms.Button SavingBtnBasic;
+        private System.Windows.Forms.Label label1;
     }
 }
 

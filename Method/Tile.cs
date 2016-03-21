@@ -39,6 +39,7 @@ namespace QRPhotoMosaic.Method
                     //size = 
                 }
             };
+            //tileSize = 
         }
 
         public Tile()
@@ -102,6 +103,8 @@ namespace QRPhotoMosaic.Method
 
                     tiles.Add(tile);
                 }
+                file.Close();
+                reader.Close();
 
             }
             catch (InvalidCastException e)

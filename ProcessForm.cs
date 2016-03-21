@@ -11,10 +11,11 @@ using QRPhotoMosaic.Method;
 
 namespace QRPhotoMosaic
 {
-    public partial class TileProcessForm : Form
+    public partial class ProcessForm : Form
     {
         public GetString stringCB;
         public static MainForm main;
+        public static int calcTileSize;
         
         public string setLabel1_Name
         {
@@ -26,7 +27,7 @@ namespace QRPhotoMosaic
             set { progressBar1.Value = value; }
         }
 
-        public TileProcessForm()
+        public ProcessForm()
         {
             InitializeComponent();
         }
@@ -56,20 +57,10 @@ namespace QRPhotoMosaic
             int t = 0;
             foreach (Tile tile in main.tiles)
             {
-                tile.CalcNonDivTileAvgRGB(main.tileSize);
+                tile.CalcNonDivTileAvgRGB(calcTileSize);
                 worker.ReportProgress(++t / main.tiles.Count * 100);
             }
-            Tile.SaveFile(main.tiles, main.tileSize, savingPath);
-        }
-
-        private void ProcessText_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void TileProcessForm_Load(object sender, EventArgs e)
-        {
-
+            Tile.SaveFile(main.tiles, calcTileSize, savingPath);
         }
 
         private void CancelTileBtn_Click(object sender, EventArgs e)

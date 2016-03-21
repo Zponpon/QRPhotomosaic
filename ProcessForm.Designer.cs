@@ -1,6 +1,6 @@
 ﻿namespace QRPhotoMosaic
 {
-    partial class TileProcessForm
+    partial class ProcessForm
     {
         /// <summary>
         /// Required designer variable.
@@ -60,7 +60,7 @@
             this.CancelTileBtn.UseVisualStyleBackColor = true;
             this.CancelTileBtn.Click += new System.EventHandler(this.CancelTileBtn_Click);
             // 
-            // TileProcessForm
+            // ProcessForm
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -70,10 +70,9 @@
             this.Controls.Add(this.CancelTileBtn);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.progressBar1);
-            this.Name = "TileProcessForm";
+            this.Name = "ProcessForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Process";
-            this.Load += new System.EventHandler(this.TileProcessForm_Load);
             this.ResumeLayout(false);
 
         }
