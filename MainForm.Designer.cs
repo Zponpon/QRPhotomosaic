@@ -417,16 +417,20 @@
             // 
             // EmbeddingWorker
             // 
+            //this.embeddingStep = new 
             this.EmbeddingWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.EmbeddingWorker_DoWork);
             // 
             // CreateWorker
             // 
+            this.BasicStep = new Method.CreatingQRAndPhotomosaic();
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
-            this.CreateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CreateWorker_DoWork);
-            //this.CreateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(firstStep.CreateWorker_DoWork);
-            this.CreateWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.CreateWorker_ProgressChanged);
-            this.CreateWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.CreateWorker_RunWorkerCompleted);
+            //this.CreateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CreateWorker_DoWork);
+            this.CreateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(BasicStep.CreateWorker_DoWork);
+            this.CreateWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(BasicStep.CreateWorker_ProgressChanged);
+            this.CreateWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(BasicStep.CreateWorker_RunWorkerCompleted);
+            //this.CreateWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.CreateWorker_ProgressChanged);
+            //this.CreateWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.CreateWorker_RunWorkerCompleted);
 
             // 
             // label1

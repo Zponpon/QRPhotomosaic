@@ -105,7 +105,6 @@ namespace QRPhotoMosaic.Method
                 }
                 file.Close();
                 reader.Close();
-
             }
             catch (InvalidCastException e)
             {
