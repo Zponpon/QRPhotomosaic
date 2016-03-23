@@ -58,6 +58,7 @@ namespace QRPhotoMosaic
             foreach (Tile tile in main.tiles)
             {
                 tile.CalcNonDivTileAvgRGB(calcTileSize);
+                if (main.tiles.Count == 0) return;
                 worker.ReportProgress(++t / main.tiles.Count * 100);
             }
             Tile.SaveFile(main.tiles, calcTileSize, savingPath);

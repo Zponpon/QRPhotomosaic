@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Method\CreatingQRAndPhotomosaic.cs" />
     <Compile Include="Method\ImageProc.cs" />
+    <Compile Include="Method\QRCodeInfo.cs" />
     <Compile Include="ProcessForm.cs">
       <SubType>Form</SubType>
     </Compile>

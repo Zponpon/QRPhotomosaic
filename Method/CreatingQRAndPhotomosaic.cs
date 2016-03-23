@@ -75,7 +75,7 @@ namespace QRPhotoMosaic.Method
             {
                 worker.ReportProgress(0);
                 Tile.ReadFile(MainForm.singleton.tiles, ref tileSize, CreatingFolderPath);
-                QRMatrix = QRCodeEncoder.CreateQR("AAA", QRCodeEncoder.GetECLevel("L"));
+                QRMatrix = QRCodeEncoder.CreateQR(MainForm.singleton.QRCodeContent, QRCodeEncoder.GetECLevel("L"));
                 mQRCode = QRCodeEncoder.ToBitmap(QRMatrix);
                 QRCodePicBox.Image = QRCode;
                 worker.ReportProgress(10);

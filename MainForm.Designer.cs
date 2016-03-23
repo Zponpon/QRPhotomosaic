@@ -28,8 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            //this.BasicStep = new Method.CreatingQRAndPhotomosaic();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.SavingBtnBasic = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
@@ -55,11 +57,10 @@
             this.StateLabel = new System.Windows.Forms.Label();
             this.CalcAvgBtn = new System.Windows.Forms.Button();
             this.TileFolderBtnAvg = new System.Windows.Forms.Button();
-            this.CalcAvgWorker = new System.ComponentModel.BackgroundWorker();
+            this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.label1 = new System.Windows.Forms.Label();
-            this.SavingBtnBasic = new System.Windows.Forms.Button();
+            this.LevelComboBox = new System.Windows.Forms.ComboBox();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -85,6 +86,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.LevelComboBox);
             this.tabPage1.Controls.Add(this.SavingBtnBasic);
             this.tabPage1.Controls.Add(this.label5);
             this.tabPage1.Controls.Add(this.numericUpDown3);
@@ -93,7 +95,6 @@
             this.tabPage1.Controls.Add(this.BlockcomboBox);
             this.tabPage1.Controls.Add(this.label3);
             this.tabPage1.Controls.Add(this.label2);
-            this.tabPage1.Controls.Add(this.label1);
             this.tabPage1.Controls.Add(this.FolderComboBox);
             this.tabPage1.Controls.Add(this.QRAndPhotmosaicBtn);
             this.tabPage1.Controls.Add(this.QRPhotomosaicBtn);
@@ -112,6 +113,17 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // SavingBtnBasic
+            // 
+            this.SavingBtnBasic.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SavingBtnBasic.Location = new System.Drawing.Point(23, 839);
+            this.SavingBtnBasic.Name = "SavingBtnBasic";
+            this.SavingBtnBasic.Size = new System.Drawing.Size(281, 32);
+            this.SavingBtnBasic.TabIndex = 20;
+            this.SavingBtnBasic.Text = "Save QR and Photomosaic";
+            this.SavingBtnBasic.UseVisualStyleBackColor = true;
+            this.SavingBtnBasic.Click += new System.EventHandler(this.SavingBtnBasic_Click);
             // 
             // label5
             // 
@@ -327,7 +339,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1518, 834);
+            this.tabPage2.Size = new System.Drawing.Size(1529, 895);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -407,51 +419,37 @@
             this.TileFolderBtnAvg.UseVisualStyleBackColor = true;
             this.TileFolderBtnAvg.Click += new System.EventHandler(this.TileFolderBtn_Click);
             // 
-            // CalcAvgWorker
+            // TileWorker
             // 
-            this.CalcAvgWorker.WorkerReportsProgress = true;
-            this.CalcAvgWorker.WorkerSupportsCancellation = true;
-            this.CalcAvgWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CalcAvgWorker_DoWork);
-            this.CalcAvgWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.CalcAvgWorker_ProgressChanged);
-            this.CalcAvgWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.CalcAvgWorker_RunWorkerCompleted);
+            this.TileWorker.WorkerReportsProgress = true;
+            this.TileWorker.WorkerSupportsCancellation = true;
+            this.TileWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.TileWorker_DoWork);
+            this.TileWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.TileWorker_ProgressChanged);
+            this.TileWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.TileWorker_RunWorkerCompleted);
             // 
             // EmbeddingWorker
             // 
-            //this.embeddingStep = new 
             this.EmbeddingWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.EmbeddingWorker_DoWork);
             // 
             // CreateWorker
             // 
-            this.BasicStep = new Method.CreatingQRAndPhotomosaic();
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
-            //this.CreateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CreateWorker_DoWork);
-            this.CreateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(BasicStep.CreateWorker_DoWork);
-            this.CreateWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(BasicStep.CreateWorker_ProgressChanged);
-            this.CreateWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(BasicStep.CreateWorker_RunWorkerCompleted);
-            //this.CreateWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.CreateWorker_ProgressChanged);
-            //this.CreateWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.CreateWorker_RunWorkerCompleted);
-
+            
             // 
-            // label1
+            // LevelComboBox
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(303, 91);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(33, 12);
-            this.label1.TabIndex = 12;
-            this.label1.Text = "label1";
-            // 
-            // SavingBtnBasic
-            // 
-            this.SavingBtnBasic.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SavingBtnBasic.Location = new System.Drawing.Point(23, 839);
-            this.SavingBtnBasic.Name = "SavingBtnBasic";
-            this.SavingBtnBasic.Size = new System.Drawing.Size(281, 32);
-            this.SavingBtnBasic.TabIndex = 20;
-            this.SavingBtnBasic.Text = "Save QR and Photomosaic";
-            this.SavingBtnBasic.UseVisualStyleBackColor = true;
-            this.SavingBtnBasic.Click += new System.EventHandler(this.SavingBtnBasic_Click);
+            this.LevelComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LevelComboBox.FormattingEnabled = true;
+            this.LevelComboBox.Location = new System.Drawing.Point(293, 58);
+            this.LevelComboBox.Name = "LevelComboBox";
+            this.LevelComboBox.Size = new System.Drawing.Size(135, 31);
+            this.LevelComboBox.TabIndex = 21;
+            this.LevelComboBox.Items.AddRange(new object[] {
+            "L",
+            "M",
+            "Q",
+            "H"});
             // 
             // MainForm
             // 
@@ -493,7 +491,7 @@
         private System.Windows.Forms.PictureBox OutputPhotomosaicPicBox;
         private System.Windows.Forms.PictureBox InputPicBox;
         private System.Windows.Forms.Button SaveImageBtn;
-        private System.ComponentModel.BackgroundWorker CalcAvgWorker;
+        private System.ComponentModel.BackgroundWorker TileWorker;
         private System.Windows.Forms.Button QRPhotomosaicBtn;
         private System.Windows.Forms.Button TileFolderBtnAvg;
         private System.Windows.Forms.Button CalcAvgBtn;
@@ -513,7 +511,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.NumericUpDown numericUpDown3;
         private System.Windows.Forms.Button SavingBtnBasic;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox LevelComboBox;
     }
 }
 

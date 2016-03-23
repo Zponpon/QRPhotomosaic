@@ -32,6 +32,7 @@ namespace QRPhotoMosaic
         public List<Tile> tiles = new List<Tile>();
         public Bitmap masterBitmap;
         public ProcessForm processForm;
+        private QRCodeInfo infoOfQRCode;
         public static MainForm singleton;
         
         private OpenFileDialog LoadingFile;
@@ -46,7 +47,23 @@ namespace QRPhotoMosaic
         private string CreatingFolderPath;// Page1
         
         //  TileProcessForm (Load & calc avg color) function register themselves into this callback function.
-        private System.Action<BackgroundWorker, string> cb;
+        public System.Action<BackgroundWorker, string> cb;
+
+        public string QRCodeContent
+        {
+            get
+            {
+                return this.QRCodeContentBox.Text;
+            }
+        }
+
+        public string QRECLevel
+        {
+            get
+            {
+                return this.LevelComboBox.Text;
+            }
+        }
         
 
         public MainForm()
@@ -63,8 +80,14 @@ namespace QRPhotoMosaic
         {
             stopWatch = new Stopwatch();
             processForm = new ProcessForm();
+            infoOfQRCode = new QRCodeInfo();
             ProcessForm.main = this;
             PhotoMosaic.main = this;
+            LevelComboBox.SelectedIndex = 0;
+            this.BasicStep = new CreatingQRAndPhotomosaic();
+            CreateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(BasicStep.CreateWorker_DoWork);
+            CreateWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(BasicStep.CreateWorker_ProgressChanged);
+            CreateWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(BasicStep.CreateWorker_RunWorkerCompleted);
             BasicStep.QRCodePicBox = QRCodePicBox;
             BasicStep.PhotomosaicPicBox = PhotomosaicPicBox;
             BasicStep.stopWatch = stopWatch;
@@ -181,14 +204,13 @@ namespace QRPhotoMosaic
             if (InputPicBox.Image != null)
             {
                 //EmbeddingForm.photomosaicImg = InputPhotomosaicPicBox.Image as Bitmap;
-                embeddingForm.photomosaicImg = InputPicBox.Image as Bitmap;
             }
         }
         #endregion
         #endregion
 
         #region Tile image region
-        private void CalcAvgWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void TileWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
             
@@ -205,18 +227,19 @@ namespace QRPhotoMosaic
             }
         }
 
-        private void CalcAvgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void TileWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             processForm.setLabel1_Name = "In the process.....";
             processForm.ProgressValue = e.ProgressPercentage;
         }
 
-        private void CalcAvgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void TileWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             //BackgroundWorker w = sender as BackgroundWorker;
-            if (e.Cancelled)
+            if (e.Cancelled || isCancel)
             {
                 //label26.Text = "Canceled!";
+                isCancel = false;
                 MessageBox.Show("Canacel");
                 //StateLabel.Text = "Loading is canceled!!!";
                 stopWatch.Stop();
@@ -232,14 +255,12 @@ namespace QRPhotoMosaic
             {
                 stopWatch.Stop();
                 MessageBox.Show("Done");
-                //StateLabel.Text = "Loading is done!!!";
+                StateLabel.Text = "Calculating is done!!!";
                 TilePicBox.Image = tiles[0].bitmap;
                 TimeSpan ts = stopWatch.Elapsed;
-                isCancel = true;
                 string elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
             }
             cb = null;
-            //processForm.Canceled -= CancelBtn_Click;
             stopWatch.Reset();
             SrcPathLabel.Text = CalcAvgFolderPath;
             processForm.Close();
@@ -253,7 +274,7 @@ namespace QRPhotoMosaic
         /// <param name="e"></param>
         private void TileFolderBtn_Click(object sender, EventArgs e)
         {
-            if (CalcAvgWorker.IsBusy) return;
+            if (TileWorker.IsBusy) return;
 
             FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
             if (folderBrowser.ShowDialog() == DialogResult.OK)
@@ -268,14 +289,14 @@ namespace QRPhotoMosaic
                 processForm.stringCB -= Path;
                 processForm.stringCB += Path;
                 stopWatch.Start();
-                CalcAvgWorker.RunWorkerAsync();
+                TileWorker.RunWorkerAsync();
                 folderBrowser.Dispose();
             }
         }
 
         private void CalcAvgBtn_Click(object sender, EventArgs e)
         {
-            if (CalcAvgWorker.IsBusy || tiles.Count == 0) return;
+            if (TileWorker.IsBusy || tiles.Count == 0) return;
 
             processForm = new ProcessForm();
             processForm.Canceled -= CancelBtn_Click;
@@ -287,8 +308,7 @@ namespace QRPhotoMosaic
             processForm.stringCB -= SavingFileName;
             processForm.stringCB += SavingFileName;
             stopWatch.Start();
-            CalcAvgWorker.RunWorkerAsync();
-            StateLabel.Text = "Calculating is done!!!";
+            TileWorker.RunWorkerAsync();
         }
 
         /// <summary>
@@ -317,7 +337,7 @@ namespace QRPhotoMosaic
 
         private string SavingFileName()
         {
-            string fileName = ProcessForm.calcTileSize.ToString() + "AvgColor.txt";
+            string fileName = "AvgColor.txt";
             return Path() + fileName;
         }
         #endregion
@@ -341,8 +361,8 @@ namespace QRPhotoMosaic
 
         private void CancelBtn_Click(object sender, EventArgs e)
         {
-            if (CalcAvgWorker.WorkerSupportsCancellation && CalcAvgWorker.IsBusy)
-                CalcAvgWorker.CancelAsync();
+            if (TileWorker.WorkerSupportsCancellation && TileWorker.IsBusy)
+                TileWorker.CancelAsync();
             if (CreateWorker.WorkerSupportsCancellation)
                 CreateWorker.CancelAsync();
             if (EmbeddingWorker.WorkerSupportsCancellation)
