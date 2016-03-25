@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using QRPhotoMosaic.Method;
 
 namespace QRPhotoMosaic
 {
@@ -16,13 +17,17 @@ namespace QRPhotoMosaic
         {
             InitializeComponent();
         }
-        public Bitmap masterImg { set; get; }
-        public Bitmap photomosaicImg { set; get; }
-        public Bitmap QRCode { set; get; }
-        public String QRcodeContent { set; get; }
-        public String ColorSpace { set; get; }
-        public int tileSize { set; get; }
-        public int centerSize { set; get; }
-        public int robustVal { set; get; }
+        public void EmbeddingWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+
+        }
+        public void EmbeddingWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+
+        }
+        public void EmbeddingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+        }
     }
 }

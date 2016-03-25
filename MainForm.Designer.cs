@@ -28,12 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            //this.BasicStep = new Method.CreatingQRAndPhotomosaic();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.LevelComboBox = new System.Windows.Forms.ComboBox();
             this.SavingBtnBasic = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
-            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
             this.BlockcomboBox = new System.Windows.Forms.ComboBox();
@@ -60,10 +58,10 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.LevelComboBox = new System.Windows.Forms.ComboBox();
+            this.CenterSizenumDown = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OutputPhotomosaicPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).BeginInit();
@@ -72,6 +70,7 @@
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TilePicBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.CenterSizenumDown)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -86,10 +85,10 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.label1);
+            this.tabPage1.Controls.Add(this.CenterSizenumDown);
             this.tabPage1.Controls.Add(this.LevelComboBox);
             this.tabPage1.Controls.Add(this.SavingBtnBasic);
-            this.tabPage1.Controls.Add(this.label5);
-            this.tabPage1.Controls.Add(this.numericUpDown3);
             this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.numericUpDown2);
             this.tabPage1.Controls.Add(this.BlockcomboBox);
@@ -114,6 +113,20 @@
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // LevelComboBox
+            // 
+            this.LevelComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LevelComboBox.FormattingEnabled = true;
+            this.LevelComboBox.Items.AddRange(new object[] {
+            "L",
+            "M",
+            "Q",
+            "H"});
+            this.LevelComboBox.Location = new System.Drawing.Point(293, 58);
+            this.LevelComboBox.Name = "LevelComboBox";
+            this.LevelComboBox.Size = new System.Drawing.Size(135, 31);
+            this.LevelComboBox.TabIndex = 21;
+            // 
             // SavingBtnBasic
             // 
             this.SavingBtnBasic.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -121,43 +134,9 @@
             this.SavingBtnBasic.Name = "SavingBtnBasic";
             this.SavingBtnBasic.Size = new System.Drawing.Size(281, 32);
             this.SavingBtnBasic.TabIndex = 20;
-            this.SavingBtnBasic.Text = "Save QR and Photomosaic";
+            this.SavingBtnBasic.Text = "Save Photomosaic";
             this.SavingBtnBasic.UseVisualStyleBackColor = true;
             this.SavingBtnBasic.Click += new System.EventHandler(this.SavingBtnBasic_Click);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(319, 287);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(87, 23);
-            this.label5.TabIndex = 19;
-            this.label5.Text = "Version";
-            // 
-            // numericUpDown3
-            // 
-            this.numericUpDown3.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.numericUpDown3.Location = new System.Drawing.Point(296, 318);
-            this.numericUpDown3.Maximum = new decimal(new int[] {
-            40,
-            0,
-            0,
-            0});
-            this.numericUpDown3.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(140, 29);
-            this.numericUpDown3.TabIndex = 18;
-            this.numericUpDown3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.numericUpDown3.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             // 
             // label4
             // 
@@ -429,33 +408,57 @@
             // 
             // EmbeddingWorker
             // 
-            this.EmbeddingWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.EmbeddingWorker_DoWork);
+            //this.EmbeddingWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.EmbeddingWorker_DoWork);
             // 
             // CreateWorker
             // 
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
-            
             // 
-            // LevelComboBox
+            // CenterSizenumDown
             // 
-            this.LevelComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LevelComboBox.FormattingEnabled = true;
-            this.LevelComboBox.Location = new System.Drawing.Point(293, 58);
-            this.LevelComboBox.Name = "LevelComboBox";
-            this.LevelComboBox.Size = new System.Drawing.Size(135, 31);
-            this.LevelComboBox.TabIndex = 21;
-            this.LevelComboBox.Items.AddRange(new object[] {
-            "L",
-            "M",
-            "Q",
-            "H"});
+            this.CenterSizenumDown.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.CenterSizenumDown.Increment = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.CenterSizenumDown.Location = new System.Drawing.Point(305, 217);
+            this.CenterSizenumDown.Maximum = new decimal(new int[] {
+            64,
+            0,
+            0,
+            0});
+            this.CenterSizenumDown.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.CenterSizenumDown.Name = "CenterSizenumDown";
+            this.CenterSizenumDown.Size = new System.Drawing.Size(120, 29);
+            this.CenterSizenumDown.TabIndex = 22;
+            this.CenterSizenumDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.CenterSizenumDown.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label1.Location = new System.Drawing.Point(317, 184);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(91, 21);
+            this.label1.TabIndex = 23;
+            this.label1.Text = "CenterSize";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1536, 924);
+            this.ClientSize = new System.Drawing.Size(1533, 924);
             this.Controls.Add(this.tabControl);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -464,7 +467,6 @@
             this.tabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OutputPhotomosaicPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).EndInit();
@@ -474,6 +476,7 @@
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TilePicBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.CenterSizenumDown)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -508,10 +511,10 @@
         private System.ComponentModel.BackgroundWorker CreateWorker;
         private System.Windows.Forms.NumericUpDown numericUpDown2;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.NumericUpDown numericUpDown3;
         private System.Windows.Forms.Button SavingBtnBasic;
         private System.Windows.Forms.ComboBox LevelComboBox;
+        private System.Windows.Forms.NumericUpDown CenterSizenumDown;
+        private System.Windows.Forms.Label label1;
     }
 }
 

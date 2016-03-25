@@ -3,87 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 using System.IO;
 using System.Drawing;
 
 namespace QRPhotoMosaic.Method
 {
-    public class Tile
+    public class BasicMethod
     {
-        public Bitmap bitmap;
-        public ColorSpace.RGB avg;
-        public bool isSelected = false;
-
         public static string avgtxt = "AvgColor.txt";
+        public GetString stringCB;
 
-        public struct TileType
+        public void LoadFolder(BackgroundWorker worker, string path)
         {
-            public string name { get; set; }
-            public string folder { get; set; }
-        }
-        public static List<TileType> type;
-
-        public static void Init()
-        {
-            type = new List<TileType>()
+            //label1.Text = "Load Tiles from " + path;
+            double total = (double)System.IO.Directory.GetFiles(path).Length;
+            foreach (string fileName in System.IO.Directory.GetFiles(path))
             {
-                new TileType
-                {
-                    name = "fleur",
-                    folder = "..\\fleur",
-                },
-                new TileType
-                {
-                    name = "food",
-                    folder = "..\\food"
-                    //size = 
-                },
-                new TileType
-                {
-                    name = "all",
-                    folder = "..\\all"
-                    //size = 
-                }
-            };
-            //tileSize = 
-        }
-
-        public Tile()
-        {
-
-        }
-
-
-
-        public Tile(string s)
-        {
-            bitmap = new Bitmap(s);
-            avg = new ColorSpace.RGB();
-        }
-
-
-        public void CalcNonDivTileAvgRGB(int s)
-        {
-            int r = 0, g = 0, b = 0;
-            if (s != bitmap.Width)
-                bitmap = ImageProc.ScaleImage(bitmap, s);
-            int size = bitmap.Height * bitmap.Height;
-            for (int y = 0; y < bitmap.Height; ++y)
-            {
-                for (int x = 0; x < bitmap.Height; ++x)
-                {
-                    r += (int)bitmap.GetPixel(x, y).R;
-                    g += (int)bitmap.GetPixel(x, y).G;
-                    b += (int)bitmap.GetPixel(x, y).B;
-                }
+                Image file = Image.FromFile(fileName);
+                Tile tile = new Tile(fileName);
+                MainForm.singleton.tiles.Add(tile);
+                worker.ReportProgress((int)((MainForm.singleton.tiles.Count / total) * 100));
             }
-            r /= size;
-            g /= size;
-            b /= size;
-
-            avg.R = r;
-            avg.G = g;
-            avg.B = b;
+        }
+        /// <summary>
+        /// Calculate the avg rgb of tile image 
+        /// </summary>
+        /// <param name="worker"></param>
+        /// <param name="savingPath"></param>
+        public void CalcAvgRGB(BackgroundWorker worker, string savingPath)
+        {
+            if (MainForm.singleton.tiles.Count == 0) return;
+            int t = 0;
+            foreach (Tile tile in MainForm.singleton.tiles)
+            {
+                tile.CalcNonDivTileAvgRGB(BasicProcessForm.calcTileSize);
+                if (MainForm.singleton.tiles.Count == 0) return;
+                worker.ReportProgress(++t / MainForm.singleton.tiles.Count * 100);
+            }
+            Tile.SaveFile(MainForm.singleton.tiles, BasicProcessForm.calcTileSize, savingPath);
         }
 
         public static void ReadFile(List<Tile> tiles, ref int tileSize, string folder)

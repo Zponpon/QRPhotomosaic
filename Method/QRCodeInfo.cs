@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace QRPhotoMosaic.Method
 {
-    class QRCodeInfo
+    public class QRCodeInfo
     {
         public int QRSize { get; set; }
         public BitMatrix QRmatrix { get; set; }
@@ -167,8 +167,5 @@ namespace QRPhotoMosaic.Method
             moduleLength = 1;
             findAlignmentPatternLocations(QRVersion, moduleLength);
         }
-
-
-
     }
 }

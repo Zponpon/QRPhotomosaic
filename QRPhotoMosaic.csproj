@@ -47,14 +47,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Method\CreatingQRAndPhotomosaic.cs" />
+    <Compile Include="Method\BasicMethod.cs" />
+    <Compile Include="Method\CreatingQRPhotomosaic.cs" />
     <Compile Include="Method\ImageProc.cs" />
     <Compile Include="Method\QRCodeInfo.cs" />
-    <Compile Include="ProcessForm.cs">
+    <Compile Include="BasicProcessForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ProcessForm.Designer.cs">
-      <DependentUpon>ProcessForm.cs</DependentUpon>
+    <Compile Include="BasicProcessForm.Designer.cs">
+      <DependentUpon>BasicProcessForm.cs</DependentUpon>
     </Compile>
     <Compile Include="EmbeddingForm.cs">
       <SubType>Form</SubType>
@@ -74,8 +75,8 @@
     <Compile Include="Method\Tile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="ProcessForm.resx">
-      <DependentUpon>ProcessForm.cs</DependentUpon>
+    <EmbeddedResource Include="BasicProcessForm.resx">
+      <DependentUpon>BasicProcessForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
