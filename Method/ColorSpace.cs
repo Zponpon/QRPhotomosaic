@@ -501,7 +501,7 @@ namespace QRPhotoMosaic.Method
             return CSLab;
         }
 
-        public Lab XYZtoLab(XYZ XYZ)
+        public Lab XYZ2Lab(XYZ XYZ)
         {
             //reference http://www.brucelindbloom.com/Eqn_XYZ_to_Lab.html
             //https://en.wikipedia.org/wiki/Lab_color_space
@@ -593,17 +593,17 @@ namespace QRPhotoMosaic.Method
             return CSXYZ;
         }
 
-        public Lab RGBtoLab(int R, int G, int B)
+        public Lab RGB2Lab(int R, int G, int B)
         {
-            return XYZtoLab(RGB2XYZ(R, G, B));
+            return XYZ2Lab(RGB2XYZ(R, G, B));
         }
 
-        public Lab RGBtoLab(RGB RGB)
+        public Lab RGB2Lab(RGB RGB)
         {
-            return XYZtoLab(RGBtoXYZ(RGB));
+            return XYZ2Lab(RGBtoXYZ(RGB));
         }
 
-        public RGB LabtoRGB(double L, double a, double b)
+        public RGB Lab2RGB(double L, double a, double b)
         {
             return XYZ2RGB(LabtoXYZ(L, a, b));
         }

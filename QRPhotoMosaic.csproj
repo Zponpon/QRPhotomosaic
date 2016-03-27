@@ -78,6 +78,9 @@
     <EmbeddedResource Include="BasicProcessForm.resx">
       <DependentUpon>BasicProcessForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EmbeddingForm.resx">
+      <DependentUpon>EmbeddingForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

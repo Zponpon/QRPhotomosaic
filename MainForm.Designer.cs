@@ -30,6 +30,10 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label5 = new System.Windows.Forms.Label();
+            this.ColorSpaceComboBox = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.CenterSizenumDown = new System.Windows.Forms.NumericUpDown();
             this.LevelComboBox = new System.Windows.Forms.ComboBox();
             this.SavingBtnBasic = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
@@ -42,7 +46,7 @@
             this.QRPhotomosaicBtn = new System.Windows.Forms.Button();
             this.SaveImageBtn = new System.Windows.Forms.Button();
             this.LoadImageBtn = new System.Windows.Forms.Button();
-            this.OutputPhotomosaicPicBox = new System.Windows.Forms.PictureBox();
+            this.ResultPicBox = new System.Windows.Forms.PictureBox();
             this.InputPicBox = new System.Windows.Forms.PictureBox();
             this.PhotomosaicPicBox = new System.Windows.Forms.PictureBox();
             this.QRCodePicBox = new System.Windows.Forms.PictureBox();
@@ -58,19 +62,17 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.CenterSizenumDown = new System.Windows.Forms.NumericUpDown();
-            this.label1 = new System.Windows.Forms.Label();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CenterSizenumDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.OutputPhotomosaicPicBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ResultPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PhotomosaicPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.QRCodePicBox)).BeginInit();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TilePicBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.CenterSizenumDown)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -85,6 +87,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.label5);
+            this.tabPage1.Controls.Add(this.ColorSpaceComboBox);
             this.tabPage1.Controls.Add(this.label1);
             this.tabPage1.Controls.Add(this.CenterSizenumDown);
             this.tabPage1.Controls.Add(this.LevelComboBox);
@@ -99,7 +103,7 @@
             this.tabPage1.Controls.Add(this.QRPhotomosaicBtn);
             this.tabPage1.Controls.Add(this.SaveImageBtn);
             this.tabPage1.Controls.Add(this.LoadImageBtn);
-            this.tabPage1.Controls.Add(this.OutputPhotomosaicPicBox);
+            this.tabPage1.Controls.Add(this.ResultPicBox);
             this.tabPage1.Controls.Add(this.InputPicBox);
             this.tabPage1.Controls.Add(this.PhotomosaicPicBox);
             this.tabPage1.Controls.Add(this.QRCodePicBox);
@@ -113,6 +117,68 @@
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label5.Location = new System.Drawing.Point(317, 119);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(96, 21);
+            this.label5.TabIndex = 25;
+            this.label5.Text = "ColorSpace";
+            // 
+            // ColorSpaceComboBox
+            // 
+            this.ColorSpaceComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ColorSpaceComboBox.FormattingEnabled = true;
+            this.ColorSpaceComboBox.Items.AddRange(new object[] {
+            "RGB",
+            "YUV",
+            "Lab"});
+            this.ColorSpaceComboBox.Location = new System.Drawing.Point(293, 152);
+            this.ColorSpaceComboBox.Name = "ColorSpaceComboBox";
+            this.ColorSpaceComboBox.Size = new System.Drawing.Size(135, 31);
+            this.ColorSpaceComboBox.TabIndex = 24;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label1.Location = new System.Drawing.Point(317, 196);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(91, 21);
+            this.label1.TabIndex = 23;
+            this.label1.Text = "CenterSize";
+            // 
+            // CenterSizenumDown
+            // 
+            this.CenterSizenumDown.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.CenterSizenumDown.Increment = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.CenterSizenumDown.Location = new System.Drawing.Point(297, 220);
+            this.CenterSizenumDown.Maximum = new decimal(new int[] {
+            64,
+            0,
+            0,
+            0});
+            this.CenterSizenumDown.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.CenterSizenumDown.Name = "CenterSizenumDown";
+            this.CenterSizenumDown.Size = new System.Drawing.Size(131, 29);
+            this.CenterSizenumDown.TabIndex = 22;
+            this.CenterSizenumDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.CenterSizenumDown.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            // 
             // LevelComboBox
             // 
             this.LevelComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -122,7 +188,7 @@
             "M",
             "Q",
             "H"});
-            this.LevelComboBox.Location = new System.Drawing.Point(293, 58);
+            this.LevelComboBox.Location = new System.Drawing.Point(293, 73);
             this.LevelComboBox.Name = "LevelComboBox";
             this.LevelComboBox.Size = new System.Drawing.Size(135, 31);
             this.LevelComboBox.TabIndex = 21;
@@ -253,14 +319,14 @@
             this.LoadImageBtn.UseVisualStyleBackColor = true;
             this.LoadImageBtn.Click += new System.EventHandler(this.LoadImageBtn_Click);
             // 
-            // OutputPhotomosaicPicBox
+            // ResultPicBox
             // 
-            this.OutputPhotomosaicPicBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.OutputPhotomosaicPicBox.Location = new System.Drawing.Point(1000, 58);
-            this.OutputPhotomosaicPicBox.Name = "OutputPhotomosaicPicBox";
-            this.OutputPhotomosaicPicBox.Size = new System.Drawing.Size(500, 500);
-            this.OutputPhotomosaicPicBox.TabIndex = 5;
-            this.OutputPhotomosaicPicBox.TabStop = false;
+            this.ResultPicBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.ResultPicBox.Location = new System.Drawing.Point(1000, 58);
+            this.ResultPicBox.Name = "ResultPicBox";
+            this.ResultPicBox.Size = new System.Drawing.Size(500, 500);
+            this.ResultPicBox.TabIndex = 5;
+            this.ResultPicBox.TabStop = false;
             // 
             // InputPicBox
             // 
@@ -408,51 +474,13 @@
             // 
             // EmbeddingWorker
             // 
-            //this.EmbeddingWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.EmbeddingWorker_DoWork);
+            this.EmbeddingWorker.WorkerReportsProgress = true;
+            this.EmbeddingWorker.WorkerSupportsCancellation = true;
             // 
             // CreateWorker
             // 
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
-            // 
-            // CenterSizenumDown
-            // 
-            this.CenterSizenumDown.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.CenterSizenumDown.Increment = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.CenterSizenumDown.Location = new System.Drawing.Point(305, 217);
-            this.CenterSizenumDown.Maximum = new decimal(new int[] {
-            64,
-            0,
-            0,
-            0});
-            this.CenterSizenumDown.Minimum = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.CenterSizenumDown.Name = "CenterSizenumDown";
-            this.CenterSizenumDown.Size = new System.Drawing.Size(120, 29);
-            this.CenterSizenumDown.TabIndex = 22;
-            this.CenterSizenumDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.CenterSizenumDown.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label1.Location = new System.Drawing.Point(317, 184);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(91, 21);
-            this.label1.TabIndex = 23;
-            this.label1.Text = "CenterSize";
             // 
             // MainForm
             // 
@@ -467,8 +495,9 @@
             this.tabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CenterSizenumDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.OutputPhotomosaicPicBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ResultPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PhotomosaicPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.QRCodePicBox)).EndInit();
@@ -476,7 +505,6 @@
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TilePicBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.CenterSizenumDown)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -491,7 +519,7 @@
         private System.Windows.Forms.PictureBox QRCodePicBox;
         private System.Windows.Forms.PictureBox PhotomosaicPicBox;
         private System.Windows.Forms.Button LoadImageBtn;
-        private System.Windows.Forms.PictureBox OutputPhotomosaicPicBox;
+        private System.Windows.Forms.PictureBox ResultPicBox;
         private System.Windows.Forms.PictureBox InputPicBox;
         private System.Windows.Forms.Button SaveImageBtn;
         private System.ComponentModel.BackgroundWorker TileWorker;
@@ -515,6 +543,8 @@
         private System.Windows.Forms.ComboBox LevelComboBox;
         private System.Windows.Forms.NumericUpDown CenterSizenumDown;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox ColorSpaceComboBox;
     }
 }
 
