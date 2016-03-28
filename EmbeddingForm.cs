@@ -29,7 +29,6 @@ namespace QRPhotoMosaic
         public void EmbeddingWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            //CreatingQRPhotomosaic method = MainForm.singleton.mainMethod;
 
             if (worker.CancellationPending)
             {
@@ -41,7 +40,7 @@ namespace QRPhotoMosaic
             {
                 worker.ReportProgress(0);
                 info.GetQRCodeInfo(info.QRmatrix, info.QRVersion);
-                Bitmap result = method.Generate(info, QRBitmap, photomosaicImg, tileSize, centerSize, robustVal, ColorSpace);
+                Bitmap result = method.Generate(worker, info, QRBitmap, photomosaicImg, tileSize, centerSize, robustVal, ColorSpace);
                 worker.ReportProgress(100);
                 MainForm.singleton.resultPicBoxImg = ImageProc.ScaleImage(result, MainForm.singleton.resultPicBox.Width, MainForm.singleton.resultPicBox.Height);
                 MainForm.singleton.result = new Bitmap(result);
@@ -50,16 +49,33 @@ namespace QRPhotoMosaic
         }
         public void EmbeddingWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            //Console.Write(e.ProgressPercentage);
             this.progressBar1.Value = e.ProgressPercentage;
-            //MainForm.singleton.basicProcess.setLabel1_Name = "In the process.....";
-            //MainForm.singleton.basicProcess.ProgressValue = e.ProgressPercentage;
         }
         public void EmbeddingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            if (e.Cancelled == true || MainForm.singleton.isCancel)
+            {
+                MessageBox.Show("Canacel");
+                MainForm.singleton.stopWatch.Stop();
+                MainForm.singleton.isCancel = false;
+                //MainForm.singleton.mainMethod.Reset();
+            }
+            else if (e.Error != null)
+            {
+                MessageBox.Show("Error");
+                MainForm.singleton.stopWatch.Stop();
+            }
+            else
+            {
+                MainForm.singleton.stopWatch.Stop();
+                MessageBox.Show("Done");
+                TimeSpan ts = MainForm.singleton.stopWatch.Elapsed;
+                string elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            }
             MainForm.singleton.stopWatch.Reset();
             this.Close();
             this.Dispose();
+            GC.Collect();
         }
     }
 }

@@ -181,13 +181,13 @@ namespace QRPhotoMosaic
                 masterImgName = masterImgName.Substring(lastindex + 1);
 
                 // Hash Code???
-
+                /*
                 Random randomPixel = new Random(10110101);
                 for (int i = 0; i < 50; i++)
                 {
                     masterImgName = masterImgName + masterBitmap.GetPixel(randomPixel.Next() % masterBitmap.Width, randomPixel.Next() % masterBitmap.Height).ToString();
                 }
-
+                */
                 //imageC.ImageHashCode = ImageName.GetHashCode().ToString();
 
                 //masterBitmap.Dispose();
@@ -200,8 +200,12 @@ namespace QRPhotoMosaic
             saveFileDialog.Title = "Save an Image File";
             saveFileDialog.ShowDialog();
             System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
-            //basicProcess.PhotomosaicBitmap.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
-            embedding.photomosaicImg.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            //Bitmap savePic = ImageProc.ScaleImage(embedding.photomosaicImg, embedding.photomosaicImg.Width * 2, embedding.photomosaicImg.Height * 2);
+            Bitmap savePic = ImageProc.ScaleImage(embedding.photomosaicImg, embedding.photomosaicImg.Width, embedding.photomosaicImg.Height);
+            savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            //savePic.Dispose();
+            saveFileDialog.Dispose();
             fs.Close();
         }
         private void SaveImageBtn_Click(object sender, EventArgs e)
@@ -213,8 +217,10 @@ namespace QRPhotoMosaic
             saveFileDialog.Title = "Save an Image File";
             saveFileDialog.ShowDialog();
             System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
-            //resultPicBox.Image.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
-            result.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            //Bitmap savePic = ImageProc.ScaleImage(result, result.Width * 2, result.Height * 2);
+            Bitmap savePic = ImageProc.ScaleImage(result, result.Width, result.Height);
+            savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            saveFileDialog.Dispose();
             fs.Close();
         }
         #endregion
@@ -276,6 +282,8 @@ namespace QRPhotoMosaic
             embedding.ColorSpace = ColorSpaceComboBox.Text;
             embedding.method = new CreatingQRPhotomosaic();
             embedding.Show();
+            //embedding.Close();
+            //embedding.Dispose();
             stopWatch.Start();
             EmbeddingWorker.RunWorkerAsync();
             

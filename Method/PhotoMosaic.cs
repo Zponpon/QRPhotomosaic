@@ -51,7 +51,8 @@ namespace QRPhotoMosaic.Method
 
         public Bitmap GenerateByNormalMethod(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version)
         {
-            int v = (version * 4 + 17)*2 + 1;
+            //int v = (version * 4 + 17 + 1) * 2;
+            int v = (version * 4 + 17) + 1;
             int blockSize = MainForm.singleton.blockSize;
             int dstSize = v * tileSize; // Depend on qr version
             double blockTotal = blockSize * blockSize;

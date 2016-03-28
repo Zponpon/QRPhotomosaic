@@ -31,6 +31,30 @@ namespace QRPhotoMosaic.Method
             return val;
         }
 
+        public static Bitmap OverlappingArea(Bitmap pm, int w, int h, int tileSize)
+        {
+            Bitmap dst = new Bitmap(w, h);
+            int half = tileSize / 2;
+            //int count = 0;
+            int numTiles = pm.Width / tileSize;
+
+            for (int pmY = 0; pmY < h; pmY += tileSize)
+            {
+                for (int pmX = 0; pmX < w; pmX += tileSize)
+                {
+                    for (int y = pmY; y < pmY + tileSize; ++y)
+                    {
+                        for (int x = pmX; x < pmX + tileSize; ++x)
+                        {
+                            Color color = pm.GetPixel(x + half, y + half);
+                            dst.SetPixel(x, y, color);
+                        }
+                    }
+                }
+            }
+                return dst;
+        }
+
         public static Bitmap GrayImage(Bitmap I, string colorSpace)
         {
             Bitmap GrayImage = new Bitmap(I.Width, I.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -70,7 +94,7 @@ namespace QRPhotoMosaic.Method
             return GrayImage;
         }
 
-        public static Bitmap PixelBasedBinarization(Bitmap I, string colorSpace)
+        public static Bitmap PixelBasedGlobalBinarization(Bitmap I, string colorSpace)
         {
             Bitmap ThresholdImage = new Bitmap(I.Width, I.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             ColorSpace CSC = new ColorSpace();
@@ -94,8 +118,8 @@ namespace QRPhotoMosaic.Method
                     {
                         ACS.Lab = CSC.RGB2Lab(I.GetPixel(x, y).R, I.GetPixel(x, y).G, I.GetPixel(x, y).B);
                         luminance = ACS.Lab.L * (255.0 / 100.0);
-                        //if (luminance > 128.0f) luminance = 255.0f;
-                        //else luminance = 0.0f;
+                        if (luminance > 128.0f) luminance = 255.0f;
+                        else luminance = 0.0f;
                     }
                     else
                     {
