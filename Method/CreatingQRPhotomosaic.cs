@@ -433,19 +433,28 @@ namespace QRPhotoMosaic.Method
         }
         #endregion
 
-        private Bitmap addQuietZone(Bitmap src, int tileSize)
+        
+        private Bitmap addQuietZone(Bitmap prevQR, int tileSize)
         {
-            Bitmap qr = new Bitmap(src.Width + tileSize * 4, src.Height + tileSize * 4);
-            for (int y = 0; y < src.Height; y++ )
+            Bitmap qr = new Bitmap(prevQR.Width + tileSize * 4, prevQR.Height + tileSize * 4);
+            int srcX = 128;
+            int srcY = 128;
+            for (int y = 0; y < qr.Height; y++ )
             {
-                for(int x = 0; x < src.Width; x++)
+                for(int x = 0; x < qr.Width; x++)
                 {
-                    qr.SetPixel(x, y, Color.White);
+                    if (x >= srcX && (x < srcX + prevQR.Width) && y >= srcY && (y < srcY + prevQR.Height))
+                    {
+                        qr.SetPixel(x, y, prevQR.GetPixel(x - srcX, y - srcY));
+                    }
+                    else
+                    {
+                        qr.SetPixel(x, y, Color.White);
+                    }
                 }
             }
 
-            int srcX = 128;
-            int srcY = 128;
+            
             //int srcEndX = 
             return qr;
         }
@@ -549,6 +558,7 @@ namespace QRPhotoMosaic.Method
         
         public Bitmap Generate(BackgroundWorker worker, QRCodeInfo info, Bitmap QRBitmap, Bitmap pmBitmap, int? tileSize, int? centerSize, int? robustVal, string colorSpace)
         {
+            if (!tileSize.HasValue || !centerSize.HasValue || !robustVal.HasValue) return null;
             this.centerSize = centerSize.Value;
             this.robustVal = robustVal.Value;
             this.colorSpace = colorSpace;
@@ -561,10 +571,13 @@ namespace QRPhotoMosaic.Method
 
             Bitmap overlapping = ImageProc.OverlappingArea(pmBitmap, size, size, tileSize.Value);
             worker.ReportProgress(30);
+            
             //return overlapping;
             //return DoProcess(worker, info.QRmatrix, pmBitmap, mask, tileSize.Value, centerSize.Value, robustVal.Value);
 
-            return DoProcess(worker, info.QRmatrix, overlapping, mask, tileSize.Value, centerSize.Value, robustVal.Value);
+            //return DoProcess(worker, info.QRmatrix, overlapping, mask, tileSize.Value, centerSize.Value, robustVal.Value);
+            Bitmap prevQR = DoProcess(worker, info.QRmatrix, overlapping, mask, tileSize.Value, centerSize.Value, robustVal.Value);
+            return addQuietZone(prevQR, tileSize.Value);
         }
     }
 }
