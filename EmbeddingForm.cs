@@ -16,7 +16,7 @@ namespace QRPhotoMosaic
         public CreatingQRPhotomosaic method;
         public QRCodeInfo info { set; get; }
         public Bitmap QRBitmap { set; get; }
-        public Bitmap photomosaicImg { set; get; }
+        public Bitmap PhotomosaicImg { set; get; }
         public string ColorSpace { set; get; }
         public int? tileSize { set; get; }  //Get it at basicform
         public int? centerSize { set; get; }
@@ -33,22 +33,26 @@ namespace QRPhotoMosaic
             if (worker.CancellationPending)
             {
                 e.Cancel = true;
-                MainForm.singleton.isCancel = true;
+                //MainForm.singleton.isCancel = true;
                 return;
             }
             else
             {
-                worker.ReportProgress(0);
+                worker.ReportProgress(0, "Start");
+
                 info.GetQRCodeInfo(info.QRmatrix, info.QRVersion);
-                Bitmap result = method.Generate(worker, info, QRBitmap, photomosaicImg, tileSize, centerSize, robustVal, ColorSpace);
-                worker.ReportProgress(100);
+                Bitmap result = method.Generate(worker, info, QRBitmap, PhotomosaicImg, tileSize, centerSize, robustVal, ColorSpace);
+                worker.ReportProgress(100, "It's done");
+
                 MainForm.singleton.resultPicBoxImg = ImageProc.ScaleImage(result, MainForm.singleton.resultPicBox.Width, MainForm.singleton.resultPicBox.Height);
                 MainForm.singleton.result = new Bitmap(result);
+
                 System.Threading.Thread.Sleep(500);
             }
         }
         public void EmbeddingWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+            this.label1.Text = e.UserState.ToString();
             this.progressBar1.Value = e.ProgressPercentage;
         }
         public void EmbeddingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -58,7 +62,6 @@ namespace QRPhotoMosaic
                 MessageBox.Show("Canacel");
                 MainForm.singleton.stopWatch.Stop();
                 MainForm.singleton.isCancel = false;
-                //MainForm.singleton.mainMethod.Reset();
             }
             else if (e.Error != null)
             {
@@ -71,6 +74,7 @@ namespace QRPhotoMosaic
                 MessageBox.Show("Done");
                 TimeSpan ts = MainForm.singleton.stopWatch.Elapsed;
                 string elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                MainForm.singleton.ProcessTimeText = elapsedTime;
             }
             MainForm.singleton.stopWatch.Reset();
             this.Close();

@@ -26,8 +26,8 @@ namespace QRPhotoMosaic.Method
 
         public struct Block
         {
-            public string size { get; set; }
-            public int value{ get; set; }
+            public string Size { get; set; }
+            public int Value{ get; set; }
         }
         public static List<Block> blockList;
 
@@ -37,13 +37,13 @@ namespace QRPhotoMosaic.Method
             {
                 new Block
                 {
-                    size = "8",
-                    value = 8,
+                    Size = "8",
+                    Value = 8,
                 },
                 new Block
                 {
-                    size = "4",
-                    value = 4,
+                    Size = "4",
+                    Value = 4,
                 },
             };
         }

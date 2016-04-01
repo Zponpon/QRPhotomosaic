@@ -18,41 +18,37 @@ namespace QRPhotoMosaic.Method
 
         public struct TileType
         {
-            public string name { get; set; }
-            public string folder { get; set; }
+            public string Name { get; set; }
+            public string Folder { get; set; }
         }
-        public static List<TileType> type;
+        public static List<TileType> typeList;
 
         public static void Init()
         {
-            type = new List<TileType>()
+            typeList = new List<TileType>()
             {
                 new TileType
                 {
-                    name = "fleur",
-                    folder = "..\\fleur",
+                    Name = "fleur",
+                    Folder = "..\\fleur",
                 },
                 new TileType
                 {
-                    name = "food",
-                    folder = "..\\food"
-                    //size = 
+                    Name = "food",
+                    Folder = "..\\food"
                 },
                 new TileType
                 {
-                    name = "all",
-                    folder = "..\\all"
-                    //size = 
+                    Name = "all",
+                    Folder = "..\\all"
                 }
             };
-            //tileSize = 
         }
 
         public Tile()
         {
 
         }
-
 
 
         public Tile(string s)
@@ -86,9 +82,10 @@ namespace QRPhotoMosaic.Method
             avg.B = b;
         }
 
-        public static void ReadFile(List<Tile> tiles, ref int tileSize, string folder)
+        public static void ReadFile(List<Tile> tiles, out int tileSize, string folder)
         {
             if (tiles.Count != 0) tiles.Clear();
+            tileSize = 0;
             try
             {
                 int total = System.IO.Directory.GetFiles(folder).Length;

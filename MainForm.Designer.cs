@@ -62,6 +62,7 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
+            this.ProcessTime = new System.Windows.Forms.Label();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CenterSizenumDown)).BeginInit();
@@ -87,6 +88,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.ProcessTime);
             this.tabPage1.Controls.Add(this.label5);
             this.tabPage1.Controls.Add(this.ColorSpaceComboBox);
             this.tabPage1.Controls.Add(this.label1);
@@ -482,6 +484,15 @@
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
             // 
+            // ProcessTime
+            // 
+            this.ProcessTime.AutoSize = true;
+            this.ProcessTime.Location = new System.Drawing.Point(816, 816);
+            this.ProcessTime.Name = "ProcessTime";
+            this.ProcessTime.Size = new System.Drawing.Size(33, 12);
+            this.ProcessTime.TabIndex = 26;
+            this.ProcessTime.Text = "label6";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -545,6 +556,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox ColorSpaceComboBox;
+        private System.Windows.Forms.Label ProcessTime;
     }
 }
 

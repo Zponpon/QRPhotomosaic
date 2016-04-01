@@ -76,11 +76,18 @@ namespace QRPhotoMosaic.Method
             return QRMat;
         }
 
-        public Bitmap BinaryImgThresholdMask(Bitmap I)
+        private Bitmap GlobalThresholdMask(Bitmap grayImage)
         {
-            return ImageProc.PixelBasedGlobalBinarization(I, "Lab"); ;
+            //return ImageProc.PixelBasedGlobalBinarization(grayImage, threshold);
+            return ImageProc.PixelBasedGlobalThresholdMask(grayImage);
         }
-        #region Replace
+
+        private Bitmap LocalThresholdMask(Bitmap grayImage, int windowSize, int moduleSize)
+        {
+            return ImageProc.PixelBasedLocakThresholdMask(grayImage, windowSize, moduleSize);
+        }
+
+        #region Embedding Work Region
         private void waterMarkDark(Bitmap result, Bitmap pmBitmap, int x, int y, int moduleLength)
         {
             Color SourceImageColor;
@@ -433,19 +440,18 @@ namespace QRPhotoMosaic.Method
         }
         #endregion
 
-        
-        private Bitmap addQuietZone(Bitmap prevQR, int tileSize)
+        private Bitmap addQuietZone(Bitmap prevWork, int tileSize)
         {
-            Bitmap qr = new Bitmap(prevQR.Width + tileSize * 4, prevQR.Height + tileSize * 4);
-            int srcX = 128;
-            int srcY = 128;
+            Bitmap qr = new Bitmap(prevWork.Width + tileSize * 4, prevWork.Height + tileSize * 4);
+            int srcX = tileSize * 2;
+            int srcY = srcX;
             for (int y = 0; y < qr.Height; y++ )
             {
                 for(int x = 0; x < qr.Width; x++)
                 {
-                    if (x >= srcX && (x < srcX + prevQR.Width) && y >= srcY && (y < srcY + prevQR.Height))
+                    if (x >= srcX && (x < srcX + prevWork.Width) && y >= srcY && (y < srcY + prevWork.Height))
                     {
-                        qr.SetPixel(x, y, prevQR.GetPixel(x - srcX, y - srcY));
+                        qr.SetPixel(x, y, prevWork.GetPixel(x - srcX, y - srcY));
                     }
                     else
                     {
@@ -453,16 +459,13 @@ namespace QRPhotoMosaic.Method
                     }
                 }
             }
-
-            
-            //int srcEndX = 
             return qr;
         }
 
         private Bitmap DoProcess(BackgroundWorker worker, BitMatrix QRMat, Bitmap pmBitmap, Bitmap mask, int tileSize, int centerSize, int robustVal)
         {
             Bitmap result = new Bitmap(pmBitmap.Width, pmBitmap.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            //tileSize==moduleSize
+            //  tileSize==moduleSize
             #region Variable
             int numModule = version * 4 + 17;
             int halfTileSize = tileSize / 2;
@@ -473,18 +476,14 @@ namespace QRPhotoMosaic.Method
             int qrEndX = pmBitmap.Width - halfTileSize - 1;
             int qrEndY = pmBitmap.Height - halfTileSize - 1;
             #endregion
-            //int count = 0 ;
+            //  pm->photomosaic
             for (int pmY = 0; pmY < pmBitmap.Height; pmY += tileSize)
             {
-                worker.ReportProgress(30 + (pmY * 70 / pmBitmap.Height));
+                worker.ReportProgress(30 + (pmY * 70 / pmBitmap.Height), "Generate a photomosaic with QR code...");
                 for (int pmX = 0; pmX < pmBitmap.Width; pmX += tileSize)
                 {
-                    /*int qrX = x - halfTileSize;
-                    int qrY = y - halfTileSize;*/
                     int matX = (pmX / tileSize) % numModule;
                     int matY = (pmY / tileSize) % numModule;
-                    //int matX = (qrX / tileSize) % numModule;
-                    //int matY = (qrY / tileSize) % numModule;
                     #region UpLeft
                     if (pmX < tileSize * 8 && pmY < tileSize * 8)
                     {
@@ -565,19 +564,22 @@ namespace QRPhotoMosaic.Method
             AlignmentPatternLocation_X = info.AlignmentPatternLocation_X * tileSize.Value;
             AlignmentPatternLocation_Y = info.AlignmentPatternLocation_Y * tileSize.Value;
             version = info.QRVersion;
-            Bitmap mask = BinaryImgThresholdMask(pmBitmap);
+            
             //int size = pmBitmap.Width - tileSize.Value * 2;
-            int size = pmBitmap.Width - tileSize.Value;
+
+            int size = pmBitmap.Width - tileSize.Value; //ex: pm->22, qr->21
 
             Bitmap overlapping = ImageProc.OverlappingArea(pmBitmap, size, size, tileSize.Value);
-            worker.ReportProgress(30);
-            
-            //return overlapping;
-            //return DoProcess(worker, info.QRmatrix, pmBitmap, mask, tileSize.Value, centerSize.Value, robustVal.Value);
+            worker.ReportProgress(10, "Calculate the overlapping area");
 
-            //return DoProcess(worker, info.QRmatrix, overlapping, mask, tileSize.Value, centerSize.Value, robustVal.Value);
-            Bitmap prevQR = DoProcess(worker, info.QRmatrix, overlapping, mask, tileSize.Value, centerSize.Value, robustVal.Value);
-            return addQuietZone(prevQR, tileSize.Value);
+            Bitmap grayImage = ImageProc.GrayImage(overlapping, colorSpace);
+            worker.ReportProgress(20, "Generate a gray image of overlapping area");
+
+            Bitmap thresholdMask = LocalThresholdMask(overlapping, 5, tileSize.Value);
+            worker.ReportProgress(30, "Generate pixel based threshold mask");
+
+            Bitmap prevWork = DoProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value);
+            return addQuietZone(prevWork, tileSize.Value);
         }
     }
 }
