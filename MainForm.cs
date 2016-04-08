@@ -34,6 +34,10 @@ namespace QRPhotoMosaic
         public EmbeddingForm embedding;
         public static MainForm singleton;
         public Bitmap result;
+        public QRCodeInfo info;
+        public Bitmap QRBitmap;
+        public Bitmap photomosaicImg;
+        public int tileSize;
         
         private OpenFileDialog loadingFile;
         
@@ -135,6 +139,14 @@ namespace QRPhotoMosaic
                 m_blockSize = value;
             }
         }
+
+        public string Check
+        {
+            get
+            {
+                return CheckInputComboBox.SelectedText;
+            }
+        }
 #endregion
 
         public MainForm()
@@ -149,12 +161,13 @@ namespace QRPhotoMosaic
         private void Init()
         {
             LevelComboBox.SelectedIndex = 0;
-            ColorSpaceComboBox.SelectedIndex = 2;
+            ColorSpaceComboBox.SelectedIndex = 1;
             this.ProcessTime.Text = "";
             Console.Write(LevelComboBox.Text);
             basicProcess = new BasicProcessForm();
+            CreateEventRegister();
             embedding = new EmbeddingForm();
-            EventRegister();
+            EmbeddingEventRegister();
 
             basicMethod = new BasicMethod();
 
@@ -167,14 +180,32 @@ namespace QRPhotoMosaic
             QRCodeContentBox.Text = "Hello World!!!";
         }
 
-        private void EventRegister()
+        private void EmbeddingEventRegister()
+        {
+            EmbeddingWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(embedding.EmbeddingWorker_DoWork);
+            EmbeddingWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(embedding.EmbeddingWorker_ProgressChanged);
+            EmbeddingWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(embedding.EmbeddingWorker_RunWorkerCompleted);
+        }
+
+        private void CreateEventRegister()
         {
             CreateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(basicProcess.CreateWorker_DoWork);
             CreateWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(basicProcess.CreateWorker_ProgressChanged);
             CreateWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(basicProcess.CreateWorker_RunWorkerCompleted);
-            EmbeddingWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(embedding.EmbeddingWorker_DoWork);
-            EmbeddingWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(embedding.EmbeddingWorker_ProgressChanged);
-            EmbeddingWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(embedding.EmbeddingWorker_RunWorkerCompleted);
+        }
+
+        private void EmbeddingEventCancel()
+        {
+            EmbeddingWorker.DoWork -= new System.ComponentModel.DoWorkEventHandler(embedding.EmbeddingWorker_DoWork);
+            EmbeddingWorker.ProgressChanged -= new System.ComponentModel.ProgressChangedEventHandler(embedding.EmbeddingWorker_ProgressChanged);
+            EmbeddingWorker.RunWorkerCompleted -= new System.ComponentModel.RunWorkerCompletedEventHandler(embedding.EmbeddingWorker_RunWorkerCompleted);
+        }
+
+        private void CreateEventCancel()
+        {
+            CreateWorker.DoWork -= new System.ComponentModel.DoWorkEventHandler(basicProcess.CreateWorker_DoWork);
+            CreateWorker.ProgressChanged -= new System.ComponentModel.ProgressChangedEventHandler(basicProcess.CreateWorker_ProgressChanged);
+            CreateWorker.RunWorkerCompleted -= new System.ComponentModel.RunWorkerCompletedEventHandler(basicProcess.CreateWorker_RunWorkerCompleted);
         }
 
         #region Our implementation
@@ -206,35 +237,45 @@ namespace QRPhotoMosaic
                 //masterBitmap.Dispose();
             }
         }
-        private void SavingBtnBasic_Click(object sender, EventArgs e)
+        private void SaveMosaicBtn_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
             saveFileDialog.Title = "Save an Image File";
             saveFileDialog.ShowDialog();
+            if (saveFileDialog.FileName == "")
+            {
+                saveFileDialog.Dispose();
+                GC.Collect();
+                return;
+            }
             System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
-            //Bitmap savePic = ImageProc.ScaleImage(embedding.photomosaicImg, embedding.photomosaicImg.Width * 2, embedding.photomosaicImg.Height * 2);
-            Bitmap savePic = ImageProc.ScaleImage(embedding.PhotomosaicImg, embedding.PhotomosaicImg.Width, embedding.PhotomosaicImg.Height);
+            Bitmap savePic = ImageProc.ScaleImage(photomosaicImg, photomosaicImg.Width, photomosaicImg.Height);
+            savePic = ImageProc.OverlappingArea(savePic, savePic.Width - tileSize, savePic.Height - tileSize, tileSize);
             savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
-            savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
-            //savePic.Dispose();
             saveFileDialog.Dispose();
             fs.Close();
+            GC.Collect();
         }
-        private void SaveImageBtn_Click(object sender, EventArgs e)
+        private void SaveResultBtn_Click(object sender, EventArgs e)
         {
-            //dst = ImageProc.ScaleImage(dst, 4096);
             if (result == null) return;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
             saveFileDialog.Title = "Save an Image File";
             saveFileDialog.ShowDialog();
-            if (!saveFileDialog.CheckFileExists) return;
+            if (saveFileDialog.FileName == "")
+            {
+                saveFileDialog.Dispose();
+                GC.Collect();
+                return;
+            }
             System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
             Bitmap savePic = ImageProc.ScaleImage(result, result.Width, result.Height);
             savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
             saveFileDialog.Dispose();
             fs.Close();
+            GC.Collect();
         }
         #endregion
 
@@ -244,25 +285,18 @@ namespace QRPhotoMosaic
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
-        {
-            int val = Convert.ToInt32(numericUpDown2.Value);
-            if (val == 33)
-                numericUpDown2.Value = 64;
-            if (val == 63 || val == 17)
-                numericUpDown2.Value = 32;
-            if (val == 31 || val == 9)
-                numericUpDown2.Value = 16;
-            if (val == 15)
-                numericUpDown2.Value = 8;
-        }
         private void QRAndPhotmosaicBtn_Click(object sender, EventArgs e)
         {
             if (CreateWorker.IsBusy||masterBitmap == null) return;
             if (basicProcess.IsDisposed)
+            {
+                CreateEventCancel();
                 basicProcess = new BasicProcessForm();
+                CreateEventRegister();
+            }
             if (embedding.info == null)
-                embedding.info = new QRCodeInfo();
+                //mbedding.info = new QRCodeInfo();
+                info = new QRCodeInfo();
             if (creatingFolderPath != FolderComboBox.SelectedValue.ToString())
             {
                 creatingFolderPath = FolderComboBox.SelectedValue.ToString();
@@ -271,9 +305,11 @@ namespace QRPhotoMosaic
             basicProcess.Canceled -= CancelBtn_Click;
             basicProcess.Canceled += CancelBtn_Click;
             basicProcess.ecLevel = QRECLevel;
+            basicProcess.check = this.CheckInputComboBox.SelectedText;
             blockSize = Convert.ToInt32(BlockcomboBox.SelectedValue);
             basicProcess.Show();
             stopWatch.Start();
+            GC.Collect();
             CreateWorker.RunWorkerAsync();
         }
         #endregion
@@ -287,17 +323,25 @@ namespace QRPhotoMosaic
             if (PhotomosaicPicBox.Image == null || QRCodePicBox.Image == null || InputPicBox.Image == null)
                 return;
             if (embedding.IsDisposed)
+            {
+                EmbeddingEventCancel();
                 embedding = new EmbeddingForm();
+                EmbeddingEventRegister();
+            }
 
-            //mainMethod.centerSize = Convert.ToInt32(this.CenterSizenumDown.Value);
             embedding.centerSize = Convert.ToInt32(this.CenterSizenumDown.Value);
-            embedding.robustVal = 64;
+            embedding.robustVal = Convert.ToInt32(RobustValue.Value);
             embedding.ColorSpace = ColorSpaceComboBox.Text;
             embedding.method = new CreatingQRPhotomosaic();
+            embedding.info = info;
+            embedding.QRBitmap = QRBitmap;
+            embedding.PhotomosaicImg = photomosaicImg;
+            embedding.tileSize = tileSize;
             embedding.Show();
             stopWatch.Reset();
             this.ProcessTimeText = stopWatch.ElapsedMilliseconds.ToString();
             stopWatch.Start();
+            GC.Collect();
             EmbeddingWorker.RunWorkerAsync();
         }
         #endregion

@@ -98,6 +98,10 @@ namespace QRPhotoMosaic.Method
                     foreach(Tile tile in tiles)
                     {
                         if (MainForm.singleton.isCancel) return null;
+                        if (tile.bitmap.Width != tileSize)
+                            tile.bitmap = ImageProc.ScaleImage(tile.bitmap, tileSize);
+                        if (tile.UseTimes == 2)
+                            continue;
 
                         double r = Math.Pow(((double)tile.avg.R - blockAvgR), 2);
                         double g = Math.Pow(((double)tile.avg.G - blockAvgG), 2);
@@ -115,6 +119,7 @@ namespace QRPhotoMosaic.Method
                     }
                     #region Replace the block by candiate tile
                     currBlock = ImageProc.ScaleImage(currBlock, tileSize);
+                    candiate.UseTimes++;
                     int tw = 0, th = 0;
                     double alpha = min / max;
                     double var_B = (double)candiate.avg.B - blockAvgB;
@@ -124,15 +129,13 @@ namespace QRPhotoMosaic.Method
                     {
                         for (int w = currDstW; tw < tileSize; ++w)
                         {
-                            // out of range, overflow
                             if (MainForm.singleton.isCancel) return null;
                             ColorSpace.RGB rgb;
-                            //rgb.R = (int)(Convert.ToDouble(currBlock.GetPixel(tw, th).R) * alpha + (1 - alpha) * Convert.ToDouble(candiate.bitmap.GetPixel(tw, th).R));
-                            //rgb.G = (int)(Convert.ToDouble(currBlock.GetPixel(tw, th).G) * alpha + (1 - alpha) * Convert.ToDouble(candiate.bitmap.GetPixel(tw, th).G));
-                            //rgb.B = (int)(Convert.ToDouble(currBlock.GetPixel(tw, th).B) * alpha + (1 - alpha) * Convert.ToDouble(candiate.bitmap.GetPixel(tw++, th).B));
+
                             rgb.R = Convert.ToInt32(Convert.ToDouble(candiate.bitmap.GetPixel(tw, th).R) - var_R);
                             rgb.G = Convert.ToInt32(Convert.ToDouble(candiate.bitmap.GetPixel(tw, th).G) - var_G);
                             rgb.B = Convert.ToInt32(Convert.ToDouble(candiate.bitmap.GetPixel(tw++, th).B) - var_B);
+
                             rgb.R = ImageProc.NormalizeRGB(rgb.R);
                             rgb.G = ImageProc.NormalizeRGB(rgb.G);
                             rgb.B = ImageProc.NormalizeRGB(rgb.B);

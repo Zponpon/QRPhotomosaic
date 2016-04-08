@@ -13,6 +13,7 @@ namespace QRPhotoMosaic.Method
         public Bitmap bitmap;
         public ColorSpace.RGB avg;
         public bool isSelected = false;
+        public int UseTimes { get; set; }
 
         public static string avgtxt = "AvgColor.txt";
 
@@ -55,6 +56,7 @@ namespace QRPhotoMosaic.Method
         {
             bitmap = new Bitmap(s);
             avg = new ColorSpace.RGB();
+            UseTimes = 0;
         }
 
 
@@ -104,7 +106,10 @@ namespace QRPhotoMosaic.Method
                     tiles.Add(tile);
                 }
                 file.Close();
+                file.Dispose();
                 reader.Close();
+                reader.Dispose();
+                GC.Collect();
             }
             catch (InvalidCastException e)
             {
@@ -129,7 +134,10 @@ namespace QRPhotoMosaic.Method
                     writer.Write(rgb, 0, 3);
                 }
                 file.Close();
+                file.Dispose();
                 writer.Close();
+                writer.Dispose();
+                GC.Collect();
             }
             catch (InvalidCastException e)
             {

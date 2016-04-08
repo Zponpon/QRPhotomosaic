@@ -26,6 +26,7 @@ namespace QRPhotoMosaic
         public int tileSize;
         public string readFilePath;
         public string ecLevel;
+        public string check;
         
         public PictureBox QRCodePicBox;
         public PictureBox PhotomosaicPicBox;
@@ -108,7 +109,7 @@ namespace QRPhotoMosaic
             {
                 tile.CalcNonDivTileAvgRGB(calcTileSize);
                 if (MainForm.singleton.tiles.Count == 0) return;
-                worker.ReportProgress(++t / MainForm.singleton.tiles.Count * 100);
+                worker.ReportProgress((++t * 100) /  MainForm.singleton.tiles.Count);
             }
             Tile.SaveFile(MainForm.singleton.tiles, calcTileSize, savingPath);
         }
@@ -127,41 +128,48 @@ namespace QRPhotoMosaic
             if (worker.CancellationPending)
             {
                 e.Cancel = true;
-                //MainForm.singleton.isCancel = true;
                 return;
             }
             else
             {
                 worker.ReportProgress(0);
-                
-                //QRMat = QRCodeEncoder.CreateQR(MainForm.singleton.QRCodeContent, QRCodeEncoder.GetECLevel(MainForm.singleton.QRECLevel));
-                //QRMat = QRCodeEncoder.CreateQR(MainForm.singleton.QRCodeContent, QRCodeEncoder.GetECLevel("L"));
-                MainForm.singleton.embedding.info.QRmatrix
+                //MainForm.singleton.embedding.info.QRmatrix;
+                MainForm.singleton.info.QRmatrix
                     = QRCodeEncoder.CreateQR(MainForm.singleton.QRCodeContent, QRCodeEncoder.GetECLevel(ecLevel));
-                //MainForm.singleton.mainMethod.infoOfQRCode.QRmatrix
-                 //   = QRCodeEncoder.CreateQR(MainForm.singleton.QRCodeContent, QRCodeEncoder.GetECLevel("L"));
-                //QRCodeBitmap = QRCodeEncoder.ToBitmap(QRMat);
-                MainForm.singleton.embedding.QRBitmap = QRCodeEncoder.ToBitmap(MainForm.singleton.embedding.info.QRmatrix);
-                //MainForm.singleton.mainMethod.QRCode = QRCodeEncoder.ToBitmap(MainForm.singleton.mainMethod.infoOfQRCode.QRmatrix);
+                MainForm.singleton.QRBitmap = QRCodeEncoder.ToBitmap(MainForm.singleton.info.QRmatrix);
+                //MainForm.singleton.embedding.QRBitmap = QRCodeEncoder.ToBitmap(MainForm.singleton.embedding.info.QRmatrix);
                 QRCodeReader reader = new QRCodeReader();
-                LuminanceSource source = new BitmapLuminanceSource(MainForm.singleton.embedding.QRBitmap);
-                //LuminanceSource source = new BitmapLuminanceSource(MainForm.singleton.mainMethod.QRCode);
+               // LuminanceSource source = new BitmapLuminanceSource(MainForm.singleton.embedding.QRBitmap);
+                LuminanceSource source = new BitmapLuminanceSource(QRCodeEncoder.ToBitmap(MainForm.singleton.info.QRmatrix));
                 BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
                 reader.decode(binaryBitmap);
                 int version = reader.Version.VersionNumber;
-                MainForm.singleton.embedding.info.QRVersion = version;
+                //MainForm.singleton.embedding.info.QRVersion = version;
+                MainForm.singleton.info.QRVersion = version;
 
-                // Generate basic photomosaic
-                Tile.ReadFile(MainForm.singleton.tiles, out tileSize, MainForm.singleton.CreatingFolderPath);
-                if (tileSize == 0) return;
+                if (check == "N")
+                {
+                    // Generate basic photomosaic
+                    Tile.ReadFile(MainForm.singleton.tiles, out tileSize, MainForm.singleton.CreatingFolderPath);
+                    if (tileSize == 0) return;
 
-                worker.ReportProgress(10);
-                MainForm.singleton.embedding.tileSize = tileSize;
+                    worker.ReportProgress(10);
+                    //MainForm.singleton.embedding.tileSize = tileSize;
+                    MainForm.singleton.tileSize = tileSize;
 
-                //MainForm.singleton.mainMethod.photomosaicImg
-                MainForm.singleton.embedding.PhotomosaicImg
-                = pmMethod.GenerateByNormalMethod(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, tileSize, version);
+                    //MainForm.singleton.embedding.PhotomosaicImg
+                    MainForm.singleton.photomosaicImg
+                    = pmMethod.GenerateByNormalMethod(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, tileSize, version);
 
+                    //worker.ReportProgress(100);
+
+                }
+                else
+                {
+                    MainForm.singleton.photomosaicImg = MainForm.singleton.masterBitmap;
+                    //temp
+                    MainForm.singleton.tileSize = 64;
+                }
                 worker.ReportProgress(100);
                 System.Threading.Thread.Sleep(500);
             }
@@ -177,41 +185,35 @@ namespace QRPhotoMosaic
             if (e.Cancelled == true || MainForm.singleton.isCancel)
             {
                 MessageBox.Show("Canacel");
-                //MainForm.singleton.stopWatch.Stop();
+                MainForm.singleton.stopWatch.Stop();
                 MainForm.singleton.isCancel = false;
-                this.Close();
-                this.Dispose();
-                //MainForm.singleton.mainMethod.Reset();
             }
             else if (e.Error != null)
             {
                 MessageBox.Show("Error");
-                //MainForm.singleton.stopWatch.Stop();
+                MainForm.singleton.stopWatch.Stop();
             }
             else
             {
-                //MainForm.singleton.stopWatch.Stop();
+                MainForm.singleton.stopWatch.Stop();
                 MessageBox.Show("Done");
                 TimeSpan ts = MainForm.singleton.stopWatch.Elapsed;
                 string elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
             }
 
-            if(MainForm.singleton.embedding.PhotomosaicImg != null)
-            //if (MainForm.singleton.mainMethod.photomosaicImg != null)
+            if(MainForm.singleton.photomosaicImg != null)
             {
                 int w = MainForm.singleton.PhotomosaicPictureBox.Width;
                 int h = MainForm.singleton.PhotomosaicPictureBox.Height;
-                MainForm.singleton.PhotoMosaicImage = ImageProc.ScaleImage(MainForm.singleton.embedding.PhotomosaicImg, w, h);
-                //MainForm.singleton.PhotoMosaicImage = ImageProc.ScaleImage(MainForm.singleton.mainMethod.photomosaicImg, w, h);
+                MainForm.singleton.PhotoMosaicImage = ImageProc.ScaleImage(MainForm.singleton.photomosaicImg, w, h);
 
                 w = MainForm.singleton.QRCodePictureBox.Width;
                 h = MainForm.singleton.QRCodePictureBox.Height;
-                MainForm.singleton.QRCodeImage = ImageProc.ScaleImage(MainForm.singleton.embedding.QRBitmap, w, h); ;
+                MainForm.singleton.QRCodeImage = ImageProc.ScaleImage(MainForm.singleton.QRBitmap, w, h);
             }
-            MainForm.singleton.stopWatch.Stop();
             MainForm.singleton.stopWatch.Reset();
-            this.Close();
-            this.Dispose();
+            Close();
+            Dispose();
             GC.Collect();
         }
     }

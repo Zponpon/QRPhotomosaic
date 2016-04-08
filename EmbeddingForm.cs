@@ -33,7 +33,6 @@ namespace QRPhotoMosaic
             if (worker.CancellationPending)
             {
                 e.Cancel = true;
-                //MainForm.singleton.isCancel = true;
                 return;
             }
             else
@@ -77,8 +76,8 @@ namespace QRPhotoMosaic
                 MainForm.singleton.ProcessTimeText = elapsedTime;
             }
             MainForm.singleton.stopWatch.Reset();
-            this.Close();
-            this.Dispose();
+            Close();
+            Dispose();
             GC.Collect();
         }
     }

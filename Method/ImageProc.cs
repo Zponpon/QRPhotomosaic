@@ -86,7 +86,7 @@ namespace QRPhotoMosaic.Method
                         luminance = ACS.YUV.Y;
                     }
                     int L = Convert.ToInt32(luminance);
-                    grayImage.SetPixel(x, y, Color.FromArgb(L, L, L));
+                    grayImage.SetPixel(x, y, Color.FromArgb(Convert.ToInt32(luminance), Convert.ToInt32(luminance), Convert.ToInt32(luminance)));
                 }
             }
             return grayImage;
@@ -196,7 +196,7 @@ namespace QRPhotoMosaic.Method
             return thresholdImage;
         }
 
-        public static Bitmap PixelBasedLocakThresholdMask(Bitmap grayImage, int windowSize, int moduleSize)
+        public static Bitmap PixelBasedLocalThresholdMask(Bitmap grayImage, int windowSize, int moduleSize)
         {
             Bitmap thresholdImage = new Bitmap(grayImage.Width, grayImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 

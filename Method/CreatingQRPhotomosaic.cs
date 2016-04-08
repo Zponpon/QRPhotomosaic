@@ -21,7 +21,6 @@ namespace QRPhotoMosaic.Method
 {
     public class CreatingQRPhotomosaic
     {
-        private int? moduleSize;
         private int AlignmentPatternLocation_X;
         private int AlignmentPatternLocation_Y;
         private double Alpha_Magnification = 0.5f;
@@ -29,18 +28,6 @@ namespace QRPhotoMosaic.Method
         private string colorSpace;
         private int centerSize;
         private double robustVal;
-
-
-        public void Reset()
-        {
-            /*photomosaicImg = null;
-            infoOfQRCode = null;
-            QRCode = null;
-            ColorSpace = null;
-            tileSize = null;
-            centerSize = null;
-            robustVal = null;*/
-        }
 
         public void RegisterColorCB()
         {
@@ -78,13 +65,12 @@ namespace QRPhotoMosaic.Method
 
         private Bitmap GlobalThresholdMask(Bitmap grayImage)
         {
-            //return ImageProc.PixelBasedGlobalBinarization(grayImage, threshold);
             return ImageProc.PixelBasedGlobalThresholdMask(grayImage);
         }
 
         private Bitmap LocalThresholdMask(Bitmap grayImage, int windowSize, int moduleSize)
         {
-            return ImageProc.PixelBasedLocakThresholdMask(grayImage, windowSize, moduleSize);
+            return ImageProc.PixelBasedLocalThresholdMask(grayImage, windowSize, moduleSize);
         }
 
         #region Embedding Work Region
@@ -127,7 +113,7 @@ namespace QRPhotoMosaic.Method
             }
         }
 
-        private Bitmap case1(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int CenterSize, int moduleLength)  //黑
+        private Bitmap BlackCase(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int CenterSize, int moduleLength)  //黑
         {
             int Around = (moduleLength - CenterSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
@@ -136,7 +122,6 @@ namespace QRPhotoMosaic.Method
             double UserSetRobustnesspercent = robustVal / 255.0;
             double Lmean = calculateScore(pmBitmap, x, y, CenterSize, moduleLength, Around);
             double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
-            //int halfmoduleLength = moduleLength / 2;
             if (Lmean + UserSetRobustnesspercent > Tmean)
             {
                 for (int i = 0; i < moduleLength; i++)
@@ -171,12 +156,6 @@ namespace QRPhotoMosaic.Method
                             }
 
                             double T = LocalThresHoldImageColor.R / 255.0;
-                            //double numOfCount = 0;
-
-                            //if ((CenterSize / 2) - 1 > 0)
-                            //    numOfCount = (T - UserSetRobustnesspercent) / ((CenterSize / 2.0) - 1);
-                            //else
-                            //    numOfCount = T - UserSetRobustnesspercent;
 
                             for (int count = 0; count < CenterSize / 2; count++)
                             {
@@ -239,16 +218,15 @@ namespace QRPhotoMosaic.Method
             return result;
         }
 
-        private Bitmap case2(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int CenterSize, int moduleLength) //白
+        private Bitmap WhiteCase(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int CenterSize, int moduleLength) //白
         {
             int Around = (moduleLength - CenterSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
             ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
-            int halfmoduleLength = 0;
             double UserSetRobustnesspercent = Convert.ToDouble(robustVal) / 255.0;
             double Lmean = calculateScore(pmBitmap, x, y, CenterSize, moduleLength, Around);
-            double Tmean = mask.GetPixel(x * moduleLength + halfmoduleLength + Around, y * moduleLength + halfmoduleLength + Around).R / 255.0;
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
             
             if (Lmean - UserSetRobustnesspercent < Tmean)
             {
@@ -256,10 +234,10 @@ namespace QRPhotoMosaic.Method
                 {
                     for (int j = 0; j < moduleLength; j++)
                     {
-                        SourceImageColor = pmBitmap.GetPixel(x * moduleLength + halfmoduleLength + i, y * moduleLength + halfmoduleLength + j);
+                        SourceImageColor = pmBitmap.GetPixel(x * moduleLength + i, y * moduleLength + j);
                         if (i > Around - 1 && i < (Around + CenterSize) && j > Around - 1 && j < (Around + CenterSize)) //center
                         {
-                            LocalThresHoldImageColor = mask.GetPixel(x * moduleLength + halfmoduleLength + i, y * moduleLength + halfmoduleLength + j);
+                            LocalThresHoldImageColor = mask.GetPixel(x * moduleLength + i, y * moduleLength + j);
                             double luminance = 0;
 
                             if (colorSpace == "HSL")
@@ -284,12 +262,6 @@ namespace QRPhotoMosaic.Method
                             }
 
                             double T = LocalThresHoldImageColor.R / 255.0;
-                            //double numOfCount = 0;
-
-                            //if ((CenterSize / 2) - 1 > 0)
-                            //    numOfCount = (1 - (T + UserSetRobustnesspercent)) / ((CenterSize / 2.0) - 1);
-                            //else
-                            //    numOfCount = 1 - (T + UserSetRobustnesspercent);
 
                             for (int count = 0; count < CenterSize / 2; count++)
                             {
@@ -299,42 +271,38 @@ namespace QRPhotoMosaic.Method
                                     {
                                         double luminance2 = T + UserSetRobustnesspercent + (Alpha_Magnification * count * UserSetRobustnesspercent);
                                         ACS = luminance_adjustment(ACS, CenterSize, luminance2, 1);
-                                        result.SetPixel(x * moduleLength + halfmoduleLength + i, y * moduleLength + halfmoduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                                        //VisualQRcodeBmap.SetPixel(x * ScaleModuleSize + i, y * ScaleModuleSize + j, Color.Red);
+                                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                                         break;
                                     }
                                     else if (i >= Around + count && i < (Around + CenterSize) - count && j == (Around + CenterSize) - count - 1) //下
                                     {
                                         double luminance2 = T + UserSetRobustnesspercent + (Alpha_Magnification * count * UserSetRobustnesspercent);
                                         ACS = luminance_adjustment(ACS, CenterSize, luminance2, 1);
-                                        result.SetPixel(x * moduleLength + halfmoduleLength + i, y * moduleLength + halfmoduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                                        //VisualQRcodeBmap.SetPixel(x * ScaleModuleSize + i, y * ScaleModuleSize + j, Color.Red);
+                                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                                         break;
                                     }
                                     else if (i == Around + count && j > Around + count && j < (Around + CenterSize) - count) //左
                                     {
                                         double luminance2 = T + UserSetRobustnesspercent + (Alpha_Magnification * count * UserSetRobustnesspercent);
                                         ACS = luminance_adjustment(ACS, CenterSize, luminance2, 1);
-                                        result.SetPixel(x * moduleLength + halfmoduleLength + i, y * moduleLength + halfmoduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                                        //VisualQRcodeBmap.SetPixel(x * ScaleModuleSize + i, y * ScaleModuleSize + j, Color.Red);
+                                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                                         break;
                                     }
                                     else if (i == (Around + CenterSize) - count - 1 && j > Around + count && j < (Around + CenterSize) - count) //右
                                     {
                                         double luminance2 = T + UserSetRobustnesspercent + (Alpha_Magnification * count * UserSetRobustnesspercent);
                                         ACS = luminance_adjustment(ACS, CenterSize, luminance2, 1);
-                                        result.SetPixel(x * moduleLength + halfmoduleLength + i, y * moduleLength + halfmoduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                                        //VisualQRcodeBmap.SetPixel(x * ScaleModuleSize + i, y * ScaleModuleSize + j, Color.Red);
+                                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                                         break;
                                     }
                                 }
                                 else
-                                    result.SetPixel(x * moduleLength + halfmoduleLength + i, y * moduleLength + halfmoduleLength + j, SourceImageColor);
+                                    result.SetPixel(x * moduleLength + i, y * moduleLength + j, SourceImageColor);
                             }//for
                         }
                         else
                         {
-                            result.SetPixel(x * moduleLength + halfmoduleLength + i, y * moduleLength + halfmoduleLength + j, SourceImageColor);
+                            result.SetPixel(x * moduleLength + i, y * moduleLength + j, SourceImageColor);
                         }
                     }//for
                 }//for
@@ -345,8 +313,8 @@ namespace QRPhotoMosaic.Method
                 {
                     for (int j = 0; j < moduleLength; j++)
                     {
-                        SourceImageColor = pmBitmap.GetPixel(x * moduleLength + halfmoduleLength + i, y * moduleLength + j);
-                        result.SetPixel(x * moduleLength + halfmoduleLength + i, y * moduleLength + halfmoduleLength + j, SourceImageColor);
+                        SourceImageColor = pmBitmap.GetPixel(x * moduleLength + i, y * moduleLength + j);
+                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, SourceImageColor);
                     }
                 }
             }
@@ -477,6 +445,7 @@ namespace QRPhotoMosaic.Method
             int qrEndY = pmBitmap.Height - halfTileSize - 1;
             #endregion
             //  pm->photomosaic
+            
             for (int pmY = 0; pmY < pmBitmap.Height; pmY += tileSize)
             {
                 worker.ReportProgress(30 + (pmY * 70 / pmBitmap.Height), "Generate a photomosaic with QR code...");
@@ -542,16 +511,18 @@ namespace QRPhotoMosaic.Method
                     {
                         if (QRMat[matX, matY]) //黑為1 白為0
                         {
-                            result = case1(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
+                            result = BlackCase(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
                         }
                         else
                         {
-                            result = case2(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
+                            result = WhiteCase(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
                         }
                         
                     }
                 }
             }
+
+       
             return result;
         }
         
@@ -570,12 +541,14 @@ namespace QRPhotoMosaic.Method
             int size = pmBitmap.Width - tileSize.Value; //ex: pm->22, qr->21
 
             Bitmap overlapping = ImageProc.OverlappingArea(pmBitmap, size, size, tileSize.Value);
+            //OpenFileDialog loadingFile = new OpenFileDialog();
+            //overlapping = new Bitmap(Image.FromFile("..//123.bmp"));
             worker.ReportProgress(10, "Calculate the overlapping area");
 
             Bitmap grayImage = ImageProc.GrayImage(overlapping, colorSpace);
             worker.ReportProgress(20, "Generate a gray image of overlapping area");
 
-            Bitmap thresholdMask = LocalThresholdMask(overlapping, 5, tileSize.Value);
+            Bitmap thresholdMask = LocalThresholdMask(grayImage, 5, tileSize.Value);
             worker.ReportProgress(30, "Generate pixel based threshold mask");
 
             Bitmap prevWork = DoProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value);

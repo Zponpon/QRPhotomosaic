@@ -16,7 +16,6 @@ namespace QRPhotoMosaic.Method
 
         public void LoadFolder(BackgroundWorker worker, string path)
         {
-            //label1.Text = "Load Tiles from " + path;
             double total = (double)System.IO.Directory.GetFiles(path).Length;
             foreach (string fileName in System.IO.Directory.GetFiles(path))
             {
@@ -39,7 +38,7 @@ namespace QRPhotoMosaic.Method
             {
                 tile.CalcNonDivTileAvgRGB(BasicProcessForm.calcTileSize);
                 if (MainForm.singleton.tiles.Count == 0) return;
-                worker.ReportProgress(++t / MainForm.singleton.tiles.Count * 100);
+                worker.ReportProgress((++t * 100)/ MainForm.singleton.tiles.Count );
             }
             Tile.SaveFile(MainForm.singleton.tiles, BasicProcessForm.calcTileSize, savingPath);
         }
