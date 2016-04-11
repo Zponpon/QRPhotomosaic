@@ -213,7 +213,6 @@ namespace QRPhotoMosaic.Method
                         result.SetPixel(x * moduleLength + i, y * moduleLength + j, SourceImageColor);
                     }
                 }
-
             }
             return result;
         }
@@ -537,7 +536,7 @@ namespace QRPhotoMosaic.Method
             version = info.QRVersion;
             
             //int size = pmBitmap.Width - tileSize.Value * 2;
-
+            if (!tileSize.HasValue) return null;
             int size = pmBitmap.Width - tileSize.Value; //ex: pm->22, qr->21
 
             Bitmap overlapping = ImageProc.OverlappingArea(pmBitmap, size, size, tileSize.Value);
@@ -552,6 +551,7 @@ namespace QRPhotoMosaic.Method
             Bitmap prevWork = DoProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value);
 
             Bitmap resultQR = addQuietZone(prevWork, tileSize.Value);
+
             grayImage = null;
             overlapping = null;
             prevWork = null;
