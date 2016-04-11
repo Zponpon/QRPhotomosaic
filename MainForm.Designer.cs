@@ -30,6 +30,7 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.CheckInputComboBox = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.RobustValue = new System.Windows.Forms.NumericUpDown();
             this.ProcessTime = new System.Windows.Forms.Label();
@@ -47,7 +48,7 @@
             this.QRPhotomosaicBtn = new System.Windows.Forms.Button();
             this.SaveResultBtn = new System.Windows.Forms.Button();
             this.LoadImageBtn = new System.Windows.Forms.Button();
-            this.ResultPicBox = new System.Windows.Forms.PictureBox();
+            this.resultPicBox = new System.Windows.Forms.PictureBox();
             this.InputPicBox = new System.Windows.Forms.PictureBox();
             this.PhotomosaicPicBox = new System.Windows.Forms.PictureBox();
             this.QRCodePicBox = new System.Windows.Forms.PictureBox();
@@ -63,12 +64,12 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.CheckInputComboBox = new System.Windows.Forms.ComboBox();
+            this.VersionLabel = new System.Windows.Forms.Label();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RobustValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CenterSizenumDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ResultPicBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.resultPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PhotomosaicPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.QRCodePicBox)).BeginInit();
@@ -89,6 +90,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.VersionLabel);
             this.tabPage1.Controls.Add(this.CheckInputComboBox);
             this.tabPage1.Controls.Add(this.label6);
             this.tabPage1.Controls.Add(this.RobustValue);
@@ -107,7 +109,7 @@
             this.tabPage1.Controls.Add(this.QRPhotomosaicBtn);
             this.tabPage1.Controls.Add(this.SaveResultBtn);
             this.tabPage1.Controls.Add(this.LoadImageBtn);
-            this.tabPage1.Controls.Add(this.ResultPicBox);
+            this.tabPage1.Controls.Add(this.resultPicBox);
             this.tabPage1.Controls.Add(this.InputPicBox);
             this.tabPage1.Controls.Add(this.PhotomosaicPicBox);
             this.tabPage1.Controls.Add(this.QRCodePicBox);
@@ -120,6 +122,18 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // CheckInputComboBox
+            // 
+            this.CheckInputComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CheckInputComboBox.FormattingEnabled = true;
+            this.CheckInputComboBox.Items.AddRange(new object[] {
+            "N",
+            "Y"});
+            this.CheckInputComboBox.Location = new System.Drawing.Point(807, 576);
+            this.CheckInputComboBox.Name = "CheckInputComboBox";
+            this.CheckInputComboBox.Size = new System.Drawing.Size(135, 31);
+            this.CheckInputComboBox.TabIndex = 29;
             // 
             // label6
             // 
@@ -336,14 +350,14 @@
             this.LoadImageBtn.UseVisualStyleBackColor = true;
             this.LoadImageBtn.Click += new System.EventHandler(this.LoadImageBtn_Click);
             // 
-            // ResultPicBox
+            // resultPicBox
             // 
-            this.ResultPicBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.ResultPicBox.Location = new System.Drawing.Point(1000, 58);
-            this.ResultPicBox.Name = "ResultPicBox";
-            this.ResultPicBox.Size = new System.Drawing.Size(500, 500);
-            this.ResultPicBox.TabIndex = 5;
-            this.ResultPicBox.TabStop = false;
+            this.resultPicBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.resultPicBox.Location = new System.Drawing.Point(1000, 58);
+            this.resultPicBox.Name = "resultPicBox";
+            this.resultPicBox.Size = new System.Drawing.Size(500, 500);
+            this.resultPicBox.TabIndex = 5;
+            this.resultPicBox.TabStop = false;
             // 
             // InputPicBox
             // 
@@ -499,18 +513,15 @@
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
             // 
-            // CheckInputComboBox
+            // VersionLabel
             // 
-            this.CheckInputComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CheckInputComboBox.FormattingEnabled = true;
-            this.CheckInputComboBox.Location = new System.Drawing.Point(807, 576);
-            this.CheckInputComboBox.Name = "CheckInputComboBox";
-            this.CheckInputComboBox.Size = new System.Drawing.Size(135, 31);
-            this.CheckInputComboBox.TabIndex = 29;
-            this.CheckInputComboBox.Items.AddRange(new object[] {
-            "N",
-            "Y"
-            });
+            this.VersionLabel.AutoSize = true;
+            this.VersionLabel.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.VersionLabel.Location = new System.Drawing.Point(301, 417);
+            this.VersionLabel.Name = "VersionLabel";
+            this.VersionLabel.Size = new System.Drawing.Size(20, 21);
+            this.VersionLabel.TabIndex = 30;
+            this.VersionLabel.Text = "0";
             // 
             // MainForm
             // 
@@ -527,7 +538,7 @@
             this.tabPage1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RobustValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CenterSizenumDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ResultPicBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.resultPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PhotomosaicPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.QRCodePicBox)).EndInit();
@@ -549,7 +560,7 @@
         private System.Windows.Forms.PictureBox QRCodePicBox;
         private System.Windows.Forms.PictureBox PhotomosaicPicBox;
         private System.Windows.Forms.Button LoadImageBtn;
-        private System.Windows.Forms.PictureBox ResultPicBox;
+        private System.Windows.Forms.PictureBox resultPicBox;
         private System.Windows.Forms.PictureBox InputPicBox;
         private System.Windows.Forms.Button SaveResultBtn;
         private System.ComponentModel.BackgroundWorker TileWorker;
@@ -577,6 +588,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown RobustValue;
         private System.Windows.Forms.ComboBox CheckInputComboBox;
+        private System.Windows.Forms.Label VersionLabel;
     }
 }
 

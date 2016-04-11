@@ -25,33 +25,37 @@ namespace QRPhotoMosaic
     public delegate string GetString();
     public partial class MainForm : Form
     {
-        public bool isCancel = false;
-
-        public BasicMethod basicMethod;
-        public List<Tile> tiles = new List<Tile>();
-        public Bitmap masterBitmap;
-        public BasicProcessForm basicProcess;
-        public EmbeddingForm embedding;
         public static MainForm singleton;
-        public Bitmap result;
+
+        //  TileProcessForm (Load & calc avg color) function register themselves into this callback function.
+        public System.Action<BackgroundWorker, string> tileCB;
+
+        public bool isCancel = false;
+        public List<Tile> tiles = new List<Tile>();
         public QRCodeInfo info;
+        public Bitmap masterBitmap;
         public Bitmap QRBitmap;
         public Bitmap photomosaicImg;
+        public Bitmap result;
         public int tileSize;
-        
-        private OpenFileDialog loadingFile;
-        
-        
-        
-        public Stopwatch stopWatch;
-        private int m_blockSize;
+
+        private BasicProcessForm basicProcess;
+        private EmbeddingForm embedding;
+        private BasicMethod basicMethod;
+        private int blockSize;
+        private Stopwatch stopWatch;
         private string calcAvgFolderPath; // Page2
         private string creatingFolderPath;// Page1
-        
-        //  TileProcessForm (Load & calc avg color) function register themselves into this callback function.
-        public System.Action<BackgroundWorker, string> cb;
 
         #region GetAndSetRegion
+        public Stopwatch StopWatch
+        {
+            get
+            {
+                return stopWatch;
+            }
+        }
+
         public string CreatingFolderPath
         {
             get { return creatingFolderPath; }
@@ -73,18 +77,27 @@ namespace QRPhotoMosaic
             }
         }
 
-        public PictureBox resultPicBox
-        {
-            get
-            {
-                return this.ResultPicBox;
-            }
-        }
-        public Image resultPicBoxImg
+        public string VersionText
         {
             set
             {
-                this.ResultPicBox.Image = value;
+                this.VersionLabel.Text = value;
+            }
+        }
+
+        public PictureBox ResultPicBox
+        {
+            get
+            {
+                return this.resultPicBox;
+            }
+        }
+
+        public Image ResultPicBoxImg
+        {
+            set
+            {
+                this.resultPicBox.Image = value;
             }
         }
 
@@ -128,15 +141,15 @@ namespace QRPhotoMosaic
             }
         }
 
-        public int blockSize
+        public int BlockSize
         {
             get
             {
-                return m_blockSize;
+                return blockSize;
             }
-            protected set
+            private set
             {
-                m_blockSize = value;
+                blockSize = value;
             }
         }
 
@@ -162,6 +175,7 @@ namespace QRPhotoMosaic
         {
             LevelComboBox.SelectedIndex = 0;
             ColorSpaceComboBox.SelectedIndex = 1;
+            CheckInputComboBox.SelectedIndex = 0;
             this.ProcessTime.Text = "";
             Console.Write(LevelComboBox.Text);
             basicProcess = new BasicProcessForm();
@@ -212,6 +226,7 @@ namespace QRPhotoMosaic
         #region Loading and Saving
         private void LoadImageBtn_Click(object sender, System.EventArgs e)
         {
+            OpenFileDialog loadingFile;
             loadingFile = new OpenFileDialog();
             if (loadingFile.ShowDialog() == DialogResult.OK)
             {
@@ -295,7 +310,6 @@ namespace QRPhotoMosaic
                 CreateEventRegister();
             }
             if (embedding.info == null)
-                //mbedding.info = new QRCodeInfo();
                 info = new QRCodeInfo();
             if (creatingFolderPath != FolderComboBox.SelectedValue.ToString())
             {
@@ -305,8 +319,8 @@ namespace QRPhotoMosaic
             basicProcess.Canceled -= CancelBtn_Click;
             basicProcess.Canceled += CancelBtn_Click;
             basicProcess.ecLevel = QRECLevel;
-            basicProcess.check = this.CheckInputComboBox.SelectedText;
-            blockSize = Convert.ToInt32(BlockcomboBox.SelectedValue);
+            basicProcess.check = this.CheckInputComboBox.Text;
+            BlockSize = Convert.ToInt32(BlockcomboBox.SelectedValue);
             basicProcess.Show();
             stopWatch.Start();
             GC.Collect();
@@ -360,7 +374,7 @@ namespace QRPhotoMosaic
             else
             {
                 worker.ReportProgress(0);
-                cb(worker, basicMethod.stringCB());
+                tileCB(worker, basicMethod.stringCB());
                 System.Threading.Thread.Sleep(500);
             }
         }
@@ -389,11 +403,13 @@ namespace QRPhotoMosaic
                 stopWatch.Stop();
                 MessageBox.Show("Done");
                 StateLabel.Text = "Calculating is done!!!";
-                TilePicBox.Image = tiles[0].bitmap;
+                //TilePicBox.Image = tiles[0].bitmap;
+                TilePicBox.Image = Image.FromFile(tiles[0].Name);
                 TimeSpan ts = stopWatch.Elapsed;
                 string elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                this.ProcessTimeText = elapsedTime;
             }
-            cb = null;
+            tileCB = null;
             stopWatch.Reset();
             SrcPathLabel.Text = calcAvgFolderPath;
             basicProcess.Close();
@@ -401,11 +417,7 @@ namespace QRPhotoMosaic
             GC.Collect();
         }
         
-        /// <summary>
-        /// MainForm tab page 2.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        // Read tile for calculating avgerage color.
         private void TileFolderBtn_Click(object sender, EventArgs e)
         {
             if (TileWorker.IsBusy || CreateWorker.IsBusy || EmbeddingWorker.IsBusy) return;
@@ -418,13 +430,14 @@ namespace QRPhotoMosaic
                 basicProcess.Canceled += CancelBtn_Click;
                 calcAvgFolderPath = folderBrowser.SelectedPath;
                 basicProcess.Show();
-                cb -= basicMethod.LoadFolder;
-                cb += basicMethod.LoadFolder;
+                tileCB -= basicMethod.LoadFolder;
+                tileCB += basicMethod.LoadFolder;
                 basicMethod.stringCB -= Path;
                 basicMethod.stringCB += Path;
                 stopWatch.Start();
-                TileWorker.RunWorkerAsync();
                 folderBrowser.Dispose();
+                GC.Collect();
+                TileWorker.RunWorkerAsync();
             }
         }
 
@@ -438,8 +451,8 @@ namespace QRPhotoMosaic
             basicProcess.Canceled += CancelBtn_Click;
             basicProcess.Show();
             // Register callback function
-            cb -= basicMethod.CalcAvgRGB;
-            cb += basicMethod.CalcAvgRGB;
+            tileCB -= basicMethod.CalcAvgRGB;
+            tileCB += basicMethod.CalcAvgRGB;
             basicMethod.stringCB -= SavingFileName;
             basicMethod.stringCB += SavingFileName;
             stopWatch.Start();
@@ -487,11 +500,6 @@ namespace QRPhotoMosaic
             BlockcomboBox.DataSource = PhotoMosaic.blockList;
             BlockcomboBox.DisplayMember = "Size";
             BlockcomboBox.ValueMember = "Value";
-        }
-
-        private void Clear()
-        {
-            //tiles.Clear();
         }
 
         private void CancelBtn_Click(object sender, EventArgs e)

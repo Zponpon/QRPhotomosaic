@@ -43,7 +43,7 @@ namespace QRPhotoMosaic
                 Bitmap result = method.Generate(worker, info, QRBitmap, PhotomosaicImg, tileSize, centerSize, robustVal, ColorSpace);
                 worker.ReportProgress(100, "It's done");
 
-                MainForm.singleton.resultPicBoxImg = ImageProc.ScaleImage(result, MainForm.singleton.resultPicBox.Width, MainForm.singleton.resultPicBox.Height);
+                MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);
                 MainForm.singleton.result = new Bitmap(result);
 
                 System.Threading.Thread.Sleep(500);
@@ -59,23 +59,23 @@ namespace QRPhotoMosaic
             if (e.Cancelled == true || MainForm.singleton.isCancel)
             {
                 MessageBox.Show("Canacel");
-                MainForm.singleton.stopWatch.Stop();
+                MainForm.singleton.StopWatch.Stop();
                 MainForm.singleton.isCancel = false;
             }
             else if (e.Error != null)
             {
                 MessageBox.Show("Error");
-                MainForm.singleton.stopWatch.Stop();
+                MainForm.singleton.StopWatch.Stop();
             }
             else
             {
-                MainForm.singleton.stopWatch.Stop();
+                MainForm.singleton.StopWatch.Stop();
                 MessageBox.Show("Done");
-                TimeSpan ts = MainForm.singleton.stopWatch.Elapsed;
+                TimeSpan ts = MainForm.singleton.StopWatch.Elapsed;
                 string elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
                 MainForm.singleton.ProcessTimeText = elapsedTime;
             }
-            MainForm.singleton.stopWatch.Reset();
+            MainForm.singleton.StopWatch.Reset();
             Close();
             Dispose();
             GC.Collect();

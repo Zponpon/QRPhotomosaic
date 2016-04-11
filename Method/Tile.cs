@@ -11,8 +11,9 @@ namespace QRPhotoMosaic.Method
     public class Tile
     {
         public Bitmap bitmap;
-        public ColorSpace.RGB avg;
+        public ColorSpace.RGB avgRGB;
         public bool isSelected = false;
+        public string Name { get; set; }
         public int UseTimes { get; set; }
 
         public static string avgtxt = "AvgColor.txt";
@@ -23,6 +24,7 @@ namespace QRPhotoMosaic.Method
             public string Folder { get; set; }
         }
         public static List<TileType> typeList;
+
 
         public static void Init()
         {
@@ -42,6 +44,11 @@ namespace QRPhotoMosaic.Method
                 {
                     Name = "all",
                     Folder = "..\\all"
+                },
+                new TileType
+                {
+                    Name="data1",
+                    Folder ="..\\data1"
                 }
             };
         }
@@ -54,8 +61,9 @@ namespace QRPhotoMosaic.Method
 
         public Tile(string s)
         {
-            bitmap = new Bitmap(s);
-            avg = new ColorSpace.RGB();
+            Name = s;
+            //bitmap = new Bitmap(s);
+            avgRGB = new ColorSpace.RGB();
             UseTimes = 0;
         }
 
@@ -63,25 +71,30 @@ namespace QRPhotoMosaic.Method
         public void CalcNonDivTileAvgRGB(int s)
         {
             int r = 0, g = 0, b = 0;
-            if (s != bitmap.Width)
-                bitmap = ImageProc.ScaleImage(bitmap, s);
-            int size = bitmap.Height * bitmap.Height;
-            for (int y = 0; y < bitmap.Height; ++y)
+            Bitmap tileImg = Image.FromFile(Name) as Bitmap;
+            //if (s != bitmap.Width)
+            //    bitmap = ImageProc.ScaleImage(bitmap, s);
+            if (s != tileImg.Width)
+                tileImg = ImageProc.ScaleImage(tileImg, s);
+            //int size = bitmap.Height * bitmap.Height;
+            int size = tileImg.Height * tileImg.Height;
+            for (int y = 0; y < tileImg.Height; ++y)
             {
-                for (int x = 0; x < bitmap.Height; ++x)
+                for (int x = 0; x < tileImg.Height; ++x)
                 {
-                    r += (int)bitmap.GetPixel(x, y).R;
-                    g += (int)bitmap.GetPixel(x, y).G;
-                    b += (int)bitmap.GetPixel(x, y).B;
+                    r += (int)tileImg.GetPixel(x, y).R;
+                    g += (int)tileImg.GetPixel(x, y).G;
+                    b += (int)tileImg.GetPixel(x, y).B;
                 }
             }
             r /= size;
             g /= size;
             b /= size;
 
-            avg.R = r;
-            avg.G = g;
-            avg.B = b;
+            avgRGB.R = r;
+            avgRGB.G = g;
+            avgRGB.B = b;
+            tileImg.Dispose();
         }
 
         public static void ReadFile(List<Tile> tiles, out int tileSize, string folder)
@@ -97,11 +110,11 @@ namespace QRPhotoMosaic.Method
                 tileSize = Convert.ToInt32(reader.ReadByte());
                 foreach (string tileName in System.IO.Directory.GetFiles(folder))
                 {
-                    Image img = Image.FromFile(tileName);
+                    //Image img = Image.FromFile(tileName);
                     Tile tile = new Tile(tileName);
-                    tile.avg.R = Convert.ToInt32(reader.ReadByte());
-                    tile.avg.G = Convert.ToInt32(reader.ReadByte());
-                    tile.avg.B = Convert.ToInt32(reader.ReadByte());
+                    tile.avgRGB.R = Convert.ToInt32(reader.ReadByte());
+                    tile.avgRGB.G = Convert.ToInt32(reader.ReadByte());
+                    tile.avgRGB.B = Convert.ToInt32(reader.ReadByte());
 
                     tiles.Add(tile);
                 }
@@ -127,9 +140,9 @@ namespace QRPhotoMosaic.Method
                 byte[] rgb = new byte[3];
                 foreach (Tile tile in tiles)
                 {
-                    rgb[0] = Convert.ToByte(tile.avg.R);
-                    rgb[1] = Convert.ToByte(tile.avg.G);
-                    rgb[2] = Convert.ToByte(tile.avg.B);
+                    rgb[0] = Convert.ToByte(tile.avgRGB.R);
+                    rgb[1] = Convert.ToByte(tile.avgRGB.G);
+                    rgb[2] = Convert.ToByte(tile.avgRGB.B);
 
                     writer.Write(rgb, 0, 3);
                 }

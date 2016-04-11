@@ -541,8 +541,6 @@ namespace QRPhotoMosaic.Method
             int size = pmBitmap.Width - tileSize.Value; //ex: pm->22, qr->21
 
             Bitmap overlapping = ImageProc.OverlappingArea(pmBitmap, size, size, tileSize.Value);
-            //OpenFileDialog loadingFile = new OpenFileDialog();
-            //overlapping = new Bitmap(Image.FromFile("..//123.bmp"));
             worker.ReportProgress(10, "Calculate the overlapping area");
 
             Bitmap grayImage = ImageProc.GrayImage(overlapping, colorSpace);
@@ -552,7 +550,13 @@ namespace QRPhotoMosaic.Method
             worker.ReportProgress(30, "Generate pixel based threshold mask");
 
             Bitmap prevWork = DoProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value);
-            return addQuietZone(prevWork, tileSize.Value);
+
+            Bitmap resultQR = addQuietZone(prevWork, tileSize.Value);
+            grayImage = null;
+            overlapping = null;
+            prevWork = null;
+            
+            return resultQR;
         }
     }
 }

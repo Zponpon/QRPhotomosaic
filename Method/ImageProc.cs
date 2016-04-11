@@ -12,12 +12,14 @@ namespace QRPhotoMosaic.Method
         public static Bitmap ScaleImage(Bitmap image, int size)
         {
             Bitmap ScaleImage = new Bitmap(image, size, size);
+            GC.Collect();
             return ScaleImage;
         }
 
         public static Bitmap ScaleImage(Bitmap image, int width, int height)
         {
             Bitmap ScaleImage = new Bitmap(image, width, height);
+            GC.Collect();
             return ScaleImage;
         }
 
@@ -51,7 +53,7 @@ namespace QRPhotoMosaic.Method
                     }
                 }
             }
-                return dst;
+            return dst;
         }
 
         public static Bitmap GrayImage(Bitmap src, string colorSpace)

@@ -53,7 +53,7 @@ namespace QRPhotoMosaic.Method
         {
             //int v = (version * 4 + 17 + 1) * 2;
             int v = (version * 4 + 17) + 1;
-            int blockSize = MainForm.singleton.blockSize;
+            int blockSize = MainForm.singleton.BlockSize;
             int dstSize = v * tileSize; // Depend on qr version
             double blockTotal = blockSize * blockSize;
             int width = v * blockSize;
@@ -63,6 +63,7 @@ namespace QRPhotoMosaic.Method
             List<int> candidates = new List<int>(); // choosen index of candidate'
             int currDstH = 0;
             int currDstW = 0;
+
             for (int y = 0; y < newSrc.Height; y += blockSize)
             {
                 currDstW = 0;
@@ -94,23 +95,31 @@ namespace QRPhotoMosaic.Method
                     blockAvgB /= blockTotal;
                     double min = double.MaxValue;
                     double max = double.MinValue;
-                    Tile candiate = null;
+                    Tile candidateTile = null;
+                    Bitmap candidateImg = null;
                     foreach(Tile tile in tiles)
                     {
                         if (MainForm.singleton.isCancel) return null;
-                        if (tile.bitmap.Width != tileSize)
-                            tile.bitmap = ImageProc.ScaleImage(tile.bitmap, tileSize);
                         if (tile.UseTimes == 2)
                             continue;
+                        //Bitmap tileImg = tileImgs[tiles.IndexOf(tile)];
+                        //if (tile.bitmap.Width != tileSize)
+                        //    tile.bitmap = ImageProc.ScaleImage(tile.bitmap, tileSize);
+                        //if (tileImg.Width != tileSize)
+                        //    tileImg = ImageProc.ScaleImage(tileImg, tileSize);
+                        
 
-                        double r = Math.Pow(((double)tile.avg.R - blockAvgR), 2);
-                        double g = Math.Pow(((double)tile.avg.G - blockAvgG), 2);
-                        double b = Math.Pow(((double)tile.avg.B - blockAvgB), 2);
+                        double r = Math.Pow(((double)tile.avgRGB.R - blockAvgR), 2);
+                        double g = Math.Pow(((double)tile.avgRGB.G - blockAvgG), 2);
+                        double b = Math.Pow(((double)tile.avgRGB.B - blockAvgB), 2);
                         double d = Math.Sqrt(r + g + b);
                         if (d < min)
                         {
                             min = d;
-                            candiate = tile;
+                            candidateTile = tile;
+                            candidateImg = Image.FromFile(tile.Name) as Bitmap;
+                            if (candidateImg.Width != tileSize)
+                                candidateImg = ImageProc.ScaleImage(candidateImg, tileSize);
                         }
                         if(d > max)
                         {
@@ -119,12 +128,12 @@ namespace QRPhotoMosaic.Method
                     }
                     #region Replace the block by candiate tile
                     currBlock = ImageProc.ScaleImage(currBlock, tileSize);
-                    candiate.UseTimes++;
+                    candidateTile.UseTimes++;
                     int tw = 0, th = 0;
                     double alpha = min / max;
-                    double var_B = (double)candiate.avg.B - blockAvgB;
-                    double var_G = (double)candiate.avg.G - blockAvgG;
-                    double var_R = (double)candiate.avg.R - blockAvgR;
+                    double var_B = (double)candidateTile.avgRGB.B - blockAvgB;
+                    double var_G = (double)candidateTile.avgRGB.G - blockAvgG;
+                    double var_R = (double)candidateTile.avgRGB.R - blockAvgR;
                     for (int h = currDstH; th < tileSize; ++h)
                     {
                         for (int w = currDstW; tw < tileSize; ++w)
@@ -132,9 +141,12 @@ namespace QRPhotoMosaic.Method
                             if (MainForm.singleton.isCancel) return null;
                             ColorSpace.RGB rgb;
 
-                            rgb.R = Convert.ToInt32(Convert.ToDouble(candiate.bitmap.GetPixel(tw, th).R) - var_R);
-                            rgb.G = Convert.ToInt32(Convert.ToDouble(candiate.bitmap.GetPixel(tw, th).G) - var_G);
-                            rgb.B = Convert.ToInt32(Convert.ToDouble(candiate.bitmap.GetPixel(tw++, th).B) - var_B);
+                            //rgb.R = Convert.ToInt32(Convert.ToDouble(candidateTile.bitmap.GetPixel(tw, th).R) - var_R);
+                            //rgb.G = Convert.ToInt32(Convert.ToDouble(candidateTile.bitmap.GetPixel(tw, th).G) - var_G);
+                            //rgb.B = Convert.ToInt32(Convert.ToDouble(candidateTile.bitmap.GetPixel(tw++, th).B) - var_B);
+                            rgb.R = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(tw, th).R) - var_R);
+                            rgb.G = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(tw, th).G) - var_G);
+                            rgb.B = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(tw++, th).B) - var_B);
 
                             rgb.R = ImageProc.NormalizeRGB(rgb.R);
                             rgb.G = ImageProc.NormalizeRGB(rgb.G);
@@ -146,11 +158,13 @@ namespace QRPhotoMosaic.Method
                         th++;
                         tw = 0;
                     }
+                    candidateImg.Dispose();
                     currDstW += tileSize;
                     #endregion 
                 }
                 currDstH += tileSize;
             }
+            GC.Collect();
             if (MainForm.singleton.isCancel) return null;
             return dst;
         }

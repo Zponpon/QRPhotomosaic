@@ -19,7 +19,6 @@ namespace QRPhotoMosaic.Method
             double total = (double)System.IO.Directory.GetFiles(path).Length;
             foreach (string fileName in System.IO.Directory.GetFiles(path))
             {
-                Image file = Image.FromFile(fileName);
                 Tile tile = new Tile(fileName);
                 MainForm.singleton.tiles.Add(tile);
                 worker.ReportProgress((int)((MainForm.singleton.tiles.Count / total) * 100));
@@ -57,9 +56,9 @@ namespace QRPhotoMosaic.Method
                 {
                     Image img = Image.FromFile(tileName);
                     Tile tile = new Tile(tileName);
-                    tile.avg.R = Convert.ToInt32(reader.ReadByte());
-                    tile.avg.G = Convert.ToInt32(reader.ReadByte());
-                    tile.avg.B = Convert.ToInt32(reader.ReadByte());
+                    tile.avgRGB.R = Convert.ToInt32(reader.ReadByte());
+                    tile.avgRGB.G = Convert.ToInt32(reader.ReadByte());
+                    tile.avgRGB.B = Convert.ToInt32(reader.ReadByte());
 
                     tiles.Add(tile);
                 }
@@ -82,9 +81,9 @@ namespace QRPhotoMosaic.Method
                 byte[] rgb = new byte[3];
                 foreach (Tile tile in tiles)
                 {
-                    rgb[0] = Convert.ToByte(tile.avg.R);
-                    rgb[1] = Convert.ToByte(tile.avg.G);
-                    rgb[2] = Convert.ToByte(tile.avg.B);
+                    rgb[0] = Convert.ToByte(tile.avgRGB.R);
+                    rgb[1] = Convert.ToByte(tile.avgRGB.G);
+                    rgb[2] = Convert.ToByte(tile.avgRGB.B);
 
                     writer.Write(rgb, 0, 3);
                 }
