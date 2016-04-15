@@ -176,6 +176,7 @@ namespace QRPhotoMosaic
             LevelComboBox.SelectedIndex = 0;
             ColorSpaceComboBox.SelectedIndex = 1;
             CheckInputComboBox.SelectedIndex = 0;
+            ShapeCombobox.SelectedIndex = 0;
             this.ProcessTime.Text = "";
             Console.Write(LevelComboBox.Text);
             basicProcess = new BasicProcessForm();
@@ -351,6 +352,8 @@ namespace QRPhotoMosaic
             embedding.QRBitmap = QRBitmap;
             embedding.PhotomosaicImg = photomosaicImg;
             embedding.tileSize = tileSize;
+            embedding.shape = ShapeCombobox.Text;
+            embedding.check = CheckInputComboBox.Text;
             embedding.Show();
             stopWatch.Reset();
             this.ProcessTimeText = stopWatch.ElapsedMilliseconds.ToString();

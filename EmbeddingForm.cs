@@ -21,6 +21,8 @@ namespace QRPhotoMosaic
         public int? tileSize { set; get; }  //Get it at basicform
         public int? centerSize { set; get; }
         public int? robustVal { set; get; }
+        public string shape;
+        public string check;
 
         public EmbeddingForm()
         {
@@ -40,7 +42,7 @@ namespace QRPhotoMosaic
                 worker.ReportProgress(0, "Start");
 
                 info.GetQRCodeInfo(info.QRmatrix, info.QRVersion);
-                Bitmap result = method.Generate(worker, info, QRBitmap, PhotomosaicImg, tileSize, centerSize, robustVal, ColorSpace);
+                Bitmap result = method.Generate(worker, info, QRBitmap, PhotomosaicImg, tileSize, centerSize, robustVal, ColorSpace, shape, check);
                 worker.ReportProgress(100, "It's done");
 
                 MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);

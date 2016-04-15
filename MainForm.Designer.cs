@@ -30,6 +30,7 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.VersionLabel = new System.Windows.Forms.Label();
             this.CheckInputComboBox = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.RobustValue = new System.Windows.Forms.NumericUpDown();
@@ -64,7 +65,7 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.VersionLabel = new System.Windows.Forms.Label();
+            this.ShapeCombobox = new System.Windows.Forms.ComboBox();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RobustValue)).BeginInit();
@@ -90,6 +91,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.ShapeCombobox);
             this.tabPage1.Controls.Add(this.VersionLabel);
             this.tabPage1.Controls.Add(this.CheckInputComboBox);
             this.tabPage1.Controls.Add(this.label6);
@@ -122,6 +124,16 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // VersionLabel
+            // 
+            this.VersionLabel.AutoSize = true;
+            this.VersionLabel.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.VersionLabel.Location = new System.Drawing.Point(301, 417);
+            this.VersionLabel.Name = "VersionLabel";
+            this.VersionLabel.Size = new System.Drawing.Size(20, 21);
+            this.VersionLabel.TabIndex = 30;
+            this.VersionLabel.Text = "0";
             // 
             // CheckInputComboBox
             // 
@@ -513,15 +525,18 @@
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
             // 
-            // VersionLabel
+            // ShapeCombobox
             // 
-            this.VersionLabel.AutoSize = true;
-            this.VersionLabel.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.VersionLabel.Location = new System.Drawing.Point(301, 417);
-            this.VersionLabel.Name = "VersionLabel";
-            this.VersionLabel.Size = new System.Drawing.Size(20, 21);
-            this.VersionLabel.TabIndex = 30;
-            this.VersionLabel.Text = "0";
+            this.ShapeCombobox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ShapeCombobox.FormattingEnabled = true;
+            this.ShapeCombobox.Items.AddRange(new object[] {
+            "Square",
+            "Circle",
+            "Diamond"});
+            this.ShapeCombobox.Location = new System.Drawing.Point(1000, 575);
+            this.ShapeCombobox.Name = "ShapeCombobox";
+            this.ShapeCombobox.Size = new System.Drawing.Size(135, 31);
+            this.ShapeCombobox.TabIndex = 31;
             // 
             // MainForm
             // 
@@ -589,6 +604,7 @@
         private System.Windows.Forms.NumericUpDown RobustValue;
         private System.Windows.Forms.ComboBox CheckInputComboBox;
         private System.Windows.Forms.Label VersionLabel;
+        private System.Windows.Forms.ComboBox ShapeCombobox;
     }
 }
 
