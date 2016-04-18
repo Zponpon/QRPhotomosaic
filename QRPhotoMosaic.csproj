@@ -73,6 +73,7 @@
     <Compile Include="Method\PhotoMosaic.cs" />
     <Compile Include="Method\QRCodeEncoding.cs" />
     <Compile Include="Method\Tile.cs" />
+    <Compile Include="Method\Utility.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="BasicProcessForm.resx">
