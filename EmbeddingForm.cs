@@ -8,6 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using QRPhotoMosaic.Method;
+using ZxingForQRcodeHiding;
+using ZxingForQRcodeHiding.Client.Result;
+using ZxingForQRcodeHiding.Common;
+using ZxingForQRcodeHiding.QrCode.Internal;
+using ZxingForQRcodeHiding.QrCode;
 
 namespace QRPhotoMosaic
 {
@@ -44,6 +49,7 @@ namespace QRPhotoMosaic
                 info.GetQRCodeInfo(info.QRmatrix, info.QRVersion);
                 Bitmap result = method.Generate(worker, info, QRBitmap, PhotomosaicImg, tileSize, centerSize, robustVal, ColorSpace, shape, check);
                 worker.ReportProgress(100, "It's done");
+                
 
                 MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);
                 MainForm.singleton.result = new Bitmap(result);
@@ -78,6 +84,8 @@ namespace QRPhotoMosaic
                 MainForm.singleton.ProcessTimeText = elapsedTime;
             }
             MainForm.singleton.StopWatch.Reset();
+ 
+            
             Close();
             Dispose();
             GC.Collect();

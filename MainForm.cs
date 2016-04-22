@@ -175,8 +175,8 @@ namespace QRPhotoMosaic
         {
             LevelComboBox.SelectedIndex = 0;
             ColorSpaceComboBox.SelectedIndex = 1;
-            CheckInputComboBox.SelectedIndex = 0;
-            ShapeCombobox.SelectedIndex = 0;
+            CheckInputComboBox.SelectedIndex = 1;
+            ShapeCombobox.SelectedIndex = 2;
             this.ProcessTime.Text = "";
             Console.Write(LevelComboBox.Text);
             basicProcess = new BasicProcessForm();

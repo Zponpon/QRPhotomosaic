@@ -30,6 +30,7 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.ShapeCombobox = new System.Windows.Forms.ComboBox();
             this.VersionLabel = new System.Windows.Forms.Label();
             this.CheckInputComboBox = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -65,7 +66,6 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.ShapeCombobox = new System.Windows.Forms.ComboBox();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RobustValue)).BeginInit();
@@ -125,6 +125,19 @@
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // ShapeCombobox
+            // 
+            this.ShapeCombobox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ShapeCombobox.FormattingEnabled = true;
+            this.ShapeCombobox.Items.AddRange(new object[] {
+            "Square",
+            "Circle",
+            "Diamond"});
+            this.ShapeCombobox.Location = new System.Drawing.Point(1000, 575);
+            this.ShapeCombobox.Name = "ShapeCombobox";
+            this.ShapeCombobox.Size = new System.Drawing.Size(135, 31);
+            this.ShapeCombobox.TabIndex = 31;
+            // 
             // VersionLabel
             // 
             this.VersionLabel.AutoSize = true;
@@ -181,7 +194,7 @@
             this.RobustValue.TabIndex = 27;
             this.RobustValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.RobustValue.Value = new decimal(new int[] {
-            32,
+            48,
             0,
             0,
             0});
@@ -252,7 +265,7 @@
             this.CenterSizenumDown.TabIndex = 22;
             this.CenterSizenumDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.CenterSizenumDown.Value = new decimal(new int[] {
-            20,
+            26,
             0,
             0,
             0});
@@ -524,19 +537,6 @@
             // 
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
-            // 
-            // ShapeCombobox
-            // 
-            this.ShapeCombobox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ShapeCombobox.FormattingEnabled = true;
-            this.ShapeCombobox.Items.AddRange(new object[] {
-            "Square",
-            "Circle",
-            "Diamond"});
-            this.ShapeCombobox.Location = new System.Drawing.Point(1000, 575);
-            this.ShapeCombobox.Name = "ShapeCombobox";
-            this.ShapeCombobox.Size = new System.Drawing.Size(135, 31);
-            this.ShapeCombobox.TabIndex = 31;
             // 
             // MainForm
             // 

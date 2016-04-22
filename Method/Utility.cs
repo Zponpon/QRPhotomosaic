@@ -114,10 +114,11 @@ namespace QRPhotoMosaic.Method
 
                             double T = LocalThresHoldImageColor.R / 255.0;
                             double d = DiamondDis(x * moduleLength + i, y * moduleLength + j, centerX, centerY);
+                            double layer = Math.Abs(halfCenterSize - d) / 5;
                             if (d <= halfCenterSize && luminance > T - robustVal)
                             {
-                                
-                                double luminance2 = T - UserSetRobustnesspercent;
+
+                                double luminance2 = T - UserSetRobustnesspercent - (0.5 * layer * UserSetRobustnesspercent);
                                 //luminance2 = 0;
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
                                 result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
@@ -195,10 +196,11 @@ namespace QRPhotoMosaic.Method
 
                             double T = LocalThresHoldImageColor.R / 255.0;
                             double d = DiamondDis(x * moduleLength + i, y * moduleLength + j, centerX, centerY);
+                            double layer = Math.Abs(halfCenterSize - d) / 5;
                             if (d <= halfCenterSize && luminance < T + UserSetRobustnesspercent)
                             {
-                                
-                                double luminance2 = T + UserSetRobustnesspercent;
+
+                                double luminance2 = T + UserSetRobustnesspercent + (0.5 * layer * UserSetRobustnesspercent);
                                 //luminance2 = 1;
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
                                 result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
@@ -284,10 +286,10 @@ namespace QRPhotoMosaic.Method
                             }
                             double T = LocalThresHoldImageColor.R / 255.0;
                             double d = Radius(x * moduleLength + i, y * moduleLength + j, centerX, centerY);
+                            double layer = Math.Abs(radius - d) / 5;
                             if (d <= radius && luminance > T-UserSetRobustnesspercent )
                             {
-                                
-                                double luminance2 = T - UserSetRobustnesspercent;
+                                double luminance2 = T - UserSetRobustnesspercent - ( 0.5 * layer * UserSetRobustnesspercent);
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
                                 result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                             }
@@ -365,11 +367,12 @@ namespace QRPhotoMosaic.Method
 
                             
                             double d = Radius(x * moduleLength + i, y * moduleLength + j, centerX, centerY);
+                            double layer = Math.Abs(radius - d) / 5;
                             double T = LocalThresHoldImageColor.R / 255.0;
 
                             if (d <= radius && luminance < T + UserSetRobustnesspercent)
                             {
-                                double luminance2 = T + UserSetRobustnesspercent;
+                                double luminance2 = T + UserSetRobustnesspercent + (layer * UserSetRobustnesspercent);
                                 //luminance2 = 1;
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
                                 result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
