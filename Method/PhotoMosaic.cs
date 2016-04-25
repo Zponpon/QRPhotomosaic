@@ -100,7 +100,7 @@ namespace QRPhotoMosaic.Method
                     foreach(Tile tile in tiles)
                     {
                         if (MainForm.singleton.isCancel) return null;
-                        if (tile.UseTimes == 2)
+                        if (tile.UseTimes == 1)
                             continue;
                         //Bitmap tileImg = tileImgs[tiles.IndexOf(tile)];
                         //if (tile.bitmap.Width != tileSize)
