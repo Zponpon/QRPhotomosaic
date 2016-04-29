@@ -503,6 +503,7 @@ namespace QRPhotoMosaic
             BlockcomboBox.DataSource = PhotoMosaic.blockList;
             BlockcomboBox.DisplayMember = "Size";
             BlockcomboBox.ValueMember = "Value";
+            FolderComboBox.SelectedIndex = 3;
         }
 
         private void CancelBtn_Click(object sender, EventArgs e)

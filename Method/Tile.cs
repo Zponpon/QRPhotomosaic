@@ -47,8 +47,8 @@ namespace QRPhotoMosaic.Method
                 },
                 new TileType
                 {
-                    Name="data1",
-                    Folder ="..\\data1"
+                    Name="Data",
+                    Folder ="..\\data"
                 }
             };
         }

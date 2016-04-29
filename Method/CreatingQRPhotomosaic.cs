@@ -168,6 +168,10 @@ namespace QRPhotoMosaic.Method
                                     //result = BlackDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
                                     Utility.BlackDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
                                     break;
+                                case "Corner":
+                                    //result = BlackDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
+                                    Utility.BlackCorner(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
+                                    break;
                                 default:
                                     break;
                             }
@@ -190,6 +194,9 @@ namespace QRPhotoMosaic.Method
                                 case "Diamond":
                                     //result = WhiteDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
                                     Utility.WhiteDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
+                                    break;
+                                case "Corner":
+                                    Utility.WhiteCorner(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
                                     break;
                                 default:
                                     break;

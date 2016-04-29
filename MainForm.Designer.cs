@@ -132,7 +132,8 @@
             this.ShapeCombobox.Items.AddRange(new object[] {
             "Square",
             "Circle",
-            "Diamond"});
+            "Diamond",
+            "Corner"});
             this.ShapeCombobox.Location = new System.Drawing.Point(1000, 575);
             this.ShapeCombobox.Name = "ShapeCombobox";
             this.ShapeCombobox.Size = new System.Drawing.Size(135, 31);

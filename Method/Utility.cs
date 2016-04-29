@@ -124,7 +124,7 @@ namespace QRPhotoMosaic.Method
                             {
                                 double layer = (Math.Abs(halfCenterSize - d)) / 5;
                                 double luminance2 = T - UserSetRobustnesspercent - (0.5 * layer * UserSetRobustnesspercent);
-                                luminance2 = 0;
+                                
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
                                 result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                             }
@@ -528,43 +528,6 @@ namespace QRPhotoMosaic.Method
                             }
 
                             double T = LocalThresHoldImageColor.R / 255.0;
-                            /*
-                            for (int count = 0; count < CenterSize / 2; count++)
-                            {
-                                if (luminance < (T + UserSetRobustnesspercent) + (Alpha_Magnification * count * UserSetRobustnesspercent))
-                                {
-                                    if (i >= Around + count && i < (Around + CenterSize) - count && j == Around + count) //上
-                                    {
-                                        double luminance2 = T + UserSetRobustnesspercent + (Alpha_Magnification * count * UserSetRobustnesspercent);
-                                        ACS = luminance_adjustment(ACS, CenterSize, luminance2, 1);
-                                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                                        break;
-                                    }
-                                    else if (i >= Around + count && i < (Around + CenterSize) - count && j == (Around + CenterSize) - count - 1) //下
-                                    {
-                                        double luminance2 = T + UserSetRobustnesspercent + (Alpha_Magnification * count * UserSetRobustnesspercent);
-                                        ACS = luminance_adjustment(ACS, CenterSize, luminance2, 1);
-                                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                                        break;
-                                    }
-                                    else if (i == Around + count && j > Around + count && j < (Around + CenterSize) - count) //左
-                                    {
-                                        double luminance2 = T + UserSetRobustnesspercent + (Alpha_Magnification * count * UserSetRobustnesspercent);
-                                        ACS = luminance_adjustment(ACS, CenterSize, luminance2, 1);
-                                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                                        break;
-                                    }
-                                    else if (i == (Around + CenterSize) - count - 1 && j > Around + count && j < (Around + CenterSize) - count) //右
-                                    {
-                                        double luminance2 = T + UserSetRobustnesspercent + (Alpha_Magnification * count * UserSetRobustnesspercent);
-                                        ACS = luminance_adjustment(ACS, CenterSize, luminance2, 1);
-                                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                                        break;
-                                    }
-                                }
-                                else
-                                    result.SetPixel(x * moduleLength + i, y * moduleLength + j, SourceImageColor);
-                            }//for*/
                             double luminance2 = 1;
                             ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
                             result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
@@ -587,8 +550,207 @@ namespace QRPhotoMosaic.Method
                     }
                 }
             }
-            //return result;
         }
+
+        public static bool CornerRadius(double radius, int xLeft, int xRight, int yTop, int yDown, int px, int py)
+        {
+            double d1 = Math.Sqrt((double)((xLeft - px) * (xLeft - px)) + (double)((yTop - py) * (yTop - py)));
+            if (d1 <= radius)
+                return false;
+            double d2 = Math.Sqrt((double)((xRight - px) * (xRight - px)) + (double)((yTop - py) * (yTop - py)));
+            if (d2 <= radius)
+                return false;
+            double d3 = Math.Sqrt((double)((xLeft - px) * (xLeft - px)) + (double)((yDown - py) * (yDown - py)));
+            if (d3 <= radius)
+                return false;
+            double d4 = Math.Sqrt((double)((xRight - px) * (xRight - px)) + (double)((yDown - py) * (yDown - py)));
+            if (d4 <= radius)
+                return false;
+
+            return true;
+        }
+
+        public static void BlackCorner(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace)
+        {
+            int Around = (moduleLength - centerSize) / 2;
+            Color SourceImageColor, LocalThresHoldImageColor;
+            ColorSpace CSC = new ColorSpace();
+            ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
+            double UserSetRobustnesspercent = Convert.ToDouble(robustVal) / 255.0;
+            double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
+            //double radius = (double)moduleLength / 2;
+            double radius = (double)centerSize / 2;
+            //double maxDistance = Math.Sqrt((moduleLength / 2) * (moduleLength / 2) * 2);
+            //int xLeft = x * moduleLength;
+            //int xRight = x * moduleLength + moduleLength - 1;
+            //int yTop = y * moduleLength;
+            //int yDown = y * moduleLength + moduleLength - 1;
+            int xLeft = x * moduleLength + Around;
+            int xRight = x * moduleLength + Around + centerSize - 1;
+            int yTop = y * moduleLength + Around;
+            int yDown = y * moduleLength + Around + centerSize - 1;
+
+
+            if (Lmean - UserSetRobustnesspercent < Tmean)
+            {
+                for (int i = 0; i < moduleLength; i++)
+                {
+                    for (int j = 0; j < moduleLength; j++)
+                    {
+                        int px = x * moduleLength + i;
+                        int py = y * moduleLength + j;
+                        SourceImageColor = pmBitmap.GetPixel(px, py);
+                        if (i >= Around && i < (Around + centerSize) && j >= Around && j < (Around + centerSize)) //center
+                        {
+                            if (CornerRadius(radius, xLeft, xRight, yTop, yDown, px, py))
+                            {
+                                LocalThresHoldImageColor = mask.GetPixel(px, py);
+                                double luminance = 0;
+
+                                if (colorSpace == "HSL")
+                                {
+                                    ACS.HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSL.L;
+                                }
+                                else if (colorSpace == "HSV")
+                                {
+                                    ACS.HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSV.V;
+                                }
+                                else if (colorSpace == "Lab")
+                                {
+                                    ACS.Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.Lab.L / 100;
+                                }
+                                else
+                                {
+                                    ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.YUV.Y / 255.0;
+                                }
+
+                                double T = LocalThresHoldImageColor.R / 255.0;
+                                double luminance2 = T - UserSetRobustnesspercent - (0.1 * UserSetRobustnesspercent);
+                                ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
+                                result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
+                            }
+                            else
+                            {
+                                result.SetPixel(px, py, SourceImageColor);
+                            }
+                        }
+                        else
+                        {
+                            result.SetPixel(px, py, SourceImageColor);
+                        }
+                    }//for
+                }//for
+            }
+            else
+            {
+                for (int i = 0; i < moduleLength; i++)
+                {
+                    for (int j = 0; j < moduleLength; j++)
+                    {
+                        SourceImageColor = pmBitmap.GetPixel(x * moduleLength + i, y * moduleLength + j);
+                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, SourceImageColor);
+                    }
+                }
+            }
+
+        }
+
+        public static void WhiteCorner(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace)
+        {
+            int Around = (moduleLength - centerSize) / 2;
+            Color SourceImageColor, LocalThresHoldImageColor;
+            ColorSpace CSC = new ColorSpace();
+            ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
+            double UserSetRobustnesspercent = Convert.ToDouble(robustVal) / 255.0;
+            double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
+            //double radius = (double)moduleLength / 2;
+            double radius = (double)centerSize / 2;
+            //double maxDistance = Math.Sqrt((moduleLength / 2) * (moduleLength / 2) * 2);
+            //int xLeft = x * moduleLength;
+            //int xRight = x * moduleLength + moduleLength - 1;
+            //int yTop = y * moduleLength;
+            //int yDown = y * moduleLength + moduleLength - 1;
+
+            int xLeft = x * moduleLength + Around;
+            int xRight = x * moduleLength + Around + centerSize - 1;
+            int yTop = y * moduleLength + Around;
+            int yDown = y * moduleLength + Around + centerSize - 1;
+
+
+            if (Lmean - UserSetRobustnesspercent < Tmean)
+            {
+                for (int i = 0; i < moduleLength; i++)
+                {
+                    for (int j = 0; j < moduleLength; j++)
+                    {
+                        int px = x * moduleLength + i;
+                        int py = y * moduleLength + j;
+                        SourceImageColor = pmBitmap.GetPixel(px, py);
+                        if (i >= Around && i < (Around + centerSize) && j >= Around && j < (Around + centerSize)) //center
+                        {
+                            if (CornerRadius(radius, xLeft, xRight, yTop, yDown, px, py))
+                            {
+                                LocalThresHoldImageColor = mask.GetPixel(px, py);
+                                double luminance = 0;
+
+                                if (colorSpace == "HSL")
+                                {
+                                    ACS.HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSL.L;
+                                }
+                                else if (colorSpace == "HSV")
+                                {
+                                    ACS.HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSV.V;
+                                }
+                                else if (colorSpace == "Lab")
+                                {
+                                    ACS.Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.Lab.L / 100;
+                                }
+                                else
+                                {
+                                    ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.YUV.Y / 255.0;
+                                }
+
+                                double T = LocalThresHoldImageColor.R / 255.0;
+                                double luminance2 = T + UserSetRobustnesspercent + (0.1 * UserSetRobustnesspercent); ;
+                                ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
+                                result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
+                            }
+                            else
+                            {
+                                result.SetPixel(px, py, SourceImageColor);
+                            }
+                        }
+                        else
+                        {
+                            result.SetPixel(px, py, SourceImageColor);
+                        }
+                    }//for
+                }//for
+            }
+            else
+            {
+                for (int i = 0; i < moduleLength; i++)
+                {
+                    for (int j = 0; j < moduleLength; j++)
+                    {
+                        SourceImageColor = pmBitmap.GetPixel(x * moduleLength + i, y * moduleLength + j);
+                        result.SetPixel(x * moduleLength + i, y * moduleLength + j, SourceImageColor);
+                    }
+                }
+            }
+        }
+
+
 
         private static double calculateScore(Bitmap pmBitmap, int x, int y, int centerSize, int moduleLength, int Around, string colorSpace)
         {
