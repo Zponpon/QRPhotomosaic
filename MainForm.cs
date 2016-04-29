@@ -192,7 +192,7 @@ namespace QRPhotoMosaic
             // Calculate avg color of tile's size : 64, 32, 16, 8
             BasicProcessForm.calcTileSize = Convert.ToInt32(numericUpDown1.Value);
             this.Text = "Photomosaic with embedded QR Code Application";
-            QRCodeContentBox.Text = "Hello World!!!";
+            QRCodeContentBox.Text = "http://www.cse.yzu.edu.tw/";
         }
 
         private void EmbeddingEventRegister()
