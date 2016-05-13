@@ -30,6 +30,7 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.SaveQRCodeBtn = new System.Windows.Forms.Button();
             this.ShapeCombobox = new System.Windows.Forms.ComboBox();
             this.VersionLabel = new System.Windows.Forms.Label();
             this.CheckInputComboBox = new System.Windows.Forms.ComboBox();
@@ -66,6 +67,7 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
+            this.DecodeBtn = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RobustValue)).BeginInit();
@@ -91,6 +93,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.DecodeBtn);
+            this.tabPage1.Controls.Add(this.SaveQRCodeBtn);
             this.tabPage1.Controls.Add(this.ShapeCombobox);
             this.tabPage1.Controls.Add(this.VersionLabel);
             this.tabPage1.Controls.Add(this.CheckInputComboBox);
@@ -124,6 +128,17 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // SaveQRCodeBtn
+            // 
+            this.SaveQRCodeBtn.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SaveQRCodeBtn.Location = new System.Drawing.Point(334, 839);
+            this.SaveQRCodeBtn.Name = "SaveQRCodeBtn";
+            this.SaveQRCodeBtn.Size = new System.Drawing.Size(281, 32);
+            this.SaveQRCodeBtn.TabIndex = 32;
+            this.SaveQRCodeBtn.Text = "Save QR Code";
+            this.SaveQRCodeBtn.UseVisualStyleBackColor = true;
+            this.SaveQRCodeBtn.Click += new System.EventHandler(this.SaveQRCodeBtn_Click);
             // 
             // ShapeCombobox
             // 
@@ -181,7 +196,7 @@
             0});
             this.RobustValue.Location = new System.Drawing.Point(297, 333);
             this.RobustValue.Maximum = new decimal(new int[] {
-            64,
+            128,
             0,
             0,
             0});
@@ -195,7 +210,7 @@
             this.RobustValue.TabIndex = 27;
             this.RobustValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.RobustValue.Value = new decimal(new int[] {
-            48,
+            64,
             0,
             0,
             0});
@@ -406,7 +421,7 @@
             // QRCodePicBox
             // 
             this.QRCodePicBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.QRCodePicBox.Location = new System.Drawing.Point(38, 287);
+            this.QRCodePicBox.Location = new System.Drawing.Point(41, 287);
             this.QRCodePicBox.Name = "QRCodePicBox";
             this.QRCodePicBox.Size = new System.Drawing.Size(250, 250);
             this.QRCodePicBox.TabIndex = 2;
@@ -539,6 +554,17 @@
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
             // 
+            // DecodeBtn
+            // 
+            this.DecodeBtn.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DecodeBtn.Location = new System.Drawing.Point(334, 778);
+            this.DecodeBtn.Name = "DecodeBtn";
+            this.DecodeBtn.Size = new System.Drawing.Size(281, 32);
+            this.DecodeBtn.TabIndex = 33;
+            this.DecodeBtn.Text = "Decode";
+            this.DecodeBtn.UseVisualStyleBackColor = true;
+            this.DecodeBtn.Click += new System.EventHandler(this.DecodeBtn_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -606,6 +632,8 @@
         private System.Windows.Forms.ComboBox CheckInputComboBox;
         private System.Windows.Forms.Label VersionLabel;
         private System.Windows.Forms.ComboBox ShapeCombobox;
+        private System.Windows.Forms.Button SaveQRCodeBtn;
+        private System.Windows.Forms.Button DecodeBtn;
     }
 }
 

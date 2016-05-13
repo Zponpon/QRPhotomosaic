@@ -256,7 +256,7 @@ namespace QRPhotoMosaic
         private void SaveMosaicBtn_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
+            saveFileDialog.Filter = "Bitmap Image|*.bmp|JPeg Image|*.jpg";
             saveFileDialog.Title = "Save an Image File";
             saveFileDialog.ShowDialog();
             if (saveFileDialog.FileName == "")
@@ -277,7 +277,7 @@ namespace QRPhotoMosaic
         {
             if (result == null) return;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
+            saveFileDialog.Filter = "Bitmap Image|*.bmp|JPeg Image|*.jpg";
             saveFileDialog.Title = "Save an Image File";
             saveFileDialog.ShowDialog();
             if (saveFileDialog.FileName == "")
@@ -519,6 +519,39 @@ namespace QRPhotoMosaic
             basicProcess.Close();
             basicProcess.Dispose();
             GC.Collect();
+        }
+
+        private void SaveQRCodeBtn_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Bitmap Image|*.bmp|JPeg Image|*.jpg";
+            saveFileDialog.Title = "Save an Image File";
+            saveFileDialog.ShowDialog();
+            if (saveFileDialog.FileName == "")
+            {
+                saveFileDialog.Dispose();
+                GC.Collect();
+                return;
+            }
+            System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
+            //this.QRCodePicBox
+            Bitmap savePic = ImageProc.ScaleImage(QRCodePicBox.Image as Bitmap, QRCodePicBox.Width, QRCodePicBox.Height);
+            //savePic = ImageProc.OverlappingArea(savePic, savePic.Width - tileSize, savePic.Height - tileSize, tileSize);
+            savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            saveFileDialog.Dispose();
+            fs.Close();
+            GC.Collect();
+        }
+
+        private void DecodeBtn_Click(object sender, EventArgs e)
+        {
+            Bitmap img = InputPicBox.Image as Bitmap;
+            //return;
+            //Bitmap img = resultPicBox.Image as Bitmap;
+            LuminanceSource source;
+            source = new BitmapLuminanceSource(img);
+            BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
+            
         }
     }
 }

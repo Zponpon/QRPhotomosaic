@@ -88,51 +88,47 @@ namespace QRPhotoMosaic.Method
                         int px = x * moduleLength + i;
                         int py = y * moduleLength + j;
                         SourceImageColor = pmBitmap.GetPixel(px, py);
-                        
                         if (i >= Around && i < (Around + centerSize) && j >= Around && j < (Around + centerSize)) //center
                         {
-                            LocalThresHoldImageColor = mask.GetPixel(px, py);
-                            double luminance = 0;
-
-                            if (colorSpace == "HSL")
-                            {
-                                ACS.HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.HSL.L;
-                            }
-                            else if (colorSpace == "HSV")
-                            {
-                                ACS.HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.HSV.V;
-                            }
-                            else if (colorSpace == "Lab")
-                            {
-                                ACS.Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.Lab.L / 100;
-                            }
-                            else
-                            {
-                                ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.YUV.Y / 255.0;
-                            }
-
-                            double T = LocalThresHoldImageColor.R / 255.0;
                             double d = DiamondDis(px, py, centerX, centerY);
-                            
-
-                            //if (d <= halfCenterSize && luminance > T - robustVal)
-                            if (d <= halfCenterSize)
-                            {
-                                double layer = (Math.Abs(halfCenterSize - d)) / 5;
-                                double luminance2 = T - UserSetRobustnesspercent - (0.5 * layer * UserSetRobustnesspercent);
-                                
-                                ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
-                                result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                            }
-                            else
+                            if (d > halfCenterSize)
                             {
                                 result.SetPixel(px, py, SourceImageColor);
                             }
+                            else
+                            {
+                                
 
+                                double luminance = 0;
+
+                                if (colorSpace == "HSL")
+                                {
+                                    ACS.HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSL.L;
+                                }
+                                else if (colorSpace == "HSV")
+                                {
+                                    ACS.HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSV.V;
+                                }
+                                else if (colorSpace == "Lab")
+                                {
+                                    ACS.Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.Lab.L / 100;
+                                }
+                                else
+                                {
+                                    ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.YUV.Y / 255.0;
+                                }
+                                LocalThresHoldImageColor = mask.GetPixel(px, py);
+                                double T = LocalThresHoldImageColor.R / 255.0;
+                                double layer = (Math.Abs(halfCenterSize - d)) / 3;
+                                double luminance2 = T - UserSetRobustnesspercent - (0.5 * layer * UserSetRobustnesspercent);
+
+                                ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
+                                result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
+                            }
                         }//if
                         else
                         {
@@ -177,44 +173,43 @@ namespace QRPhotoMosaic.Method
                         SourceImageColor = pmBitmap.GetPixel(x * moduleLength + i, y * moduleLength + j);
                         if (i >= Around && i < (Around + centerSize) && j >= Around && j < (Around + centerSize)) //center
                         {
-                            LocalThresHoldImageColor = mask.GetPixel(x * moduleLength + i, y * moduleLength + j);
-                            double luminance = 0;
-
-                            if (colorSpace == "HSL")
+                            double d = DiamondDis(x * moduleLength + i, y * moduleLength + j, centerX, centerY);
+                            if (d > halfCenterSize)
                             {
-                                ACS.HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.HSL.L;
-                            }
-                            else if (colorSpace == "HSV")
-                            {
-                                ACS.HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.HSV.V;
-                            }
-                            else if (colorSpace == "Lab")
-                            {
-                                ACS.Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.Lab.L / 100;
+                                result.SetPixel(x * moduleLength + i, y * moduleLength + j, SourceImageColor);
                             }
                             else
                             {
-                                ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.YUV.Y / 255.0;
-                            }
 
-                            double T = LocalThresHoldImageColor.R / 255.0;
-                            double d = DiamondDis(x * moduleLength + i, y * moduleLength + j, centerX, centerY);
-                            
-                            //if (d <= halfCenterSize && luminance < T + UserSetRobustnesspercent)
-                            if (d <= halfCenterSize)
-                            {
-                                double layer = (Math.Abs(halfCenterSize - d)) / 5;
+
+                                LocalThresHoldImageColor = mask.GetPixel(x * moduleLength + i, y * moduleLength + j);
+                                double luminance = 0;
+
+                                if (colorSpace == "HSL")
+                                {
+                                    ACS.HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSL.L;
+                                }
+                                else if (colorSpace == "HSV")
+                                {
+                                    ACS.HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSV.V;
+                                }
+                                else if (colorSpace == "Lab")
+                                {
+                                    ACS.Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.Lab.L / 100;
+                                }
+                                else
+                                {
+                                    ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.YUV.Y / 255.0;
+                                }
+                                double T = LocalThresHoldImageColor.R / 255.0;
+                                double layer = (Math.Abs(halfCenterSize - d)) / 3;
                                 double luminance2 = T + UserSetRobustnesspercent + (0.5 * layer * UserSetRobustnesspercent);
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
                                 result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                            }
-                            else
-                            {
-                                result.SetPixel(x * moduleLength + i, y * moduleLength + j, SourceImageColor);
                             }
                         }//if
                         else
@@ -267,47 +262,45 @@ namespace QRPhotoMosaic.Method
                         int px = x * moduleLength + i;
                         int py = y * moduleLength + j;
                         SourceImageColor = pmBitmap.GetPixel(px, py);
-                        if (i >= Around && i <= (Around + centerSize) && j >= Around && j <= (Around + centerSize)) //center
+                        if (i >= Around && i < (Around + centerSize) && j >= Around && j < (Around + centerSize)) //center
                         {
-                            LocalThresHoldImageColor = mask.GetPixel(px, py);
-                            double luminance = 0;
-
-                            if (colorSpace == "HSL")
-                            {
-                                ACS.HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.HSL.L;
-                            }
-                            else if (colorSpace == "HSV")
-                            {
-                                ACS.HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.HSV.V;
-                            }
-                            else if (colorSpace == "Lab")
-                            {
-                                ACS.Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.Lab.L / 100;
-                            }
-                            else
-                            {
-                                ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.YUV.Y / 255.0;
-                            }
-                            double T = LocalThresHoldImageColor.R / 255.0;
                             double d = Radius(px, py, centerX, centerY);
-                            
-                            //if (d <= radius && luminance > T-UserSetRobustnesspercent )
-                            if (d <= radius)
-                            {
-                                double layer = (Math.Abs(radius - d)) / 5;
-                                double luminance2 = T - UserSetRobustnesspercent - ( 0.5 * layer * UserSetRobustnesspercent);
-                                ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
-                                result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
-                            }
-                            else
+                            if(d > radius)
                             {
                                 result.SetPixel(px, py, SourceImageColor);
                             }
+                            else
+                            {
+                                LocalThresHoldImageColor = mask.GetPixel(px, py);
+                                double luminance = 0;
 
+                                if (colorSpace == "HSL")
+                                {
+                                    ACS.HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSL.L;
+                                }
+                                else if (colorSpace == "HSV")
+                                {
+                                    ACS.HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSV.V;
+                                }
+                                else if (colorSpace == "Lab")
+                                {
+                                    ACS.Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.Lab.L / 100;
+                                }
+                                else
+                                {
+                                    ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.YUV.Y / 255.0;
+                                }
+                                double T = LocalThresHoldImageColor.R / 255.0;
+                                double layer = (Math.Abs(radius - d)) / 3;
+                                double luminance2 = T - UserSetRobustnesspercent - ( 0.5 * layer * UserSetRobustnesspercent);
+                                //double luminance2 = T - UserSetRobustnesspercent *1.5;
+                                ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
+                                result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
+                            }
                         }//if
                         else
                         {
@@ -355,37 +348,50 @@ namespace QRPhotoMosaic.Method
                         SourceImageColor = pmBitmap.GetPixel(px, py);
                         if (i >= Around && i < (Around + centerSize) && j >= Around && j < (Around + centerSize)) //center
                         {
-                            LocalThresHoldImageColor = mask.GetPixel(px, py);
-                            double luminance = 0;
-
-                            if (colorSpace == "HSL")
+                            double d = Radius(px, py, centerX, centerY);
+                            if (d > radius)
                             {
-                                ACS.HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.HSL.L;
-                            }
-                            else if (colorSpace == "HSV")
-                            {
-                                ACS.HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.HSV.V;
-                            }
-                            else if (colorSpace == "Lab")
-                            {
-                                ACS.Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.Lab.L / 100;
+                                result.SetPixel(px, py, SourceImageColor);
                             }
                             else
                             {
-                                ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
-                                luminance = ACS.YUV.Y / 255.0;
+                                LocalThresHoldImageColor = mask.GetPixel(px, py);
+                                double luminance = 0;
+                                if (colorSpace == "HSL")
+                                {
+                                    ACS.HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSL.L;
+                                }
+                                else if (colorSpace == "HSV")
+                                {
+                                    ACS.HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.HSV.V;
+                                }
+                                else if (colorSpace == "Lab")
+                                {
+                                    ACS.Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.Lab.L / 100;
+                                }
+                                else
+                                {
+                                    ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                                    luminance = ACS.YUV.Y / 255.0;
+                                } 
+                                double T = LocalThresHoldImageColor.R / 255.0;
+                                double layer = (Math.Abs(radius - d)) / 3;
+                                double luminance2 = T + UserSetRobustnesspercent + (0.5 * layer * UserSetRobustnesspercent);
+                                //double luminance2 = T + UserSetRobustnesspercent * 1.5;
+                                ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
+                                result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                             }
-
-                            double T = LocalThresHoldImageColor.R / 255.0;
-                            double d = Radius(px, py, centerX, centerY);
+                           /*
+                            //double d = Radius(px, py, centerX, centerY);
                             //if (d <= radius && luminance < T + UserSetRobustnesspercent)
                             if (d <= radius)
                             {
-                                double layer = (Math.Abs(radius - d)) / 5;
+                                double layer = (Math.Abs(radius - d)) / 3;
                                 double luminance2 = T + UserSetRobustnesspercent + (0.5 * layer * UserSetRobustnesspercent);
+                                //double luminance2 = T + UserSetRobustnesspercent * 1.5;
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
                                 result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                             }
@@ -393,7 +399,7 @@ namespace QRPhotoMosaic.Method
                             {
                                 result.SetPixel(px, py, SourceImageColor);
                             }
-
+                            */
                         }//if
                         else
                         {
@@ -458,8 +464,8 @@ namespace QRPhotoMosaic.Method
                                 ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
                                 luminance = ACS.YUV.Y / 255.0;
                             }
-
-                            double luminance2 = 0;
+                            double T = LocalThresHoldImageColor.R / 255.0f;
+                            double luminance2 = T - 1.5*UserSetRobustnesspercent;
                             ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
                             result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                         }//if
@@ -528,7 +534,7 @@ namespace QRPhotoMosaic.Method
                             }
 
                             double T = LocalThresHoldImageColor.R / 255.0;
-                            double luminance2 = 1;
+                            double luminance2 = T + 1.5*UserSetRobustnesspercent;
                             ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
                             result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                         }
@@ -630,7 +636,7 @@ namespace QRPhotoMosaic.Method
                                 }
 
                                 double T = LocalThresHoldImageColor.R / 255.0;
-                                double luminance2 = T - UserSetRobustnesspercent - (0.1 * UserSetRobustnesspercent);
+                                double luminance2 = T - UserSetRobustnesspercent * 1.5;
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
                                 result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                             }
@@ -721,7 +727,7 @@ namespace QRPhotoMosaic.Method
                                 }
 
                                 double T = LocalThresHoldImageColor.R / 255.0;
-                                double luminance2 = T + UserSetRobustnesspercent + (0.1 * UserSetRobustnesspercent); ;
+                                double luminance2 = T + UserSetRobustnesspercent * 1.5 ;
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
                                 result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                             }
