@@ -167,6 +167,7 @@ namespace QRPhotoMosaic
                     MainForm.singleton.photomosaicImg = MainForm.singleton.masterBitmap;
                     //temp
                     MainForm.singleton.tileSize = 64;
+                    //MainForm.singleton.tileSize = 128;
                 }
                 worker.ReportProgress(100);
                 System.Threading.Thread.Sleep(500);

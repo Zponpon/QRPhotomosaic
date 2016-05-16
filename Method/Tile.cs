@@ -108,6 +108,7 @@ namespace QRPhotoMosaic.Method
                 FileStream file = File.Open(txtName, FileMode.Open, FileAccess.Read);
                 BinaryReader reader = new BinaryReader(file);
                 tileSize = Convert.ToInt32(reader.ReadByte());
+                //tileSize = 128;
                 foreach (string tileName in System.IO.Directory.GetFiles(folder))
                 {
                     //Image img = Image.FromFile(tileName);

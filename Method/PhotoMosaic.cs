@@ -118,7 +118,7 @@ namespace QRPhotoMosaic.Method
                             min = d;
                             candidateTile = tile;
                             candidateImg = Image.FromFile(tile.Name) as Bitmap;
-                            if (candidateImg.Width != tileSize)
+                            if (candidateImg.Width != tileSize || candidateImg.Height != tileSize)
                                 candidateImg = ImageProc.ScaleImage(candidateImg, tileSize);
                         }
                         if(d > max)
