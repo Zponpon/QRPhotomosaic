@@ -24,26 +24,26 @@ namespace QRPhotoMosaic.Method
             
         }
 
-        public struct Block
+        public struct TileSize
         {
             public string Size { get; set; }
             public int Value{ get; set; }
         }
-        public static List<Block> blockList;
+        public static List<TileSize> tileList;
 
         public static void Init()
         {
-            blockList = new List<Block>()
+            tileList = new List<TileSize>()
             {
-                new Block
+                new TileSize
                 {
-                    Size = "8",
-                    Value = 8,
+                    Size = "64",
+                    Value = 64,
                 },
-                new Block
+                new TileSize
                 {
-                    Size = "4",
-                    Value = 4,
+                    Size = "128",
+                    Value = 128,
                 },
             };
         }

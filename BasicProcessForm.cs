@@ -156,17 +156,18 @@ namespace QRPhotoMosaic
 
                     worker.ReportProgress(10);
                     //MainForm.singleton.embedding.tileSize = tileSize;
-                    MainForm.singleton.tileSize = tileSize;
+                    //MainForm.singleton.tileSize = tileSize;
+                    //MainForm.singleton.tileSize = MainForm.singleton.TileSize;
 
                     //MainForm.singleton.embedding.PhotomosaicImg
                     MainForm.singleton.photomosaicImg
-                    = pmMethod.GenerateByNormalMethod(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, tileSize, version);
+                    = pmMethod.GenerateByNormalMethod(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version);
                 }
                 else
                 {
                     MainForm.singleton.photomosaicImg = MainForm.singleton.masterBitmap;
                     //temp
-                    MainForm.singleton.tileSize = 64;
+                    //MainForm.singleton.tileSize = 64;
                     //MainForm.singleton.tileSize = 128;
                 }
                 worker.ReportProgress(100);

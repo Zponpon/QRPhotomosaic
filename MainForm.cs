@@ -38,6 +38,7 @@ namespace QRPhotoMosaic
         public Bitmap photomosaicImg;
         public Bitmap result;
         public int tileSize;
+        public String masterImgName;
 
         private BasicProcessForm basicProcess;
         private EmbeddingForm embedding;
@@ -53,6 +54,14 @@ namespace QRPhotoMosaic
             get
             {
                 return stopWatch;
+            }
+        }
+
+        public int TileSize
+        {
+            get
+            {
+                return Convert.ToInt32(TileSizecomboBox.SelectedValue);
             }
         }
 
@@ -236,21 +245,9 @@ namespace QRPhotoMosaic
                 Bitmap inputPic = new Bitmap(masterImg, InputPicBox.Width, InputPicBox.Height);
                 InputPicBox.Image = inputPic;
 
-                String masterImgName = loadingFile.FileName;
+                masterImgName = loadingFile.FileName;
                 int lastindex = masterImgName.LastIndexOf("\\");
                 masterImgName = masterImgName.Substring(lastindex + 1);
-
-                // Hash Code???
-                /*
-                Random randomPixel = new Random(10110101);
-                for (int i = 0; i < 50; i++)
-                {
-                    masterImgName = masterImgName + masterBitmap.GetPixel(randomPixel.Next() % masterBitmap.Width, randomPixel.Next() % masterBitmap.Height).ToString();
-                }
-                */
-                //imageC.ImageHashCode = ImageName.GetHashCode().ToString();
-
-                //masterBitmap.Dispose();
             }
         }
         private void SaveMosaicBtn_Click(object sender, EventArgs e)
@@ -267,7 +264,7 @@ namespace QRPhotoMosaic
             }
             System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
             Bitmap savePic = ImageProc.ScaleImage(photomosaicImg, photomosaicImg.Width, photomosaicImg.Height);
-            savePic = ImageProc.OverlappingArea(savePic, savePic.Width - tileSize, savePic.Height - tileSize, tileSize);
+            savePic = ImageProc.OverlappingArea(savePic, savePic.Width - TileSize, savePic.Height - TileSize, TileSize);
             savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
             saveFileDialog.Dispose();
             fs.Close();
@@ -321,7 +318,9 @@ namespace QRPhotoMosaic
             basicProcess.Canceled += CancelBtn_Click;
             basicProcess.ecLevel = QRECLevel;
             basicProcess.check = this.CheckInputComboBox.Text;
-            BlockSize = Convert.ToInt32(BlockcomboBox.SelectedValue);
+            tileSize = TileSize;
+            //BlockSize = Convert.ToInt32(BlockcomboBox.SelectedValue);
+            BlockSize = 8;
             basicProcess.Show();
             stopWatch.Start();
             GC.Collect();
@@ -351,7 +350,8 @@ namespace QRPhotoMosaic
             embedding.info = info;
             embedding.QRBitmap = QRBitmap;
             embedding.PhotomosaicImg = photomosaicImg;
-            embedding.tileSize = tileSize;
+            //embedding.tileSize = tileSize;
+            embedding.tileSize = TileSize;
             embedding.shape = ShapeCombobox.Text;
             embedding.check = CheckInputComboBox.Text;
             embedding.Show();
@@ -500,9 +500,10 @@ namespace QRPhotoMosaic
             FolderComboBox.DataSource = Tile.typeList;
             FolderComboBox.DisplayMember = "name";
             FolderComboBox.ValueMember = "folder";
-            BlockcomboBox.DataSource = PhotoMosaic.blockList;
-            BlockcomboBox.DisplayMember = "Size";
-            BlockcomboBox.ValueMember = "Value";
+            TileSizecomboBox.DataSource = PhotoMosaic.tileList;
+            TileSizecomboBox.DisplayMember = "Size";
+            TileSizecomboBox.ValueMember = "Value";
+            TileSizecomboBox.SelectedIndex = 0;
             FolderComboBox.SelectedIndex = 3;
         }
 

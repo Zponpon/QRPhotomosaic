@@ -228,21 +228,49 @@ namespace QRPhotoMosaic.Method
             int size = pmBitmap.Width - tileSize.Value; //ex: pm->22, qr->21
             Bitmap overlapping = pmBitmap;
             if (check == "N")
+            {
+                worker.ReportProgress(10, "Calculate the overlapping area");
                 overlapping = ImageProc.OverlappingArea(pmBitmap, size, size, tileSize.Value);
+            }
 
-            worker.ReportProgress(10, "Calculate the overlapping area");
+            Bitmap greyImage = null;
+            string path = "..\\GreyImage\\" + MainForm.singleton.masterImgName;
+            //Console.WriteLine(path);
+            try
+            {
+                greyImage = Image.FromFile(path) as Bitmap;
+            }
+            //FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.Read);
+            catch(FileNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+                worker.ReportProgress(20, "Generate a gray image of overlapping area");
+                greyImage = ImageProc.GrayImage(overlapping, colorSpace);
+                FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.Write);
+                greyImage.Save(file, System.Drawing.Imaging.ImageFormat.Bmp);
+            }
 
-            Bitmap grayImage = ImageProc.GrayImage(overlapping, colorSpace);
-            worker.ReportProgress(20, "Generate a gray image of overlapping area");
-
-            Bitmap thresholdMask = LocalThresholdMask(grayImage, 5, tileSize.Value);
-            worker.ReportProgress(30, "Generate pixel based threshold mask");
+            path = "..\\ThresholdMask\\" + MainForm.singleton.masterImgName;
+            Bitmap thresholdMask;
+            try
+            {
+                thresholdMask = Image.FromFile(path) as Bitmap;
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+                worker.ReportProgress(30, "Generate pixel based threshold mask");
+                thresholdMask = LocalThresholdMask(greyImage, 5, tileSize.Value);
+                FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.Write);
+                thresholdMask.Save(file, System.Drawing.Imaging.ImageFormat.Bmp);
+            }
+            
 
             Bitmap prevWork = GeneratingProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value, shape);
 
             Bitmap resultQR = addQuietZone(prevWork, tileSize.Value);
 
-            grayImage = null;
+            greyImage = null;
             overlapping = null;
             prevWork = null;
             GC.Collect();

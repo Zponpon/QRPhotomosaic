@@ -30,6 +30,7 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.DecodeBtn = new System.Windows.Forms.Button();
             this.SaveQRCodeBtn = new System.Windows.Forms.Button();
             this.ShapeCombobox = new System.Windows.Forms.ComboBox();
             this.VersionLabel = new System.Windows.Forms.Label();
@@ -43,7 +44,7 @@
             this.CenterSizenumDown = new System.Windows.Forms.NumericUpDown();
             this.LevelComboBox = new System.Windows.Forms.ComboBox();
             this.SaveMosaicBtn = new System.Windows.Forms.Button();
-            this.BlockcomboBox = new System.Windows.Forms.ComboBox();
+            this.TileSizecomboBox = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.FolderComboBox = new System.Windows.Forms.ComboBox();
@@ -67,7 +68,6 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.DecodeBtn = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RobustValue)).BeginInit();
@@ -107,7 +107,7 @@
             this.tabPage1.Controls.Add(this.CenterSizenumDown);
             this.tabPage1.Controls.Add(this.LevelComboBox);
             this.tabPage1.Controls.Add(this.SaveMosaicBtn);
-            this.tabPage1.Controls.Add(this.BlockcomboBox);
+            this.tabPage1.Controls.Add(this.TileSizecomboBox);
             this.tabPage1.Controls.Add(this.label3);
             this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.FolderComboBox);
@@ -128,6 +128,17 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // DecodeBtn
+            // 
+            this.DecodeBtn.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DecodeBtn.Location = new System.Drawing.Point(334, 778);
+            this.DecodeBtn.Name = "DecodeBtn";
+            this.DecodeBtn.Size = new System.Drawing.Size(281, 32);
+            this.DecodeBtn.TabIndex = 33;
+            this.DecodeBtn.Text = "Decode";
+            this.DecodeBtn.UseVisualStyleBackColor = true;
+            this.DecodeBtn.Click += new System.EventHandler(this.DecodeBtn_Click);
             // 
             // SaveQRCodeBtn
             // 
@@ -267,7 +278,7 @@
             0});
             this.CenterSizenumDown.Location = new System.Drawing.Point(297, 220);
             this.CenterSizenumDown.Maximum = new decimal(new int[] {
-            64,
+            128,
             0,
             0,
             0});
@@ -311,14 +322,14 @@
             this.SaveMosaicBtn.UseVisualStyleBackColor = true;
             this.SaveMosaicBtn.Click += new System.EventHandler(this.SaveMosaicBtn_Click);
             // 
-            // BlockcomboBox
+            // TileSizecomboBox
             // 
-            this.BlockcomboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BlockcomboBox.FormattingEnabled = true;
-            this.BlockcomboBox.Location = new System.Drawing.Point(305, 711);
-            this.BlockcomboBox.Name = "BlockcomboBox";
-            this.BlockcomboBox.Size = new System.Drawing.Size(135, 31);
-            this.BlockcomboBox.TabIndex = 15;
+            this.TileSizecomboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TileSizecomboBox.FormattingEnabled = true;
+            this.TileSizecomboBox.Location = new System.Drawing.Point(305, 711);
+            this.TileSizecomboBox.Name = "TileSizecomboBox";
+            this.TileSizecomboBox.Size = new System.Drawing.Size(135, 31);
+            this.TileSizecomboBox.TabIndex = 15;
             // 
             // label3
             // 
@@ -326,9 +337,9 @@
             this.label3.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.Location = new System.Drawing.Point(308, 674);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(120, 23);
+            this.label3.Size = new System.Drawing.Size(109, 23);
             this.label3.TabIndex = 14;
-            this.label3.Text = "Block Size";
+            this.label3.Text = "Tile Size";
             // 
             // label2
             // 
@@ -554,17 +565,6 @@
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
             // 
-            // DecodeBtn
-            // 
-            this.DecodeBtn.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DecodeBtn.Location = new System.Drawing.Point(334, 778);
-            this.DecodeBtn.Name = "DecodeBtn";
-            this.DecodeBtn.Size = new System.Drawing.Size(281, 32);
-            this.DecodeBtn.TabIndex = 33;
-            this.DecodeBtn.Text = "Decode";
-            this.DecodeBtn.UseVisualStyleBackColor = true;
-            this.DecodeBtn.Click += new System.EventHandler(this.DecodeBtn_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -616,7 +616,7 @@
         private System.Windows.Forms.ComboBox FolderComboBox;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.ComponentModel.BackgroundWorker EmbeddingWorker;
-        private System.Windows.Forms.ComboBox BlockcomboBox;
+        private System.Windows.Forms.ComboBox TileSizecomboBox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.ComponentModel.BackgroundWorker CreateWorker;
