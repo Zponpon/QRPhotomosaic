@@ -21,6 +21,10 @@ namespace QRPhotoMosaic.Method
 {
     static class Utility
     {
+        static int max;
+        static int min;
+        static double minL;
+        static double maxL;
         public static void waterMarkDark(Bitmap result, Bitmap pmBitmap, int x, int y, int moduleLength)
         {
             Color SourceImageColor;
@@ -60,6 +64,77 @@ namespace QRPhotoMosaic.Method
             }
         }
 
+        public static void ParamsAB(int maxR, int minR, double maxL, double minL, string colorSpace, out double a, out double minusb, out double plusb)
+        {
+            a = Math.Log((double)maxR / (double)minR, Math.E) / ((double)maxL - (double)minL);
+            max = maxR;
+            min = minR;
+            Utility.maxL = maxL;
+            Utility.minL = minL;
+            minusb = maxR / Math.Exp(a * minL * -1);
+            plusb = maxR / Math.Exp(a * maxL);
+        }
+
+        public static int ExpMinus(double a, double b, double L)
+        {
+            if (L < minL) L = minL;
+            if (L > maxL) L = maxL;
+            return (int)(b * Math.Exp(a * L * -1));
+        }
+
+        public static int ExpPlus(double a, double b, double L)
+        {
+            if (L < minL) L = minL;
+            if (L > maxL) L = maxL;
+            return (int)(b * Math.Exp(a * L));
+        }
+
+
+        private static double AvgMoudleLum(Bitmap pmBitmap, int x, int y, int moduleLength, string colorSpace)
+        {
+            Color SourceImageColor;
+            ColorSpace CSC = new ColorSpace();
+            double Sum_Luminance = 0, Lmean;
+            for (int j = 0; j < moduleLength; ++j)
+            {
+                for (int i = 0; i < moduleLength; ++i)
+                {
+                    SourceImageColor = pmBitmap.GetPixel(x * moduleLength + i, y * moduleLength + j);
+                    double Luminance = 0;
+
+                    if (colorSpace == "HSL")
+                    {
+                        ColorSpace.HSL HSL;
+                        HSL = CSC.RGB2HSL(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                        Luminance = HSL.L;
+                    }
+                    else if (colorSpace == "HSV")
+                    {
+                        ColorSpace.HSV HSV;
+                        HSV = CSC.RGB2HSV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                        Luminance = HSV.V;
+                    }
+                    else if (colorSpace == "Lab")
+                    {
+                        ColorSpace.Lab Lab;
+                        Lab = CSC.RGB2Lab(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                        Luminance = Lab.L / 100;
+                    }
+                    else
+                    {
+                        ColorSpace.YUV YUV;
+                        YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
+                        Luminance = YUV.Y / 255.0;
+                    }
+                    Sum_Luminance += Luminance;
+                }
+            }
+
+            Lmean = (Sum_Luminance / (moduleLength * moduleLength));
+
+            return Lmean;
+        }
+
         private static int DiamondDis(int pX, int pY, int cX, int cY)
         {
             int x = Math.Abs(pX - cX);
@@ -67,8 +142,13 @@ namespace QRPhotoMosaic.Method
             return x + y;
         }
 
-        public static void BlackDiamond(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace)  //黑
+        public static void BlackDiamond(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
+            double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
+            moduleAvgLum *= 255.0f;
+            centerSize = Utility.ExpPlus(a, b, moduleAvgLum);
+            robustVal = (int)(((double)(centerSize-Utility.min) / (double)(Utility.max-Utility.min)) * 16) + 48;
+            Console.Write("Black: " + robustVal.ToString() + "\n");
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
@@ -152,8 +232,12 @@ namespace QRPhotoMosaic.Method
             }
         }
                       
-        public static void WhiteDiamond(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace)  //黑
+        public static void WhiteDiamond(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
+            double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
+            moduleAvgLum *= 255.0f;
+            centerSize = Utility.ExpMinus(a, b, moduleAvgLum);
+            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
@@ -180,8 +264,6 @@ namespace QRPhotoMosaic.Method
                             }
                             else
                             {
-
-
                                 LocalThresHoldImageColor = mask.GetPixel(x * moduleLength + i, y * moduleLength + j);
                                 double luminance = 0;
 
@@ -241,8 +323,12 @@ namespace QRPhotoMosaic.Method
             return Math.Sqrt(x + y);
         }     
 
-        public static void BlackCircle(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace)  //黑
+        public static void BlackCircle(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
+            double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
+            moduleAvgLum *= 255.0f;
+            centerSize = Utility.ExpPlus(a, b, moduleAvgLum);
+            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
@@ -325,8 +411,12 @@ namespace QRPhotoMosaic.Method
             //return result;
         }
                       
-        public static void WhiteCircle(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace)  //黑
+        public static void WhiteCircle(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
+            double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
+            moduleAvgLum *= 255.0f;
+            centerSize = Utility.ExpMinus(a, b, moduleAvgLum);
+            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
@@ -423,8 +513,12 @@ namespace QRPhotoMosaic.Method
             }
         }
                       
-        public static void BlackSquare(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace)  //黑
+        public static void BlackSquare(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
+            double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
+            moduleAvgLum *= 255.0f;
+            centerSize = Utility.ExpPlus(a, b, moduleAvgLum);
+            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
@@ -490,8 +584,12 @@ namespace QRPhotoMosaic.Method
             //return result;
         }
                       
-        public static void WhiteSquare(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace) //白
+        public static void WhiteSquare(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b) //白
         {
+            double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
+            moduleAvgLum *= 255.0f;
+            centerSize = Utility.ExpMinus(a, b, moduleAvgLum);
+            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
@@ -576,8 +674,12 @@ namespace QRPhotoMosaic.Method
             return true;
         }
 
-        public static void BlackCorner(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace)
+        public static void BlackCorner(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)
         {
+            double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
+            moduleAvgLum *= 255.0f;
+            centerSize = Utility.ExpPlus(a, b, moduleAvgLum);
+            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
@@ -666,8 +768,12 @@ namespace QRPhotoMosaic.Method
 
         }
 
-        public static void WhiteCorner(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace)
+        public static void WhiteCorner(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace,double a, double b)
         {
+            double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
+            moduleAvgLum *= 255.0f;
+            centerSize = Utility.ExpMinus(a, b, moduleAvgLum);
+            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();

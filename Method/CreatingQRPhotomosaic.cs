@@ -28,6 +28,8 @@ namespace QRPhotoMosaic.Method
         private int centerSize;
         private double robustVal;
 
+        private double a, minusb, plusb;//function params
+
         public void RegisterColorCB()
         {
              
@@ -158,19 +160,19 @@ namespace QRPhotoMosaic.Method
                             {
                                 case "Square":
                                     //result = BlackSquare(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
-                                    Utility.BlackSquare(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
+                                    Utility.BlackSquare(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, plusb);
                                     break;
                                 case "Circle":
                                     //result = BlackCircle(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
-                                    Utility.BlackCircle(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
+                                    Utility.BlackCircle(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, plusb);
                                     break;
                                 case "Diamond":
                                     //result = BlackDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
-                                    Utility.BlackDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
+                                    Utility.BlackDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, plusb);
                                     break;
                                 case "Corner":
                                     //result = BlackDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
-                                    Utility.BlackCorner(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
+                                    Utility.BlackCorner(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, plusb);
                                     break;
                                 default:
                                     break;
@@ -185,18 +187,18 @@ namespace QRPhotoMosaic.Method
                             {
                                 case "Square":
                                     //result = WhiteSquare(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
-                                    Utility.WhiteSquare(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
+                                    Utility.WhiteSquare(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, minusb);
                                     break;
                                 case "Circle":
                                     //result = WhiteCircle(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
-                                    Utility.WhiteCircle(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
+                                    Utility.WhiteCircle(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, minusb);
                                     break;
                                 case "Diamond":
                                     //result = WhiteDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
-                                    Utility.WhiteDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
+                                    Utility.WhiteDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, minusb);
                                     break;
                                 case "Corner":
-                                    Utility.WhiteCorner(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace);
+                                    Utility.WhiteCorner(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, minusb);
                                     break;
                                 default:
                                     break;
@@ -264,8 +266,11 @@ namespace QRPhotoMosaic.Method
                 FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.Write);
                 thresholdMask.Save(file, System.Drawing.Imaging.ImageFormat.Bmp);
             }
-            
 
+            if(shape != "Corner")
+                Utility.ParamsAB(tileSize.Value / 2, tileSize.Value * 5 / 16, 200.0f, 30.0f, colorSpace, out a, out minusb, out plusb);
+            else
+                Utility.ParamsAB(tileSize.Value * 3 / 4, tileSize.Value * 1 / 2, 200.0f, 30.0f, colorSpace, out a, out minusb, out plusb);
             Bitmap prevWork = GeneratingProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value, shape);
 
             Bitmap resultQR = addQuietZone(prevWork, tileSize.Value);
