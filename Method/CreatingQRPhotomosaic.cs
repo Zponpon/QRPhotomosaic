@@ -221,7 +221,8 @@ namespace QRPhotoMosaic.Method
             if (!tileSize.HasValue || !centerSize.HasValue || !robustVal.HasValue) return null;
             this.centerSize = centerSize.Value;
             this.robustVal = robustVal.Value;
-            this.colorSpace = colorSpace;
+            //this.colorSpace = colorSpace;
+            this.colorSpace = "YUV";
             AlignmentPatternLocation_X = info.AlignmentPatternLocation_X * tileSize.Value;
             AlignmentPatternLocation_Y = info.AlignmentPatternLocation_Y * tileSize.Value;
             version = info.QRVersion;
@@ -268,9 +269,9 @@ namespace QRPhotoMosaic.Method
             }
 
             if(shape != "Corner")
-                Utility.ParamsAB(tileSize.Value / 2, tileSize.Value * 5 / 16, 200.0f, 30.0f, colorSpace, out a, out minusb, out plusb);
+                Utility.ParamsAB(tileSize.Value * 9 / 16, tileSize.Value * 5 / 16, 255.0f, 0.0f, colorSpace, out a, out minusb, out plusb);
             else
-                Utility.ParamsAB(tileSize.Value * 3 / 4, tileSize.Value * 1 / 2, 200.0f, 30.0f, colorSpace, out a, out minusb, out plusb);
+                Utility.ParamsAB(tileSize.Value * 3 / 4, tileSize.Value * 1 / 2, 255.0f, 0.0f, colorSpace, out a, out minusb, out plusb);
             Bitmap prevWork = GeneratingProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value, shape);
 
             Bitmap resultQR = addQuietZone(prevWork, tileSize.Value);

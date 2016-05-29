@@ -30,7 +30,6 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.DecodeBtn = new System.Windows.Forms.Button();
             this.SaveQRCodeBtn = new System.Windows.Forms.Button();
             this.ShapeCombobox = new System.Windows.Forms.ComboBox();
             this.VersionLabel = new System.Windows.Forms.Label();
@@ -93,7 +92,6 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.DecodeBtn);
             this.tabPage1.Controls.Add(this.SaveQRCodeBtn);
             this.tabPage1.Controls.Add(this.ShapeCombobox);
             this.tabPage1.Controls.Add(this.VersionLabel);
@@ -128,17 +126,6 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // DecodeBtn
-            // 
-            this.DecodeBtn.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DecodeBtn.Location = new System.Drawing.Point(334, 778);
-            this.DecodeBtn.Name = "DecodeBtn";
-            this.DecodeBtn.Size = new System.Drawing.Size(281, 32);
-            this.DecodeBtn.TabIndex = 33;
-            this.DecodeBtn.Text = "Decode";
-            this.DecodeBtn.UseVisualStyleBackColor = true;
-            this.DecodeBtn.Click += new System.EventHandler(this.DecodeBtn_Click);
             // 
             // SaveQRCodeBtn
             // 
@@ -633,7 +620,6 @@
         private System.Windows.Forms.Label VersionLabel;
         private System.Windows.Forms.ComboBox ShapeCombobox;
         private System.Windows.Forms.Button SaveQRCodeBtn;
-        private System.Windows.Forms.Button DecodeBtn;
     }
 }
 
