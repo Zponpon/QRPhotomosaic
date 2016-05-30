@@ -183,9 +183,9 @@ namespace QRPhotoMosaic
         private void Init()
         {
             LevelComboBox.SelectedIndex = 0;
-            ColorSpaceComboBox.SelectedIndex = 1;
+            //ColorSpaceComboBox.SelectedIndex = 1;
             CheckInputComboBox.SelectedIndex = 1;
-            ShapeCombobox.SelectedIndex = 2;
+            ShapeCombobox.SelectedIndex = 1;
             this.ProcessTime.Text = "";
             Console.Write(LevelComboBox.Text);
             basicProcess = new BasicProcessForm();
@@ -343,9 +343,13 @@ namespace QRPhotoMosaic
                 EmbeddingEventRegister();
             }
 
-            embedding.centerSize = Convert.ToInt32(this.CenterSizenumDown.Value);
-            embedding.robustVal = Convert.ToInt32(RobustValue.Value);
-            embedding.ColorSpace = ColorSpaceComboBox.Text;
+            //embedding.centerSize = Convert.ToInt32(this.CenterSizenumDown.Value);
+            //embedding.robustVal = Convert.ToInt32(RobustValue.Value);
+            embedding.centerSize = 26;
+            embedding.robustVal = 64;
+            
+            //embedding.ColorSpace = ColorSpaceComboBox.Text;
+            embedding.ColorSpace = "YUV";
             embedding.method = new CreatingQRPhotomosaic();
             embedding.info = info;
             embedding.QRBitmap = QRBitmap;

@@ -95,11 +95,20 @@ namespace QRPhotoMosaic.Method
             Color SourceImageColor;
             ColorSpace CSC = new ColorSpace();
             double Sum_Luminance = 0, Lmean;
+            /*
+            int half = moduleLength / 2;
+            int leftx = x * moduleLength;
+            int rightx = (x + 1) * moduleLength;
+            int downy = (y+1) * moduleLength;
+            int topy = y * moduleLength;
+             */
             for (int j = 0; j < moduleLength; ++j)
             {
-                for (int i = 0; i < moduleLength; ++i)
+                for (int i = 0; i < moduleLength ; ++i)
                 {
-                    SourceImageColor = pmBitmap.GetPixel(x * moduleLength + i, y * moduleLength + j);
+                    int px = x * moduleLength + i;
+                    int py = y * moduleLength + j;
+                    SourceImageColor = pmBitmap.GetPixel(px, py);
                     double Luminance = 0;
 
                     if (colorSpace == "HSL")
@@ -129,7 +138,6 @@ namespace QRPhotoMosaic.Method
                     Sum_Luminance += Luminance;
                 }
             }
-
             Lmean = (Sum_Luminance / (moduleLength * moduleLength));
 
             return Lmean;
