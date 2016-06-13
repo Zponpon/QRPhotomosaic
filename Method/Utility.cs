@@ -219,7 +219,7 @@ namespace QRPhotoMosaic.Method
 
                                 if (d <= sizeCount1) layer *= (0.4 * 3);
                                 if (d <= sizeCount2 && d > sizeCount1) layer *= (0.4 * 2);
-                                if (d <= sizeCount3 && d > sizeCount2) layer *= 0.4;
+                                if (d <= sizeCount3 && d > sizeCount2) layer *= 0;
 
                                 double luminance2 = T - UserSetRobustnesspercent - (0.4 * layer * UserSetRobustnesspercent);
 
@@ -314,7 +314,7 @@ namespace QRPhotoMosaic.Method
 
                                 if (d <= sizeCount1) layer *= (0.4 * 3);
                                 if (d <= sizeCount2 && d > sizeCount1) layer *= (0.4 * 2);
-                                if (d <= sizeCount3 && d > sizeCount2) layer *= 0.4;
+                                if (d <= sizeCount3 && d > sizeCount2) layer *= 0;
 
                                 double luminance2 = T + UserSetRobustnesspercent + (0.4 * layer * UserSetRobustnesspercent);
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
@@ -417,7 +417,7 @@ namespace QRPhotoMosaic.Method
 
                                 if (d <= sizeCount1) layer *= (0.4 * 3);
                                 if (d <= sizeCount2 && d > sizeCount1) layer *= (0.4 * 2);
-                                if (d <= sizeCount3 && d > sizeCount2) layer *= 0.4;
+                                if (d <= sizeCount3 && d > sizeCount2) layer *= 0;
 
                                 double luminance2 = T - UserSetRobustnesspercent - ( 0.4 * layer * UserSetRobustnesspercent);
                                 //double luminance2 = T - UserSetRobustnesspercent *1.5;
@@ -514,7 +514,7 @@ namespace QRPhotoMosaic.Method
 
                                 if (d <= sizeCount1) layer *= (0.4 * 3);
                                 if (d <= sizeCount2 && d > sizeCount1) layer *= (0.4 * 2);
-                                if (d <= sizeCount3 && d > sizeCount2) layer *= 0.4;
+                                if (d <= sizeCount3 && d > sizeCount2) layer *= 0;
                                  
                                 double luminance2 = T + UserSetRobustnesspercent + (0.4 * layer * UserSetRobustnesspercent);
                                 //double luminance2 = T + UserSetRobustnesspercent * 1.5;
@@ -776,8 +776,8 @@ namespace QRPhotoMosaic.Method
                                 double T = LocalThresHoldImageColor.R / 255.0;
                                 double layer = (Math.Abs(radius - d)) / 3;
 
-                                double luminance2 = T - UserSetRobustnesspercent - (0.4 * layer * UserSetRobustnesspercent);
-                                //luminance2 = T - UserSetRobustnesspercent * 1.5;
+                                //double luminance2 = T - UserSetRobustnesspercent - (0.4 * layer * UserSetRobustnesspercent);
+                                double luminance2 = T - UserSetRobustnesspercent * 1.5;
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
                                 result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                             }
@@ -813,6 +813,7 @@ namespace QRPhotoMosaic.Method
             moduleAvgLum *= 255.0f;
             centerSize = Utility.ExpMinus(a, b, moduleAvgLum);
             robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            Console.Write(robustVal);
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
@@ -887,9 +888,9 @@ namespace QRPhotoMosaic.Method
                                 if (d <= sizeCount3 && d > sizeCount2) layer *= 0.4;
                                 */
 
-                                double luminance2 = T + UserSetRobustnesspercent + (0.4 * layer * UserSetRobustnesspercent);
+                                //double luminance2 = T + UserSetRobustnesspercent + (0.4 * layer * UserSetRobustnesspercent);
 
-                                //luminance2 = T + UserSetRobustnesspercent * 1.5 ;
+                                double luminance2 = T + UserSetRobustnesspercent * 1.5 ;
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
                                 result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                             }

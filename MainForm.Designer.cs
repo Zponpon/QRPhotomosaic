@@ -35,6 +35,7 @@
             this.VersionLabel = new System.Windows.Forms.Label();
             this.CheckInputComboBox = new System.Windows.Forms.ComboBox();
             this.ProcessTime = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.LevelComboBox = new System.Windows.Forms.ComboBox();
             this.SaveMosaicBtn = new System.Windows.Forms.Button();
             this.TileSizecomboBox = new System.Windows.Forms.ComboBox();
@@ -61,7 +62,8 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.label5 = new System.Windows.Forms.Label();
+            this.MinLum = new System.Windows.Forms.NumericUpDown();
+            this.MaxLum = new System.Windows.Forms.NumericUpDown();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.resultPicBox)).BeginInit();
@@ -71,6 +73,8 @@
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TilePicBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MinLum)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxLum)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -85,6 +89,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.MaxLum);
+            this.tabPage1.Controls.Add(this.MinLum);
             this.tabPage1.Controls.Add(this.SaveQRCodeBtn);
             this.tabPage1.Controls.Add(this.ShapeCombobox);
             this.tabPage1.Controls.Add(this.VersionLabel);
@@ -170,6 +176,16 @@
             this.ProcessTime.Size = new System.Drawing.Size(33, 12);
             this.ProcessTime.TabIndex = 26;
             this.ProcessTime.Text = "label6";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label5.Location = new System.Drawing.Point(294, 91);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(174, 21);
+            this.label5.TabIndex = 25;
+            this.label5.Text = "Error Correction Level";
             // 
             // LevelComboBox
             // 
@@ -439,15 +455,39 @@
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
             // 
-            // label5
+            // MinLum
             // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("微軟正黑體", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label5.Location = new System.Drawing.Point(294, 91);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(174, 21);
-            this.label5.TabIndex = 25;
-            this.label5.Text = "Error Correction Level";
+            this.MinLum.Location = new System.Drawing.Point(312, 206);
+            this.MinLum.Maximum = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.MinLum.Name = "MinLum";
+            this.MinLum.Size = new System.Drawing.Size(135, 22);
+            this.MinLum.TabIndex = 33;
+            // 
+            // MaxLum
+            // 
+            this.MaxLum.Location = new System.Drawing.Point(312, 320);
+            this.MaxLum.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.MaxLum.Minimum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
+            this.MaxLum.Name = "MaxLum";
+            this.MaxLum.Size = new System.Drawing.Size(135, 22);
+            this.MaxLum.TabIndex = 34;
+            this.MaxLum.Value = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
             // 
             // MainForm
             // 
@@ -470,6 +510,8 @@
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TilePicBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MinLum)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxLum)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -510,6 +552,8 @@
         private System.Windows.Forms.ComboBox ShapeCombobox;
         private System.Windows.Forms.Button SaveQRCodeBtn;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.NumericUpDown MaxLum;
+        private System.Windows.Forms.NumericUpDown MinLum;
     }
 }
 

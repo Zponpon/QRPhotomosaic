@@ -5,6 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Drawing;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Flann;
+using Emgu.CV.Features2D;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using Emgu.CV.GPU;
 
 
 using ZxingForQRcodeHiding.Common;
@@ -48,12 +55,28 @@ namespace QRPhotoMosaic.Method
             };
         }
 
+        public void TestFunc(Bitmap src, List<Tile> tiles/*, Bitmap block*/)
+        {
+            Bitmap a = new Bitmap(8, 8);
+            for(int i = 0; i < 8; ++i)
+            {
+                for(int j = 0; j < 8; ++j)
+                {
+                    a.SetPixel(i, j, src.GetPixel(i, j));
+                }
+            }
+            IList<IndecesMapping> result = FLANN.Match(tiles, src);
+            Console.Write(result.Count);
+            Console.Write(result.Count);
+        }
+
 
         public Bitmap GenerateByNormalMethod(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version)
         {
             //int v = (version * 4 + 17 + 1) * 2;
             int v = (version * 4 + 17) + 1;
             int blockSize = MainForm.singleton.BlockSize;
+            //blockSize = 8;
             int dstSize = v * tileSize; // Depend on qr version
             double blockTotal = blockSize * blockSize;
             int width = v * blockSize;
@@ -63,6 +86,7 @@ namespace QRPhotoMosaic.Method
             List<int> candidates = new List<int>(); // choosen index of candidate'
             int currDstH = 0;
             int currDstW = 0;
+            //flann.
 
             for (int y = 0; y < newSrc.Height; y += blockSize)
             {

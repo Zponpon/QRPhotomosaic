@@ -29,6 +29,9 @@ namespace QRPhotoMosaic
         public string shape;
         public string check;
 
+        public double maxLum;
+        public double minLum;
+
         public EmbeddingForm()
         {
             InitializeComponent();
@@ -47,7 +50,7 @@ namespace QRPhotoMosaic
                 worker.ReportProgress(0, "Start");
 
                 info.GetQRCodeInfo(info.QRmatrix, info.QRVersion);
-                Bitmap result = method.Generate(worker, info, QRBitmap, PhotomosaicImg, tileSize, centerSize, robustVal, ColorSpace, shape, check);
+                Bitmap result = method.Generate(worker, info, QRBitmap, PhotomosaicImg, tileSize, centerSize, robustVal, ColorSpace, shape, check, minLum, maxLum);
                 worker.ReportProgress(100, "It's done");
                 
 
