@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.IO;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Flann;
@@ -14,146 +15,58 @@ using Emgu.CV.GPU;
 
 namespace QRPhotoMosaic.Method
 {
-    public class IndecesMapping
-    {
-        public int IndexStart { get; set; }
-        public int IndexEnd { get; set; }
-        public int Similarity { get; set; }
-        public string fileName { get; set; }
-    }
-
     public static class FLANN
     {
+        public static string avgtxt = "AvgColor.txt";
+        public static Matrix<float> features = null;
+        public static Index kdtree = null;
+        public static Matrix<int> Indices = null;
+        public static Matrix<float> Query = null;
 
-        public static Matrix<float> ComputeSingleDescriptors(Bitmap block)
+        public static void Search(Bitmap src, int version)
         {
-            Matrix<float> descs;
-            SURFDetector detector = new SURFDetector(500, true);
+            int blockSize = MainForm.singleton.BlockSize;
+            int v = (version * 4 + 17) + 1;
+            int dstSize = v * v;
+            float blockTotal = blockSize * blockSize;
+            float R = 0, G = 0, B = 0;
 
-            using (Image<Gray, Byte> img = new Image<Gray, byte>(block))
+            Matrix<int> indices = new Matrix<int>(dstSize, 1);
+            Matrix<float> dist = new Matrix<float>(dstSize, 1);
+            Matrix<float> query = new Matrix<float>(dstSize, 3);
+            Bitmap newSrc = ImageProc.ScaleImage(src, v * blockSize);
+            int index = 0;
+            for (int y = 0; y < newSrc.Height; y += blockSize)
             {
-                VectorOfKeyPoint keyPoints = detector.DetectKeyPointsRaw(img, null);
-                descs = detector.ComputeDescriptorsRaw(img, null, keyPoints);
-            }
-
-            return descs;
-        }
-
-        public static Matrix<float> ComputeSingleDescriptors(string fileName)
-        {
-            Matrix<float> descs;
-            SURFDetector detector = new SURFDetector(500, true);
-
-            using (Image<Gray, Byte> img = new Image<Gray, byte>(fileName))
-            {
-                VectorOfKeyPoint keyPoints = detector.DetectKeyPointsRaw(img, null);
-                descs = detector.ComputeDescriptorsRaw(img, null, keyPoints);
-            }
-
-            
-            return descs;
-        }
-
-        public static IList<Matrix<float>> ComputeMultipleDescriptors(List<string> fileNames, out IList<IndecesMapping> imap)
-        {
-            imap = new List<IndecesMapping>();
-
-            IList<Matrix<float>> descs = new List<Matrix<float>>();
-
-            int r = 0;
-
-            for (int i = 0; i < fileNames.Count; i++)
-            {
-                var desc = ComputeSingleDescriptors(fileNames[i]);
-                if (desc != null)
+                for (int x = 0; x < newSrc.Height; x += blockSize)
                 {
-                    descs.Add(desc);
-
-                    imap.Add(new IndecesMapping()
+                    int currX = 0, currY = 0;
+                    Bitmap currBlock = new Bitmap(blockSize, blockSize);
+                    for (int i = y; i < y + blockSize; ++i)
                     {
-                        fileName = fileNames[i],
-                        IndexStart = r,
-                        IndexEnd = r + desc.Rows - 1
-                    });r += desc.Rows;
-                }
-            }
-
-            return descs;
-        }
-
-        public static Matrix<float> ConcatDescriptors(IList<Matrix<float>> descriptors)
-        {
-            int cols = descriptors[0].Cols;
-            int rows = descriptors.Sum(a => a.Rows);
-
-            float[,] concatedDescs = new float[rows, cols];
-
-            int offset = 0;
-
-            foreach (var descriptor in descriptors)
-            {
-                // append new descriptors
-                Buffer.BlockCopy(descriptor.ManagedArray, 0, concatedDescs, offset, sizeof(float) * descriptor.ManagedArray.Length);
-                offset += sizeof(float) * descriptor.ManagedArray.Length;
-            }
-
-            return new Matrix<float>(concatedDescs);
-        }
-
-        public static void FindMatches(Matrix<float> dbDescriptors, Matrix<float> queryDescriptors, ref IList<IndecesMapping> imap)
-        {
-            var indices = new Matrix<int>(queryDescriptors.Rows, 2); // matrix that will contain indices of the 2-nearest neighbors found
-            var dists = new Matrix<float>(queryDescriptors.Rows, 2); // matrix that will contain distances to the 2-nearest neighbors found
-
-            // create FLANN index with 4 kd-trees and perform KNN search over it look for 2 nearest neighbours
-            var flannIndex = new Index(dbDescriptors, 4);
-            flannIndex.KnnSearch(queryDescriptors, indices, dists, 2, 24);
-
-            for (int i = 0; i < indices.Rows; i++)
-            {
-                // filter out all inadequate pairs based on distance between pairs
-                if (dists.Data[i, 0] < (0.6 * dists.Data[i, 1]))
-                {
-                    // find image from the db to which current descriptor range belongs and increment similarity value.
-                    // in the actual implementation this should be done differently as it's not very efficient for large image collections.
-                    foreach (var img in imap)
-                    {
-                        if (img.IndexStart <= i && img.IndexEnd >= i)
+                        for (int j = x; j < x + blockSize; ++j)
                         {
-                            img.Similarity++;
-                            break;
+                            R += Convert.ToSingle(newSrc.GetPixel(j, i).R);
+                            G += Convert.ToSingle(newSrc.GetPixel(j, i).G);
+                            B += Convert.ToSingle(newSrc.GetPixel(j, i).B);
+                            currBlock.SetPixel(currX++, currY, newSrc.GetPixel(j, i));
                         }
+                        currY++;
+                        currX = 0;
                     }
+                    R /= blockTotal;
+                    G /= blockTotal;
+                    B /= blockTotal;
+                    query.Data[index, 0] = R;
+                    query.Data[index, 1] = G;
+                    query.Data[index, 2] = B;
+                    index++;
+                    R = G = B = 0;
                 }
             }
+            kdtree.KnnSearch(query, indices, dist, 1, 64);
+            FLANN.Query = query;
+            FLANN.Indices = indices;
         }
-
-        public static IList<IndecesMapping> Match(List<Tile> tiles, Bitmap block)
-        {
-            //string[] dbImages = { "1.jpg", "2.jpg", "3.jpg" };
-            List<string> dbImages = new List<string>();
-            for (int i = 0; i < tiles.Count; ++i)
-            {
-                dbImages.Add(tiles[i].Name);
-            }
-            //string queryImage = "query.jpg";
-
-            IList<IndecesMapping> imap;
-
-            // compute descriptors for each image
-            var dbDescsList = ComputeMultipleDescriptors(dbImages, out imap);
-
-            // concatenate all DB images descriptors into single Matrix
-            Matrix<float> dbDescs = ConcatDescriptors(dbDescsList);
-
-            // compute descriptors for the query image
-            //Matrix<float> queryDescriptors = ComputeSingleDescriptors(queryImage);
-            Matrix<float> queryDescriptors = ComputeSingleDescriptors(block);
-
-            FindMatches(dbDescs, queryDescriptors, ref imap);
-
-            return imap;
-        }
-
     }
 }

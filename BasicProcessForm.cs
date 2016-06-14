@@ -161,6 +161,7 @@ namespace QRPhotoMosaic
 
                     //MainForm.singleton.embedding.PhotomosaicImg
                     //pmMethod.TestFunc(MainForm.singleton.masterBitmap, MainForm.singleton.tiles);
+                    //pmMethod.flann(MainForm.singleton.masterBitmap, 1, MainForm.singleton.tiles);
                     MainForm.singleton.photomosaicImg
                     = pmMethod.GenerateByNormalMethod(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version);
                 }

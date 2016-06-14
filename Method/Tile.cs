@@ -99,8 +99,13 @@ namespace QRPhotoMosaic.Method
 
         public static void ReadFile(List<Tile> tiles, out int tileSize, string folder)
         {
-            if (tiles.Count != 0) tiles.Clear();
-            tileSize = 0;
+            //if (tiles.Count != 0) tiles.Clear();
+            tileSize = tiles.Count;
+            if (tiles.Count != 0)
+            {
+                return;
+            }
+
             try
             {
                 int total = System.IO.Directory.GetFiles(folder).Length;
@@ -108,6 +113,8 @@ namespace QRPhotoMosaic.Method
                 FileStream file = File.Open(txtName, FileMode.Open, FileAccess.Read);
                 BinaryReader reader = new BinaryReader(file);
                 tileSize = Convert.ToInt32(reader.ReadByte());
+                
+                int index = 0;
                 //tileSize = 128;
                 foreach (string tileName in System.IO.Directory.GetFiles(folder))
                 {
@@ -116,9 +123,22 @@ namespace QRPhotoMosaic.Method
                     tile.avgRGB.R = Convert.ToInt32(reader.ReadByte());
                     tile.avgRGB.G = Convert.ToInt32(reader.ReadByte());
                     tile.avgRGB.B = Convert.ToInt32(reader.ReadByte());
-
+                    
+                    //FLANN.features.Data[index, 0] = (float)tile.avgRGB.R;
+                    //FLANN.features.Data[index, 1] = (float)tile.avgRGB.G;
+                    //FLANN.features.Data[index, 2] = (float)tile.avgRGB.B;
+                    //index++;
                     tiles.Add(tile);
                 }
+
+                FLANN.features = new Emgu.CV.Matrix<float>(tiles.Count, 3);
+                for (int i = 0; i < tiles.Count; ++i)
+                {
+                    FLANN.features.Data[i, 0] = (float)tiles[i].avgRGB.R;
+                    FLANN.features.Data[i, 1] = (float)tiles[i].avgRGB.G;
+                    FLANN.features.Data[i, 2] = (float)tiles[i].avgRGB.B;
+                }
+                FLANN.kdtree = new Emgu.CV.Flann.Index(FLANN.features, 5);
                 file.Close();
                 file.Dispose();
                 reader.Close();
