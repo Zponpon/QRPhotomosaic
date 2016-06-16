@@ -27,6 +27,7 @@ namespace QRPhotoMosaic
         public string readFilePath;
         public string ecLevel;
         public string check;
+        public string search;
         
         public PictureBox QRCodePicBox;
         public PictureBox PhotomosaicPicBox;
@@ -162,8 +163,17 @@ namespace QRPhotoMosaic
                     //MainForm.singleton.embedding.PhotomosaicImg
                     //pmMethod.TestFunc(MainForm.singleton.masterBitmap, MainForm.singleton.tiles);
                     //pmMethod.flann(MainForm.singleton.masterBitmap, 1, MainForm.singleton.tiles);
-                    MainForm.singleton.photomosaicImg
-                    = pmMethod.GenerateByNormalMethod(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version);
+                    switch(search)
+                    { 
+                        case "Flann":
+                            MainForm.singleton.photomosaicImg
+                            = pmMethod.GenerateByFlann(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version);
+                            break;
+                        case "Full":
+                            MainForm.singleton.photomosaicImg
+                            = pmMethod.GenerateByNormalMethod(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version);
+                            break;
+                    }
                 }
                 else
                 {
@@ -185,6 +195,7 @@ namespace QRPhotoMosaic
 
         public void CreateWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            string elapsedTime="";
             if (e.Cancelled == true || MainForm.singleton.isCancel)
             {
                 MessageBox.Show("Canacel");
@@ -201,7 +212,8 @@ namespace QRPhotoMosaic
                 MainForm.singleton.StopWatch.Stop();
                 MessageBox.Show("Done");
                 TimeSpan ts = MainForm.singleton.StopWatch.Elapsed;
-                string elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                
             }
 
             if(MainForm.singleton.photomosaicImg != null)
@@ -214,6 +226,7 @@ namespace QRPhotoMosaic
                 h = MainForm.singleton.QRCodePictureBox.Height;
                 MainForm.singleton.QRCodeImage = ImageProc.ScaleImage(MainForm.singleton.QRBitmap, w, h);
                 MainForm.singleton.VersionText = "Version: " + MainForm.singleton.info.QRVersion.ToString();
+                MainForm.singleton.ProcessTimeText = elapsedTime;
             }
             MainForm.singleton.StopWatch.Reset();
             Close();

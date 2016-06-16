@@ -60,40 +60,53 @@ namespace QRPhotoMosaic.Method
             int v = (version * 4 + 17) + 1;
             int dstSize = v * tileSize; // Depend on qr version
             Bitmap dst = new Bitmap(dstSize, dstSize); // final result
+            Matrix<int> indices = new Matrix<int>(dstSize, 1);
+            Matrix<float> dist = new Matrix<float>(dstSize, 1);
+            //Search(src, version, indices, dist);
             FLANN.Search(src, version);
             
             int currBlockIdx = 0;
+            Bitmap candidateImg = null;
             for (int y = 0; y < dst.Height; y += tileSize)
             {
-                for (int x = 0; x < dst.Height; x += tileSize)
+                if (MainForm.singleton.isCancel) return null;
+                worker.ReportProgress((y*90) / dst.Height  + 10);
+                for (int x = 0; x < dst.Width; x += tileSize)
                 {
-                    for (int i = 0; i < tileSize; ++i )
+                    if (MainForm.singleton.isCancel) return null;
+                    candidateImg = Image.FromFile(tiles[FLANN.Indices.Data[currBlockIdx, 0]].Name) as Bitmap;
+                    if (candidateImg.Width != tileSize || candidateImg.Height != tileSize)
+                        candidateImg = ImageProc.ScaleImage(candidateImg, tileSize);
+                    for (int i = 0; i < tileSize; ++i)
                     {
+                        if (MainForm.singleton.isCancel) return null;
                         for (int j = 0; j < tileSize; ++j)
                         {
                             if (MainForm.singleton.isCancel) return null;
                             ColorSpace.RGB rgb;
-                            Bitmap candidateImg = Image.FromFile(tiles[FLANN.Indices.Data[0, 0]].Name) as Bitmap;
-
-                            float var_B = (float)tiles[FLANN.Indices.Data[currBlockIdx, 0]].avgRGB.B - FLANN.Query.Data[currBlockIdx, 0];
-                            float var_G = (float)tiles[FLANN.Indices.Data[currBlockIdx, 0]].avgRGB.G - FLANN.Query.Data[currBlockIdx, 0];
+                            
+                            float var_B = (float)tiles[FLANN.Indices.Data[currBlockIdx, 0]].avgRGB.B - FLANN.Query.Data[currBlockIdx, 2];
+                            float var_G = (float)tiles[FLANN.Indices.Data[currBlockIdx, 0]].avgRGB.G - FLANN.Query.Data[currBlockIdx, 1];
                             float var_R = (float)tiles[FLANN.Indices.Data[currBlockIdx, 0]].avgRGB.R - FLANN.Query.Data[currBlockIdx, 0];
                             
-                            rgb.R = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(x+j, y+i).R) - var_R);
-                            rgb.G = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(x+j, y+i).G) - var_G);
-                            rgb.B = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(x+j++, y+i).B) - var_B);
+                            
+                            rgb.R = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(j, i).R) - var_R);
+                            rgb.G = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(j, i).G) - var_G);
+                            rgb.B = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(j, i).B) - var_B);
 
                             rgb.R = ImageProc.NormalizeRGB(rgb.R);
                             rgb.G = ImageProc.NormalizeRGB(rgb.G);
                             rgb.B = ImageProc.NormalizeRGB(rgb.B);
 
                             Color pixel = Color.FromArgb(255, rgb.R, rgb.G, rgb.B);
-                            //dst.SetPixel(w, h, pixel);
+                            dst.SetPixel(j+x, i+y, pixel);
                         }
                     }
+                    candidateImg.Dispose();
                     currBlockIdx++;
                 }
             }
+            GC.Collect();
             return dst;
         }
 
@@ -113,7 +126,7 @@ namespace QRPhotoMosaic.Method
             List<int> candidates = new List<int>(); // choosen index of candidate'
             int currDstH = 0;
             int currDstW = 0;
-            FLANN.Search(src, version);
+            //FLANN.Search(src, version);
 
             for (int y = 0; y < newSrc.Height; y += blockSize)
             {
@@ -187,9 +200,6 @@ namespace QRPhotoMosaic.Method
                             if (MainForm.singleton.isCancel) return null;
                             ColorSpace.RGB rgb;
 
-                            //rgb.R = Convert.ToInt32(Convert.ToDouble(candidateTile.bitmap.GetPixel(tw, th).R) - var_R);
-                            //rgb.G = Convert.ToInt32(Convert.ToDouble(candidateTile.bitmap.GetPixel(tw, th).G) - var_G);
-                            //rgb.B = Convert.ToInt32(Convert.ToDouble(candidateTile.bitmap.GetPixel(tw++, th).B) - var_B);
                             rgb.R = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(tw, th).R) - var_R);
                             rgb.G = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(tw, th).G) - var_G);
                             rgb.B = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(tw++, th).B) - var_B);

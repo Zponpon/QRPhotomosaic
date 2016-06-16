@@ -183,6 +183,7 @@ namespace QRPhotoMosaic
         private void Init()
         {
             LevelComboBox.SelectedIndex = 0;
+            SearchMethodComboBox.SelectedIndex = 0;
             //ColorSpaceComboBox.SelectedIndex = 1;
             CheckInputComboBox.SelectedIndex = 1;
             ShapeCombobox.SelectedIndex = 1;
@@ -317,6 +318,7 @@ namespace QRPhotoMosaic
             basicProcess.Canceled -= CancelBtn_Click;
             basicProcess.Canceled += CancelBtn_Click;
             basicProcess.ecLevel = QRECLevel;
+            basicProcess.search = SearchMethodComboBox.Text;
             basicProcess.check = this.CheckInputComboBox.Text;
             tileSize = TileSize;
             //BlockSize = Convert.ToInt32(BlockcomboBox.SelectedValue);
@@ -510,7 +512,7 @@ namespace QRPhotoMosaic
             TileSizecomboBox.DisplayMember = "Size";
             TileSizecomboBox.ValueMember = "Value";
             TileSizecomboBox.SelectedIndex = 0;
-            FolderComboBox.SelectedIndex = 3;
+            //FolderComboBox.SelectedIndex = 3;
         }
 
         private void CancelBtn_Click(object sender, EventArgs e)

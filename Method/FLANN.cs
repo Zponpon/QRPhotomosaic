@@ -67,6 +67,21 @@ namespace QRPhotoMosaic.Method
             kdtree.KnnSearch(query, indices, dist, 1, 64);
             FLANN.Query = query;
             FLANN.Indices = indices;
+            GC.Collect();
+        }
+
+        public static List<int> Index()
+        {
+            List<int> index = new List<int>();
+
+            for (int i = 0; i < FLANN.Indices.Height; ++i)
+            {
+                index.Add(FLANN.Indices.Data[i, 0]);
+            }
+
+            return index;
         }
     }
+
+
 }

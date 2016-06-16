@@ -30,6 +30,9 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.SearchMethodComboBox = new System.Windows.Forms.ComboBox();
+            this.MaxLum = new System.Windows.Forms.NumericUpDown();
+            this.MinLum = new System.Windows.Forms.NumericUpDown();
             this.SaveQRCodeBtn = new System.Windows.Forms.Button();
             this.ShapeCombobox = new System.Windows.Forms.ComboBox();
             this.VersionLabel = new System.Windows.Forms.Label();
@@ -40,7 +43,6 @@
             this.SaveMosaicBtn = new System.Windows.Forms.Button();
             this.TileSizecomboBox = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.FolderComboBox = new System.Windows.Forms.ComboBox();
             this.QRAndPhotmosaicBtn = new System.Windows.Forms.Button();
             this.QRPhotomosaicBtn = new System.Windows.Forms.Button();
@@ -62,10 +64,11 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.MinLum = new System.Windows.Forms.NumericUpDown();
-            this.MaxLum = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxLum)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MinLum)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.resultPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PhotomosaicPicBox)).BeginInit();
@@ -73,8 +76,6 @@
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TilePicBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MinLum)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxLum)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -89,6 +90,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.label1);
+            this.tabPage1.Controls.Add(this.SearchMethodComboBox);
             this.tabPage1.Controls.Add(this.MaxLum);
             this.tabPage1.Controls.Add(this.MinLum);
             this.tabPage1.Controls.Add(this.SaveQRCodeBtn);
@@ -101,7 +104,6 @@
             this.tabPage1.Controls.Add(this.SaveMosaicBtn);
             this.tabPage1.Controls.Add(this.TileSizecomboBox);
             this.tabPage1.Controls.Add(this.label3);
-            this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.FolderComboBox);
             this.tabPage1.Controls.Add(this.QRAndPhotmosaicBtn);
             this.tabPage1.Controls.Add(this.QRPhotomosaicBtn);
@@ -120,6 +122,52 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // SearchMethodComboBox
+            // 
+            this.SearchMethodComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SearchMethodComboBox.FormattingEnabled = true;
+            this.SearchMethodComboBox.Items.AddRange(new object[] {
+            "Flann",
+            "Full"});
+            this.SearchMethodComboBox.Location = new System.Drawing.Point(304, 527);
+            this.SearchMethodComboBox.Name = "SearchMethodComboBox";
+            this.SearchMethodComboBox.Size = new System.Drawing.Size(135, 31);
+            this.SearchMethodComboBox.TabIndex = 35;
+            // 
+            // MaxLum
+            // 
+            this.MaxLum.Location = new System.Drawing.Point(312, 320);
+            this.MaxLum.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.MaxLum.Minimum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
+            this.MaxLum.Name = "MaxLum";
+            this.MaxLum.Size = new System.Drawing.Size(135, 22);
+            this.MaxLum.TabIndex = 34;
+            this.MaxLum.Value = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            // 
+            // MinLum
+            // 
+            this.MinLum.Location = new System.Drawing.Point(312, 206);
+            this.MinLum.Maximum = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.MinLum.Name = "MinLum";
+            this.MinLum.Size = new System.Drawing.Size(135, 22);
+            this.MinLum.TabIndex = 33;
             // 
             // SaveQRCodeBtn
             // 
@@ -231,21 +279,12 @@
             this.label3.TabIndex = 14;
             this.label3.Text = "Tile Size";
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(308, 583);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(131, 23);
-            this.label2.TabIndex = 13;
-            this.label2.Text = "Tile folder";
-            // 
             // FolderComboBox
             // 
+            this.FolderComboBox.BackColor = System.Drawing.SystemColors.Window;
             this.FolderComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FolderComboBox.FormattingEnabled = true;
-            this.FolderComboBox.Location = new System.Drawing.Point(305, 609);
+            this.FolderComboBox.Location = new System.Drawing.Point(305, 616);
             this.FolderComboBox.Name = "FolderComboBox";
             this.FolderComboBox.Size = new System.Drawing.Size(135, 31);
             this.FolderComboBox.TabIndex = 11;
@@ -455,39 +494,15 @@
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
             // 
-            // MinLum
+            // label1
             // 
-            this.MinLum.Location = new System.Drawing.Point(312, 206);
-            this.MinLum.Maximum = new decimal(new int[] {
-            30,
-            0,
-            0,
-            0});
-            this.MinLum.Name = "MinLum";
-            this.MinLum.Size = new System.Drawing.Size(135, 22);
-            this.MinLum.TabIndex = 33;
-            // 
-            // MaxLum
-            // 
-            this.MaxLum.Location = new System.Drawing.Point(312, 320);
-            this.MaxLum.Maximum = new decimal(new int[] {
-            255,
-            0,
-            0,
-            0});
-            this.MaxLum.Minimum = new decimal(new int[] {
-            128,
-            0,
-            0,
-            0});
-            this.MaxLum.Name = "MaxLum";
-            this.MaxLum.Size = new System.Drawing.Size(135, 22);
-            this.MaxLum.TabIndex = 34;
-            this.MaxLum.Value = new decimal(new int[] {
-            255,
-            0,
-            0,
-            0});
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(294, 488);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(153, 23);
+            this.label1.TabIndex = 36;
+            this.label1.Text = "Search Method";
             // 
             // MainForm
             // 
@@ -502,6 +517,8 @@
             this.tabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxLum)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MinLum)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.resultPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PhotomosaicPicBox)).EndInit();
@@ -510,8 +527,6 @@
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TilePicBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MinLum)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxLum)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -542,7 +557,6 @@
         private System.ComponentModel.BackgroundWorker EmbeddingWorker;
         private System.Windows.Forms.ComboBox TileSizecomboBox;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
         private System.ComponentModel.BackgroundWorker CreateWorker;
         private System.Windows.Forms.Button SaveMosaicBtn;
         private System.Windows.Forms.ComboBox LevelComboBox;
@@ -554,6 +568,8 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.NumericUpDown MaxLum;
         private System.Windows.Forms.NumericUpDown MinLum;
+        private System.Windows.Forms.ComboBox SearchMethodComboBox;
+        private System.Windows.Forms.Label label1;
     }
 }
 

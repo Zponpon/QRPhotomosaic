@@ -29,7 +29,7 @@ namespace QRPhotoMosaic.Method
         public static void Init()
         {
             typeList = new List<TileType>()
-            {
+            {/*
                 new TileType
                 {
                     Name = "fleur",
@@ -44,7 +44,7 @@ namespace QRPhotoMosaic.Method
                 {
                     Name = "all",
                     Folder = "..\\all"
-                },
+                },*/
                 new TileType
                 {
                     Name="Data",
@@ -100,6 +100,7 @@ namespace QRPhotoMosaic.Method
         public static void ReadFile(List<Tile> tiles, out int tileSize, string folder)
         {
             //if (tiles.Count != 0) tiles.Clear();
+            //folder = "..\\data";
             tileSize = tiles.Count;
             if (tiles.Count != 0)
             {
