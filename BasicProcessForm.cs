@@ -210,10 +210,9 @@ namespace QRPhotoMosaic
             else
             {
                 MainForm.singleton.StopWatch.Stop();
-                MessageBox.Show("Done");
                 TimeSpan ts = MainForm.singleton.StopWatch.Elapsed;
                 elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-                
+                MessageBox.Show("Done");
             }
 
             if(MainForm.singleton.photomosaicImg != null)
