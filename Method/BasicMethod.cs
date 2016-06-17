@@ -42,6 +42,19 @@ namespace QRPhotoMosaic.Method
             Tile.SaveFile(MainForm.singleton.tiles, BasicProcessForm.calcTileSize, savingPath);
         }
 
+        public void CalcAvgRGB4x4(BackgroundWorker worker, string savingPath)
+        {
+            if (MainForm.singleton.tiles.Count == 0) return;
+            int t = 0;
+            foreach (Tile tile in MainForm.singleton.tiles)
+            {
+                tile.CalcNonDivTileAvgRGB4x4(BasicProcessForm.calcTileSize);
+                if (MainForm.singleton.tiles.Count == 0) return;
+                worker.ReportProgress((++t * 100) / MainForm.singleton.tiles.Count);
+            }
+            Tile.SaveFile4x4(MainForm.singleton.tiles, BasicProcessForm.calcTileSize, savingPath);
+        }
+
         public static void ReadFile(List<Tile> tiles, ref int tileSize, string folder)
         {
             if (tiles.Count != 0) tiles.Clear();
