@@ -156,7 +156,6 @@ namespace QRPhotoMosaic.Method
             moduleAvgLum *= 255.0f;
             centerSize = Utility.ExpPlus(a, b, moduleAvgLum);
             robustVal = (int)(((double)(centerSize-Utility.min) / (double)(Utility.max-Utility.min)) * 16) + 48;
-            Console.Write("Black: " + robustVal.ToString() + "\n");
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
@@ -813,7 +812,6 @@ namespace QRPhotoMosaic.Method
             moduleAvgLum *= 255.0f;
             centerSize = Utility.ExpMinus(a, b, moduleAvgLum);
             robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
-            Console.Write(robustVal);
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();

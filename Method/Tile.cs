@@ -74,17 +74,15 @@ namespace QRPhotoMosaic.Method
         {
             int r = 0, g = 0, b = 0;
             Bitmap tileImg = Image.FromFile(Name) as Bitmap;
-            //if (s != bitmap.Width)
-            //    bitmap = ImageProc.ScaleImage(bitmap, s);
+
             if (s != tileImg.Width || s != tileImg.Height)
                 tileImg = ImageProc.ScaleImage(tileImg, s);
-            //int size = bitmap.Height * bitmap.Height;
-            int size = tileImg.Height * tileImg.Height;
+
             int quater = tileImg.Height / 4;
             int dq = quater * quater;
             for (int y = 0; y < tileImg.Height; y += quater)
             {
-                for (int x = 0; x < tileImg.Height; x += quater)
+                for (int x = 0; x < tileImg.Width; x += quater)
                 {
                     for (int i = 0; i < quater; ++i)
                     {
@@ -279,7 +277,7 @@ namespace QRPhotoMosaic.Method
                 FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 BinaryWriter writer = new BinaryWriter(file);
                 writer.Write(Convert.ToSByte(tileSize));
-                //byte[] rgb;
+                
                 foreach (Tile tile in tiles)
                 {
                     trans(tile, writer);
@@ -466,7 +464,7 @@ namespace QRPhotoMosaic.Method
             rgb[7] = Convert.ToByte(tile.rgb4x4[2].G);
             rgb[8] = Convert.ToByte(tile.rgb4x4[2].B);
 
-            rgb[9] = Convert.ToByte(tile.rgb4x4[3].R);
+            rgb[9]  = Convert.ToByte(tile.rgb4x4[3].R);
             rgb[10] = Convert.ToByte(tile.rgb4x4[3].G);
             rgb[11] = Convert.ToByte(tile.rgb4x4[3].B);
 

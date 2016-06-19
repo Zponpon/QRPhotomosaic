@@ -55,6 +55,49 @@ namespace QRPhotoMosaic.Method
             };
         }
 
+        private void tryMethod(Tile tile, int idx, int y, int x, Bitmap img, Bitmap dst)
+        {
+            ColorSpace.RGB rgb;
+            int index = 0;
+            int blockidxX = 0;
+            int blockidxY = 0;
+            for (int m = 0; m < 48;)
+            {
+                float var_R = (float)tile.rgb4x4[index].R - FLANN.Query4x4.Data[idx, m++];
+                float var_G = (float)tile.rgb4x4[index].G - FLANN.Query4x4.Data[idx, m++];
+                float var_B = (float)tile.rgb4x4[index].B - FLANN.Query4x4.Data[idx, m++];
+                if (blockidxY >= 64)
+                {
+                    blockidxY = blockidxX = 0;
+                }
+                if (blockidxX == 64)
+                {
+                    blockidxX = 0;
+                    blockidxY += 16;
+                }
+
+                for (int n = 0; n < 16; ++n )
+                {
+                    for(int k = 0; k < 16; ++k)
+                    {                                                                       
+                        rgb.R = Convert.ToInt32(Convert.ToSingle(img.GetPixel(k+blockidxX, n+blockidxY).R) - var_R);
+                        rgb.G = Convert.ToInt32(Convert.ToSingle(img.GetPixel(k+blockidxX, n+blockidxY).G) - var_G);
+                        rgb.B = Convert.ToInt32(Convert.ToSingle(img.GetPixel(k+blockidxX, n+blockidxY).B) - var_B);
+
+                        rgb.R = ImageProc.NormalizeRGB(rgb.R);
+                        rgb.G = ImageProc.NormalizeRGB(rgb.G);
+                        rgb.B = ImageProc.NormalizeRGB(rgb.B);
+                        Color pixel = Color.FromArgb(255, rgb.R, rgb.G, rgb.B);
+                        dst.SetPixel(x + k + blockidxX, y + n + blockidxY, pixel);
+                    }
+                }
+                //x += 64;
+                blockidxX += 16;
+                index++;
+            }
+
+        }
+
         public Bitmap GenerateByFlann4x4(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k)
         {
             int v = (version * 4 + 17) + 1;
@@ -99,39 +142,21 @@ namespace QRPhotoMosaic.Method
                     if (candidateImg.Width != tileSize || candidateImg.Height != tileSize)
                         candidateImg = ImageProc.ScaleImage(candidateImg, tileSize);
 
-                    for (int i = 0; i < tileSize; ++i)
+                    if (MainForm.singleton.isCancel) return null;
+                    tryMethod(tiles[FLANN.Indices4x4.Data[currBlockIdx, tileIdx]], currBlockIdx, y, x, candidateImg, dst);
+                    /*
+                    for (int i = 0; i < dstSize; i+=tileSize)
                     {
                         if (MainForm.singleton.isCancel) return null;
-                        for (int j = 0; j < tileSize; ++j)
+                        for (int j = 0; j < dstSize; j += tileSize)
                         {
                             if (MainForm.singleton.isCancel) return null;
-                            //go home to think
-                            float var_B = (float)tiles[FLANN.Indices.Data[currBlockIdx, tileIdx]].avgRGB.B - FLANN.Query.Data[currBlockIdx, 2];
-                            float var_G = (float)tiles[FLANN.Indices.Data[currBlockIdx, tileIdx]].avgRGB.G - FLANN.Query.Data[currBlockIdx, 1];
-                            float var_R = (float)tiles[FLANN.Indices.Data[currBlockIdx, tileIdx]].avgRGB.R - FLANN.Query.Data[currBlockIdx, 0];
-                            /*
-                            ColorSpace.RGB rgb;
-                            
-                            
-                            float var_B = (float)tiles[FLANN.Indices.Data[currBlockIdx, tileIdx]].avgRGB.B - FLANN.Query.Data[currBlockIdx, 2];
-                            float var_G = (float)tiles[FLANN.Indices.Data[currBlockIdx, tileIdx]].avgRGB.G - FLANN.Query.Data[currBlockIdx, 1];
-                            float var_R = (float)tiles[FLANN.Indices.Data[currBlockIdx, tileIdx]].avgRGB.R - FLANN.Query.Data[currBlockIdx, 0];
-
-
-                            rgb.R = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(j, i).R) - var_R);
-                            rgb.G = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(j, i).G) - var_G);
-                            rgb.B = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(j, i).B) - var_B);
-
-                            rgb.R = ImageProc.NormalizeRGB(rgb.R);
-                            rgb.G = ImageProc.NormalizeRGB(rgb.G);
-                            rgb.B = ImageProc.NormalizeRGB(rgb.B);
-                            */
-
-                            dst.SetPixel(j + x, i + y, candidateImg.GetPixel(j, i));
+                            tryMethod(tiles[FLANN.Indices4x4.Data[currBlockIdx, tileIdx]], currBlockIdx, y, x, candidateImg, dst);
+                            //dst.SetPixel(j + x, i + y, candidateImg.GetPixel(j, i));
                             //Color pixel = Color.FromArgb(255, rgb.R, rgb.G, rgb.B);
                             //dst.SetPixel(j + x, i + y, pixel);
                         }
-                    }
+                    }*/
                     candidateImg.Dispose();
                     currBlockIdx++;
                 }
@@ -197,9 +222,9 @@ namespace QRPhotoMosaic.Method
                             float var_R = (float)tiles[FLANN.Indices.Data[currBlockIdx, tileIdx]].avgRGB.R - FLANN.Query.Data[currBlockIdx, 0];
                             
                             
-                            rgb.R = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(j, i).R) - var_R);
-                            rgb.G = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(j, i).G) - var_G);
-                            rgb.B = Convert.ToInt32(Convert.ToDouble(candidateImg.GetPixel(j, i).B) - var_B);
+                            rgb.R = Convert.ToInt32(Convert.ToSingle(candidateImg.GetPixel(j, i).R) - var_R);
+                            rgb.G = Convert.ToInt32(Convert.ToSingle(candidateImg.GetPixel(j, i).G) - var_G);
+                            rgb.B = Convert.ToInt32(Convert.ToSingle(candidateImg.GetPixel(j, i).B) - var_B);
 
                             rgb.R = ImageProc.NormalizeRGB(rgb.R);
                             rgb.G = ImageProc.NormalizeRGB(rgb.G);

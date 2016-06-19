@@ -462,10 +462,10 @@ namespace QRPhotoMosaic
             basicProcess.Canceled += CancelBtn_Click;
             basicProcess.Show();
             // Register callback function
-            tileCB -= basicMethod.CalcAvgRGB;
-            tileCB += basicMethod.CalcAvgRGB;
-            //tileCB -= basicMethod.CalcAvgRGB4x4;
-            //tileCB += basicMethod.CalcAvgRGB4x4;
+            //tileCB -= basicMethod.CalcAvgRGB;
+            //tileCB += basicMethod.CalcAvgRGB;
+            tileCB -= basicMethod.CalcAvgRGB4x4;
+            tileCB += basicMethod.CalcAvgRGB4x4;
             basicMethod.stringCB -= SavingFileName;
             basicMethod.stringCB += SavingFileName;
             stopWatch.Start();

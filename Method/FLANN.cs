@@ -111,10 +111,10 @@ namespace QRPhotoMosaic.Method
                             R /= dq;
                             G /= dq;
                             B /= dq;
-                            query.Data[index, blockIdx]   = R;
-                            query.Data[index, blockIdx+1] = G;
-                            query.Data[index, blockIdx+2] = B;
-                            blockIdx += 3;
+                            query.Data[index, blockIdx++] = R;
+                            query.Data[index, blockIdx++] = G;
+                            query.Data[index, blockIdx++] = B;
+                            //blockIdx += 3;
                             R = G = B = 0;
                         }
                     }
