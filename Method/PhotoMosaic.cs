@@ -212,6 +212,7 @@ namespace QRPhotoMosaic.Method
                         for (int j = 0; j < tileSize; ++j)
                         {
                             if (MainForm.singleton.isCancel) return null;
+                            
                             ColorSpace.RGB rgb;
 
                             float var_B = (float)tiles[FLANN.Indices.Data[currBlockIdx, tileIdx]].avgRGB.B - FLANN.Query.Data[currBlockIdx, 2];
