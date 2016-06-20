@@ -322,7 +322,7 @@ namespace QRPhotoMosaic
             basicProcess.check = this.CheckInputComboBox.Text;
             tileSize = TileSize;
             //BlockSize = Convert.ToInt32(BlockcomboBox.SelectedValue);
-            BlockSize = 8;
+            BlockSize = 4;
             basicProcess.Show();
             stopWatch.Start();
             GC.Collect();

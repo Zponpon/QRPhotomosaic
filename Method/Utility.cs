@@ -446,7 +446,7 @@ namespace QRPhotoMosaic.Method
             }
             //return result;
         }
-                      
+
         public static void WhiteCircle(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
             double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
@@ -553,6 +553,13 @@ namespace QRPhotoMosaic.Method
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
             ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
+
+            double sizeCount1 = centerSize / 6;
+            double sizeCount2 = centerSize  / 3;
+            double sizeCount3 = centerSize / 2;
+            int centerX = x * moduleLength + Around + centerSize/2;
+            int centerY = y * moduleLength + Around + centerSize/2;
+
             double UserSetRobustnesspercent = robustVal / 255.0;
             double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
             double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
@@ -589,7 +596,46 @@ namespace QRPhotoMosaic.Method
                                 luminance = ACS.YUV.Y / 255.0;
                             }
                             double T = LocalThresHoldImageColor.R / 255.0f;
-                            double luminance2 = T - 1.5*UserSetRobustnesspercent;
+
+                            double d = Radius(x * moduleLength + i, y * moduleLength + j, centerX, centerY);
+                            //double layer = (Math.Abs(centerSize - d)) / 3;
+                            double layer = 0;
+                            bool done = false;
+
+                            if (x * moduleLength + i <= centerX + sizeCount1 && y * moduleLength + j <= centerY + sizeCount1 &&
+                                x * moduleLength + i >= centerX - sizeCount1 && y * moduleLength + j >= centerY - sizeCount1)
+                            {
+                                layer = 2;
+                                done = true;
+                            }
+                            else if (x * moduleLength + i <= centerX + sizeCount2 && y * moduleLength + j <= centerY + sizeCount2 &&
+                                x * moduleLength + i >= centerX - sizeCount2 && y * moduleLength + j >= centerY - sizeCount2 && !done)
+                            {
+                                layer = 1;
+                                done = true;
+                            }
+                            else if (x * moduleLength + i <= centerX + sizeCount3 && y * moduleLength + j <= centerY + sizeCount3 &&
+                                x * moduleLength + i >= centerX - sizeCount3 && y * moduleLength + j >= centerY - sizeCount3 && !done)
+                            {
+                                layer = 0.0;
+                                done = true;
+                            }
+                            /*
+                            if (d <= sizeCount1)
+                            {
+                                layer = Math.Abs(centerSize - sizeCount1) / 3 * (0.4 * 3);
+                            }
+                            if (d <= sizeCount2 && d > sizeCount1)
+                            {
+                                layer = Math.Abs(centerSize - sizeCount2) / 3 * (0.4 * 2); 
+                            }
+                            if (d <= sizeCount3 && d > sizeCount2)
+                            {
+                                layer = 0;
+                            }
+                             * */
+                            //double luminance2 = T - 1.5 * UserSetRobustnesspercent;
+                            double luminance2 = T - UserSetRobustnesspercent - (0.4 * layer * UserSetRobustnesspercent);
                             ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
                             result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                         }//if
@@ -628,6 +674,13 @@ namespace QRPhotoMosaic.Method
             double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
             double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
 
+            double sizeCount1 = centerSize / 6;
+            double sizeCount2 = centerSize / 3;
+            double sizeCount3 = centerSize / 2;
+            int centerX = x * moduleLength + Around + (centerSize)/2;
+            int centerY = y * moduleLength + Around + (centerSize)/2;
+
+
             if (Lmean - UserSetRobustnesspercent < Tmean)
             {
                 for (int i = 0; i < moduleLength; i++)
@@ -660,9 +713,46 @@ namespace QRPhotoMosaic.Method
                                 ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
                                 luminance = ACS.YUV.Y / 255.0;
                             }
-
                             double T = LocalThresHoldImageColor.R / 255.0;
-                            double luminance2 = T + 1.5*UserSetRobustnesspercent;
+
+                            double d = Radius(x * moduleLength + i, y * moduleLength + j, centerX, centerY);
+
+                            double layer = 0;
+                            bool done = false;
+                            if (x * moduleLength + i <= centerX + sizeCount1 && y * moduleLength + j <= centerY + sizeCount1 &&
+                                x * moduleLength + i >= centerX - sizeCount1 && y * moduleLength + j >= centerY - sizeCount1)
+                            {
+                                layer = 2;
+                                done = true;
+                            }
+                            else if (x * moduleLength + i <= centerX + sizeCount2 && y * moduleLength + j <= centerY + sizeCount2 &&
+                                x * moduleLength + i >= centerX - sizeCount2 && y * moduleLength + j >= centerY - sizeCount2 && !done)
+                            {
+                                layer = 1;
+                                done = true;
+                            }
+                            else if (x * moduleLength + i <= centerX + sizeCount3 && y * moduleLength + j <= centerY + sizeCount3 &&
+                                x * moduleLength + i >= centerX - sizeCount3 && y * moduleLength + j >= centerY - sizeCount3 && !done)
+                            {
+                                layer = 0.0;
+                                done = true;
+                            }
+                            /*
+                            if (d <= sizeCount1)
+                            {
+                                layer = Math.Abs(centerSize - sizeCount1)/3 * (0.4 * 3);
+                            }
+                            if (d <= sizeCount2 && d > sizeCount1)
+                            {
+                                layer = Math.Abs(centerSize - sizeCount2)/3 * (0.4 * 2);
+                            }
+                            if (d <= sizeCount3 && d > sizeCount2)
+                            {
+                                layer = 0;
+                            }
+                            */
+                            double luminance2 = T + UserSetRobustnesspercent + (layer * UserSetRobustnesspercent);
+                            //double luminance2 = T + 2*UserSetRobustnesspercent;
                             ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
                             result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                         }

@@ -271,9 +271,11 @@ namespace QRPhotoMosaic.Method
             if(shape != "Corner")
                 //Utility.ParamsAB(tileSize.Value * 9 / 16, tileSize.Value * 5 / 16, 255.0f, 0.0f, colorSpace, out a, out minusb, out plusb);
                 Utility.ParamsAB(tileSize.Value * 9 / 16, tileSize.Value * 5 / 16, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
+                //Utility.ParamsAB(tileSize.Value, tileSize.Value * 5 / 16, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
             else
                 //Utility.ParamsAB(tileSize.Value * 3 / 4, tileSize.Value * 1 / 2, 255.0f, 0.0f, colorSpace, out a, out minusb, out plusb);
                 Utility.ParamsAB(tileSize.Value * 3 / 4, tileSize.Value * 1 / 2, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
+                //Utility.ParamsAB(tileSize.Value , tileSize.Value * 1 / 2, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
 
             Bitmap prevWork = GeneratingProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value, shape);
 

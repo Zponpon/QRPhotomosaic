@@ -16,8 +16,8 @@ namespace QRPhotoMosaic.Method
         public string Name { get; set; }
         public int UseTimes { get; set; }
 
+        //public List<ColorSpace.RGB> rgb4x4 = new List<ColorSpace.RGB>();
         public List<ColorSpace.RGB> rgb4x4 = new List<ColorSpace.RGB>();
-
         public static string avgtxt = "AvgColor.txt";
         public static string avgtxt4x4 = "AvgColor4x4.txt";
 
@@ -52,6 +52,17 @@ namespace QRPhotoMosaic.Method
                 {
                     Name="Data",
                     Folder ="..\\data"
+                },
+
+                new TileType
+                {
+                    Name="Data2",
+                    Folder ="..\\data2"
+                },
+                new TileType
+                {
+                    Name="fleur",
+                    Folder ="..\\fleur"
                 }
             };
         }
@@ -164,11 +175,6 @@ namespace QRPhotoMosaic.Method
                     Tile tile = new Tile(tileName);
                     //tile.rgb4x4
                     readtrans(tile, reader);
-
-                    //FLANN.features.Data[index, 0] = (float)tile.avgRGB.R;
-                    //FLANN.features.Data[index, 1] = (float)tile.avgRGB.G;
-                    //FLANN.features.Data[index, 2] = (float)tile.avgRGB.B;
-                    //index++;
                     tiles.Add(tile);
                 }
 
@@ -368,81 +374,111 @@ namespace QRPhotoMosaic.Method
         {
             ColorSpace.RGB rgb;
             
+            //  0
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+            //  1
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  2
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  3
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  4
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  5
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  6
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  7
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  8
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  9
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  10
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  11
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  12
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  13
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  14
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
 
+
+            //  15
             rgb.R = Convert.ToInt32(reader.ReadByte());
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());

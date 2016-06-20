@@ -103,9 +103,6 @@ namespace QRPhotoMosaic.Method
             int v = (version * 4 + 17) + 1;
             int dstSize = v * tileSize; // Depend on qr version
             Bitmap dst = new Bitmap(dstSize, dstSize); // final result
-            Matrix<int> indices = new Matrix<int>(dstSize, 1);
-            Matrix<float> dist = new Matrix<float>(dstSize, 1);
-            //Search(src, version, indices, dist);
             List<string> candicatetiles = new List<string>();
             FLANN.Search4x4(src, version, k);
 
@@ -143,20 +140,20 @@ namespace QRPhotoMosaic.Method
                         candidateImg = ImageProc.ScaleImage(candidateImg, tileSize);
 
                     if (MainForm.singleton.isCancel) return null;
-                    tryMethod(tiles[FLANN.Indices4x4.Data[currBlockIdx, tileIdx]], currBlockIdx, y, x, candidateImg, dst);
-                    /*
-                    for (int i = 0; i < dstSize; i+=tileSize)
+                    //tryMethod(tiles[FLANN.Indices4x4.Data[currBlockIdx, tileIdx]], currBlockIdx, y, x, candidateImg, dst);
+                    
+                    for (int i = 0; i < tileSize; i++)
                     {
                         if (MainForm.singleton.isCancel) return null;
-                        for (int j = 0; j < dstSize; j += tileSize)
+                        for (int j = 0; j < tileSize; j ++)
                         {
                             if (MainForm.singleton.isCancel) return null;
-                            tryMethod(tiles[FLANN.Indices4x4.Data[currBlockIdx, tileIdx]], currBlockIdx, y, x, candidateImg, dst);
-                            //dst.SetPixel(j + x, i + y, candidateImg.GetPixel(j, i));
+                            //tryMethod(tiles[FLANN.Indices4x4.Data[currBlockIdx, tileIdx]], currBlockIdx, y, x, candidateImg, dst);
+                            dst.SetPixel(j + x, i + y, candidateImg.GetPixel(j, i));
                             //Color pixel = Color.FromArgb(255, rgb.R, rgb.G, rgb.B);
                             //dst.SetPixel(j + x, i + y, pixel);
                         }
-                    }*/
+                    }
                     candidateImg.Dispose();
                     currBlockIdx++;
                 }

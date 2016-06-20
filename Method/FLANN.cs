@@ -43,8 +43,8 @@ namespace QRPhotoMosaic.Method
             {
                 for (int x = 0; x < newSrc.Height; x += blockSize)
                 {
-                    int currX = 0, currY = 0;
-                    Bitmap currBlock = new Bitmap(blockSize, blockSize);
+                    //int currX = 0, currY = 0;
+                    //Bitmap currBlock = new Bitmap(blockSize, blockSize);
                     for (int i = y; i < y + blockSize; ++i)
                     {
                         for (int j = x; j < x + blockSize; ++j)
@@ -52,10 +52,10 @@ namespace QRPhotoMosaic.Method
                             R += Convert.ToSingle(newSrc.GetPixel(j, i).R);
                             G += Convert.ToSingle(newSrc.GetPixel(j, i).G);
                             B += Convert.ToSingle(newSrc.GetPixel(j, i).B);
-                            currBlock.SetPixel(currX++, currY, newSrc.GetPixel(j, i));
+                            //currBlock.SetPixel(currX++, currY, newSrc.GetPixel(j, i));
                         }
-                        currY++;
-                        currX = 0;
+                        //currY++;
+                        //currX = 0;
                     }
                     R /= blockTotal;
                     G /= blockTotal;
@@ -79,14 +79,14 @@ namespace QRPhotoMosaic.Method
             int v = (version * 4 + 17) + 1;
             int dstSize = v * v;
             float blockTotal = blockSize * blockSize;
-            float R = 0, G = 0, B = 0;
+            int R = 0, G = 0, B = 0;
 
             Matrix<int> indices = new Matrix<int>(dstSize, k);
             Matrix<float> dist = new Matrix<float>(dstSize, k);
             Matrix<float> query = new Matrix<float>(dstSize, 48);
             Bitmap newSrc = ImageProc.ScaleImage(src, v * blockSize);
             int quater = blockSize / 4;
-            int dq=quater*quater;
+            int dq = quater * quater;
             int index = 0;
             for (int y = 0; y < newSrc.Height; y += blockSize)
             {
@@ -102,19 +102,18 @@ namespace QRPhotoMosaic.Method
                             {
                                 for (int n = 0; n < quater; n++)
                                 {
-                                    R += Convert.ToSingle(newSrc.GetPixel(j+n, i+m).R);
-                                    G += Convert.ToSingle(newSrc.GetPixel(j+n, i+m).G);
-                                    B += Convert.ToSingle(newSrc.GetPixel(j+n, i+m).B);
+                                    R += Convert.ToInt32(newSrc.GetPixel(j+n, i+m).R);
+                                    G += Convert.ToInt32(newSrc.GetPixel(j+n, i+m).G);
+                                    B += Convert.ToInt32(newSrc.GetPixel(j+n, i+m).B);
                                 }
                             }
 
                             R /= dq;
                             G /= dq;
                             B /= dq;
-                            query.Data[index, blockIdx++] = R;
-                            query.Data[index, blockIdx++] = G;
-                            query.Data[index, blockIdx++] = B;
-                            //blockIdx += 3;
+                            query.Data[index, blockIdx++] = (float)R;
+                            query.Data[index, blockIdx++] = (float)G;
+                            query.Data[index, blockIdx++] = (float)B;
                             R = G = B = 0;
                         }
                     }
