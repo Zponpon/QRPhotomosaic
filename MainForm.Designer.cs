@@ -30,6 +30,7 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
             this.SearchMethodComboBox = new System.Windows.Forms.ComboBox();
             this.MaxLum = new System.Windows.Forms.NumericUpDown();
             this.MinLum = new System.Windows.Forms.NumericUpDown();
@@ -64,7 +65,6 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.label1 = new System.Windows.Forms.Label();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MaxLum)).BeginInit();
@@ -123,12 +123,21 @@
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(294, 488);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(153, 23);
+            this.label1.TabIndex = 36;
+            this.label1.Text = "Search Method";
+            // 
             // SearchMethodComboBox
             // 
             this.SearchMethodComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SearchMethodComboBox.FormattingEnabled = true;
             this.SearchMethodComboBox.Items.AddRange(new object[] {
-            "Flann4x4",
             "Flann",
             "Full"});
             this.SearchMethodComboBox.Location = new System.Drawing.Point(304, 527);
@@ -407,12 +416,12 @@
             this.numericUpDown1.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.numericUpDown1.Location = new System.Drawing.Point(926, 485);
             this.numericUpDown1.Maximum = new decimal(new int[] {
-            64,
+            128,
             0,
             0,
             0});
             this.numericUpDown1.Minimum = new decimal(new int[] {
-            8,
+            64,
             0,
             0,
             0});
@@ -494,16 +503,6 @@
             // 
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(294, 488);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(153, 23);
-            this.label1.TabIndex = 36;
-            this.label1.Text = "Search Method";
             // 
             // MainForm
             // 

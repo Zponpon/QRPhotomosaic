@@ -19,6 +19,7 @@ namespace QRPhotoMosaic.Method
         //public List<ColorSpace.RGB> rgb4x4 = new List<ColorSpace.RGB>();
         public List<ColorSpace.RGB> rgb4x4 = new List<ColorSpace.RGB>();
         public static string avgtxt = "AvgColor.txt";
+        public static string avgtxt128 = "AvgColor128.txt";
         public static string avgtxt4x4 = "AvgColor4x4.txt";
 
         public struct TileType
@@ -56,13 +57,18 @@ namespace QRPhotoMosaic.Method
 
                 new TileType
                 {
-                    Name="Data2",
-                    Folder ="..\\data2"
+                    Name="Data128",
+                    Folder ="..\\data128"
                 },
                 new TileType
                 {
                     Name="fleur",
                     Folder ="..\\fleur"
+                },
+                new TileType
+                {
+                    Name="fleur128",
+                    Folder ="..\\fleur128"
                 }
             };
         }
@@ -88,6 +94,7 @@ namespace QRPhotoMosaic.Method
 
             if (s != tileImg.Width || s != tileImg.Height)
                 tileImg = ImageProc.ScaleImage(tileImg, s);
+
 
             int quater = tileImg.Height / 4;
             int dq = quater * quater;
@@ -120,7 +127,7 @@ namespace QRPhotoMosaic.Method
             tileImg.Dispose();
         }
 
-
+        public static int idx = 0;
         public void CalcNonDivTileAvgRGB(int s)
         {
             int r = 0, g = 0, b = 0;
@@ -130,6 +137,9 @@ namespace QRPhotoMosaic.Method
             if (s != tileImg.Width || s != tileImg.Height)
                 tileImg = ImageProc.ScaleImage(tileImg, s);
             //int size = bitmap.Height * bitmap.Height;
+            //MemoryStream ms = new MemoryStream();
+            //tileImg.Save("..\\data128\\" + idx.ToString() + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            idx++;
             int size = tileImg.Height * tileImg.Height;
             for (int y = 0; y < tileImg.Height; ++y)
             {
@@ -193,11 +203,9 @@ namespace QRPhotoMosaic.Method
             }
         }
 
-        public static void ReadFile(List<Tile> tiles, out int tileSize, string folder)
+        public static void ReadFile(List<Tile> tiles, int tileSize, string folder)
         {
-            //if (tiles.Count != 0) tiles.Clear();
-            //folder = "..\\data";
-            tileSize = tiles.Count;
+            //tileSize = tiles.Count;
             if (tiles.Count != 0)
             {
                 tiles.Clear();
@@ -206,13 +214,15 @@ namespace QRPhotoMosaic.Method
             try
             {
                 int total = System.IO.Directory.GetFiles(folder).Length;
-                string txtName = folder + avgtxt;
+                string txtName = string.Empty;
+                //if (tileSize == 64)
+                    txtName = folder + avgtxt;
+                /*else if (tileSize == 128)
+                    txtName = folder + avgtxt128;*/
                 FileStream file = File.Open(txtName, FileMode.Open, FileAccess.Read);
                 BinaryReader reader = new BinaryReader(file);
-                tileSize = Convert.ToInt32(reader.ReadByte());
-                
-                int index = 0;
-                //tileSize = 128;
+                int tmp = Convert.ToInt32(reader.ReadByte());
+
                 foreach (string tileName in System.IO.Directory.GetFiles(folder))
                 {
                     //Image img = Image.FromFile(tileName);
@@ -220,11 +230,7 @@ namespace QRPhotoMosaic.Method
                     tile.avgRGB.R = Convert.ToInt32(reader.ReadByte());
                     tile.avgRGB.G = Convert.ToInt32(reader.ReadByte());
                     tile.avgRGB.B = Convert.ToInt32(reader.ReadByte());
-                    
-                    //FLANN.features.Data[index, 0] = (float)tile.avgRGB.R;
-                    //FLANN.features.Data[index, 1] = (float)tile.avgRGB.G;
-                    //FLANN.features.Data[index, 2] = (float)tile.avgRGB.B;
-                    //index++;
+
                     tiles.Add(tile);
                 }
 
@@ -254,7 +260,7 @@ namespace QRPhotoMosaic.Method
             {
                 FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 BinaryWriter writer = new BinaryWriter(file);
-                writer.Write(Convert.ToSByte(tileSize));
+                writer.Write(Convert.ToByte(tileSize));
                 byte[] rgb = new byte[3];
                 foreach (Tile tile in tiles)
                 {

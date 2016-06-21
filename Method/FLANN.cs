@@ -43,8 +43,6 @@ namespace QRPhotoMosaic.Method
             {
                 for (int x = 0; x < newSrc.Height; x += blockSize)
                 {
-                    //int currX = 0, currY = 0;
-                    //Bitmap currBlock = new Bitmap(blockSize, blockSize);
                     for (int i = y; i < y + blockSize; ++i)
                     {
                         for (int j = x; j < x + blockSize; ++j)
@@ -52,10 +50,7 @@ namespace QRPhotoMosaic.Method
                             R += Convert.ToSingle(newSrc.GetPixel(j, i).R);
                             G += Convert.ToSingle(newSrc.GetPixel(j, i).G);
                             B += Convert.ToSingle(newSrc.GetPixel(j, i).B);
-                            //currBlock.SetPixel(currX++, currY, newSrc.GetPixel(j, i));
                         }
-                        //currY++;
-                        //currX = 0;
                     }
                     R /= blockTotal;
                     G /= blockTotal;

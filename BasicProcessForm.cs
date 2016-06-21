@@ -134,53 +134,47 @@ namespace QRPhotoMosaic
             else
             {
                 worker.ReportProgress(0);
-                //MainForm.singleton.embedding.info.QRmatrix;
                 MainForm.singleton.info.QRmatrix
                     = QRCodeEncoder.CreateQR(MainForm.singleton.QRCodeContent, QRCodeEncoder.GetECLevel(ecLevel));
                 MainForm.singleton.QRBitmap = QRCodeEncoder.ToBitmap(MainForm.singleton.info.QRmatrix);
-                //MainForm.singleton.embedding.QRBitmap = QRCodeEncoder.ToBitmap(MainForm.singleton.embedding.info.QRmatrix);
                 QRCodeReader reader = new QRCodeReader();
-               // LuminanceSource source = new BitmapLuminanceSource(MainForm.singleton.embedding.QRBitmap);
                 LuminanceSource source = new BitmapLuminanceSource(QRCodeEncoder.ToBitmap(MainForm.singleton.info.QRmatrix));
                 BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
                 reader.decode(binaryBitmap);
                 int version = reader.Version.VersionNumber;
-                //MainForm.singleton.embedding.info.QRVersion = version;
                 MainForm.singleton.info.QRVersion = version;
-                //MainForm.singleton.VersionText = version.ToString();
 
                 if (check == "N")
                 {
                     // Generate basic photomosaic
-                    if (search == "Flann4x4")
+                    MainForm.singleton.StopWatch.Start();
+                    /*if (search == "Flann4x4")
                         Tile.ReadFile4x4(MainForm.singleton.tiles, out tileSize, MainForm.singleton.CreatingFolderPath);
-                    else
-                        Tile.ReadFile(MainForm.singleton.tiles, out tileSize, MainForm.singleton.CreatingFolderPath);
-                    if (tileSize == 0) return;
+                    else*/
+                    Tile.ReadFile(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
+                    //if (tileSize == 0) return;
 
                     worker.ReportProgress(10);
-                    //MainForm.singleton.embedding.tileSize = tileSize;
-                    //MainForm.singleton.tileSize = tileSize;
-                    //MainForm.singleton.tileSize = MainForm.singleton.TileSize;
+                    
 
-                    //MainForm.singleton.embedding.PhotomosaicImg
-                    //pmMethod.TestFunc(MainForm.singleton.masterBitmap, MainForm.singleton.tiles);
-                    //pmMethod.flann(MainForm.singleton.masterBitmap, 1, MainForm.singleton.tiles);
                     switch(search)
                     { 
+                            /*
                         case "Flann4x4":
                             MainForm.singleton.photomosaicImg
                             = pmMethod.GenerateByFlann4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000);
                             break;
+                            */
                         case "Flann":
                             MainForm.singleton.photomosaicImg
-                            = pmMethod.GenerateByFlann(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000);
+                            = pmMethod.GenerateByFlann(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 500);
                             break;
                         case "Full":
                             MainForm.singleton.photomosaicImg
                             = pmMethod.GenerateByNormalMethod(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version);
                             break;
                     }
+                    MainForm.singleton.StopWatch.Stop();
                 }
                 else
                 {
@@ -216,7 +210,7 @@ namespace QRPhotoMosaic
             }
             else
             {
-                MainForm.singleton.StopWatch.Stop();
+                //MainForm.singleton.StopWatch.Stop();
                 TimeSpan ts = MainForm.singleton.StopWatch.Elapsed;
                 elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
                 MessageBox.Show("Done");
