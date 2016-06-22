@@ -167,7 +167,7 @@ namespace QRPhotoMosaic
                             */
                         case "Flann":
                             MainForm.singleton.photomosaicImg
-                            = pmMethod.GenerateByFlann(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 500);
+                            = pmMethod.GenerateByFlann(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 50);
                             break;
                         case "Full":
                             MainForm.singleton.photomosaicImg
