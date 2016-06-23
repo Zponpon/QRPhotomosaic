@@ -136,8 +136,8 @@ namespace QRPhotoMosaic.Method
 
                     if (MainForm.singleton.isCancel) return null;
                     candidateImg = Image.FromFile(tiles[FLANN.Indices4x4.Data[currBlockIdx, tileIdx]].Name) as Bitmap;
-                    if (candidateImg.Width != tileSize || candidateImg.Height != tileSize)
-                        candidateImg = ImageProc.ScaleImage(candidateImg, tileSize);
+                    //if (candidateImg.Width != tileSize || candidateImg.Height != tileSize)
+                    //    candidateImg = ImageProc.ScaleImage(candidateImg, tileSize);
 
                     if (MainForm.singleton.isCancel) return null;
                     //tryMethod(tiles[FLANN.Indices4x4.Data[currBlockIdx, tileIdx]], currBlockIdx, y, x, candidateImg, dst);
