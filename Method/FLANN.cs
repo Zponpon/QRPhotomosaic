@@ -97,9 +97,10 @@ namespace QRPhotoMosaic.Method
                             {
                                 for (int n = 0; n < quater; n++)
                                 {
-                                    R += Convert.ToInt32(newSrc.GetPixel(j+n, i+m).R);
-                                    G += Convert.ToInt32(newSrc.GetPixel(j+n, i+m).G);
-                                    B += Convert.ToInt32(newSrc.GetPixel(j+n, i+m).B);
+                                    Color pixel = newSrc.GetPixel(j + n, i + m);
+                                    R += Convert.ToInt32(pixel.R);
+                                    G += Convert.ToInt32(pixel.G);
+                                    B += Convert.ToInt32(pixel.B);
                                 }
                             }
 

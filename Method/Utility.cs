@@ -620,22 +620,8 @@ namespace QRPhotoMosaic.Method
                                 layer = 0.0;
                                 done = true;
                             }
-                            /*
-                            if (d <= sizeCount1)
-                            {
-                                layer = Math.Abs(centerSize - sizeCount1) / 3 * (0.4 * 3);
-                            }
-                            if (d <= sizeCount2 && d > sizeCount1)
-                            {
-                                layer = Math.Abs(centerSize - sizeCount2) / 3 * (0.4 * 2); 
-                            }
-                            if (d <= sizeCount3 && d > sizeCount2)
-                            {
-                                layer = 0;
-                            }
-                             * */
-                            //double luminance2 = T - 1.5 * UserSetRobustnesspercent;
-                            double luminance2 = T - UserSetRobustnesspercent - (0.4 * layer * UserSetRobustnesspercent);
+
+                            double luminance2 = T - UserSetRobustnesspercent - (layer * UserSetRobustnesspercent);
                             ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
                             result.SetPixel(x * moduleLength + i, y * moduleLength + j, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                         }//if

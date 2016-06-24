@@ -138,6 +138,7 @@
             this.SearchMethodComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SearchMethodComboBox.FormattingEnabled = true;
             this.SearchMethodComboBox.Items.AddRange(new object[] {
+                "Flann4x4",
             "Flann",
             "Full"});
             this.SearchMethodComboBox.Location = new System.Drawing.Point(304, 527);

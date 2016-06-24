@@ -288,7 +288,7 @@ namespace QRPhotoMosaic.Method
             {
                 FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 BinaryWriter writer = new BinaryWriter(file);
-                writer.Write(Convert.ToSByte(tileSize));
+                writer.Write(Convert.ToByte(tileSize));
                 
                 foreach (Tile tile in tiles)
                 {
