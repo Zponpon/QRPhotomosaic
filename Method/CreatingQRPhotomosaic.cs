@@ -263,7 +263,7 @@ namespace QRPhotoMosaic.Method
             {
                 Console.WriteLine(e.Message);
                 worker.ReportProgress(30, "Generate pixel based threshold mask");
-                thresholdMask = LocalThresholdMask(greyImage, 5, tileSize.Value);
+                thresholdMask = LocalThresholdMask(greyImage, 3, tileSize.Value);
                 FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.Write);
                 thresholdMask.Save(file, System.Drawing.Imaging.ImageFormat.Bmp);
             }
