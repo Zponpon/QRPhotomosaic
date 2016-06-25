@@ -139,6 +139,7 @@
             this.SearchMethodComboBox.FormattingEnabled = true;
             this.SearchMethodComboBox.Items.AddRange(new object[] {
                 "Flann4x4",
+                "Full4x4",
             "Flann",
             "Full"});
             this.SearchMethodComboBox.Location = new System.Drawing.Point(304, 527);

@@ -22,6 +22,7 @@ namespace QRPhotoMosaic.Method
         public static string avgtxt128 = "AvgColor128.txt";
         public static string avgtxt4x4 = "AvgColor4x4.txt";
 
+
         public struct TileType
         {
             public string Name { get; set; }
@@ -160,11 +161,12 @@ namespace QRPhotoMosaic.Method
             tileImg.Dispose();
         }
 
-        public static void ReadFile4x4(List<Tile> tiles, out int tileSize, string folder)
+        public static void ReadFile4x4(List<Tile> tiles, int tileSize, string folder)
         {
             //if (tiles.Count != 0) tiles.Clear();
             //folder = "..\\data";
-            tileSize = tiles.Count;
+            //tileSize = tiles.Count;i
+            int tmp = 0;
             if (tiles.Count != 0)
             {
                 tiles.Clear();
@@ -173,10 +175,12 @@ namespace QRPhotoMosaic.Method
             try
             {
                 int total = System.IO.Directory.GetFiles(folder).Length;
-                string txtName = folder + avgtxt4x4;
+                string txtName=string.Empty;
+      
+                    txtName = folder + avgtxt4x4;
                 FileStream file = File.Open(txtName, FileMode.Open, FileAccess.Read);
                 BinaryReader reader = new BinaryReader(file);
-                tileSize = Convert.ToInt32(reader.ReadByte());
+                tmp = Convert.ToInt32(reader.ReadByte());
 
                 //tileSize = 128;
                 foreach (string tileName in System.IO.Directory.GetFiles(folder))

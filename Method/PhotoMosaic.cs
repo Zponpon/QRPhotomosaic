@@ -382,9 +382,8 @@ namespace QRPhotoMosaic.Method
             List<int> candidates = new List<int>(); // choosen index of candidate'
             int currDstH = 0;
             int currDstW = 0;
-
-            //double max = double.MinValue;
-            //FLANN.Search(src, version);
+            int quater = blockSize / 4;
+            int dq = quater * quater;
 
             for (int y = 0; y < newSrc.Height; y += blockSize)
             {
@@ -394,71 +393,67 @@ namespace QRPhotoMosaic.Method
                 worker.ReportProgress((y * 90) / newSrc.Height + 10);
                 for (int x = 0; x < newSrc.Width; x += blockSize)
                 {
-                    ColorSpace.RGB blockAvg;
-                    double blockAvgR = 0.0f, blockAvgG = 0.0f, blockAvgB = 0.0f;
-                    //Bitmap currBlock = new Bitmap(blockSize, blockSize);
-                    //int currX = 0, currY = 0;
-                    blockAvg.R = blockAvg.G = blockAvg.B = 0;
                     ColorSpace.RGB [] vec = new ColorSpace.RGB [16];
                     if (MainForm.singleton.isCancel) return null;
-                    for (int i = y; i < y + blockSize; ++i)
+                    int vecIdx = 0;
+                    for (int i = y; i < y + blockSize; i+=quater)
                     {
-                        for (int j = x; j < x + blockSize; ++j)
+                        for (int j = x; j < x + blockSize; j+=quater)
                         {
-                            Color pixel = newSrc.GetPixel(j, i);
-                            blockAvgR += (double)(pixel.R);
-                            blockAvgG += (double)(pixel.G);
-                            blockAvgB += (double)(pixel.B);
-                            //currBlock.SetPixel(currX++, currY, pixel);
+                            for(int m = 0; m < quater; ++m)
+                            {
+                                for (int n = 0; n < quater; ++n)
+                                {
+                                    Color pixel = newSrc.GetPixel(j+n, i+m);
+                                    vec[vecIdx].R += pixel.R;
+                                    vec[vecIdx].G += pixel.G;
+                                    vec[vecIdx].B += pixel.B;
+                                }
+                            }
+                            vec[vecIdx].R /= dq;
+                            vec[vecIdx].G /= dq;
+                            vec[vecIdx].B /= dq;
+                            vecIdx++;
                         }
-                        //currY++;
-                        //currX = 0;
                     }
-                    blockAvgR /= blockTotal;
-                    blockAvgG /= blockTotal;
-                    blockAvgB /= blockTotal;
+
                     double min = double.MaxValue;
                     Tile candidateTile = null;
                     Bitmap candidateImg = null;
+                    string name = string.Empty;
                     foreach (Tile tile in tiles)
                     {
                         if (MainForm.singleton.isCancel) return null;
                         if (tile.UseTimes == 1)
                             continue;
+                        double d = 0;
+                        for (int t = 0; t < 16; ++t)
+                        {
+                            double r = Math.Pow((tile.rgb4x4[t].R - vec[t].R), 2);
+                            double g = Math.Pow((tile.rgb4x4[t].G - vec[t].G), 2);
+                            double b = Math.Pow((tile.rgb4x4[t].B - vec[t].B), 2);
+                            d += Math.Sqrt(r + g + b);
+                        }
 
-
-                        double r = Math.Pow(((double)tile.avgRGB.R - blockAvgR), 2);
-                        double g = Math.Pow(((double)tile.avgRGB.G - blockAvgG), 2);
-                        double b = Math.Pow(((double)tile.avgRGB.B - blockAvgB), 2);
-                        double d = Math.Sqrt(r + g + b);
                         if (d < min)
                         {
                             min = d;
                             candidateTile = tile;
-                            candidateImg = Image.FromFile(tile.Name) as Bitmap;
-                            //if (candidateImg.Width != tileSize || candidateImg.Height != tileSize)
-                            //    candidateImg = ImageProc.ScaleImage(candidateImg, tileSize);
+                            name = tile.Name;
+                            //candidateImg = Image.FromFile(tile.Name) as Bitmap;
                         }
-                        /*
-                        if(d > max)
-                        {
-                            max = d;
-                        }
-                        */
                     }
+                    candidateImg = Image.FromFile(name) as Bitmap;
                     #region Replace the block by candiate tile
                     //currBlock = ImageProc.ScaleImage(currBlock, tileSize);
                     candidateTile.UseTimes++;
                     int tw = 0, th = 0;
-                    //double alpha = min / max;
-                    double var_B = (double)candidateTile.avgRGB.B - blockAvgB;
-                    double var_G = (double)candidateTile.avgRGB.G - blockAvgG;
-                    double var_R = (double)candidateTile.avgRGB.R - blockAvgR;
                     for (int h = currDstH; th < tileSize; ++h)
                     {
                         for (int w = currDstW; tw < tileSize; ++w)
                         {
                             Color p = candidateImg.GetPixel(tw, th);
+                            tw++;
                             dst.SetPixel(w, h, p);
                         }
                         th++;

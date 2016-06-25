@@ -148,8 +148,8 @@ namespace QRPhotoMosaic
                 {
                     // Generate basic photomosaic
                     MainForm.singleton.StopWatch.Start();
-                    if (search == "Flann4x4")
-                        Tile.ReadFile4x4(MainForm.singleton.tiles, out tileSize, MainForm.singleton.CreatingFolderPath);
+                    if (search == "Flann4x4" || search == "Full4x4")
+                        Tile.ReadFile4x4(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
                     else
                         Tile.ReadFile(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
                     //if (tileSize == 0) return;
@@ -164,7 +164,10 @@ namespace QRPhotoMosaic
                             MainForm.singleton.photomosaicImg
                             = pmMethod.GenerateByFlann4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000);
                             break;
-                            
+                        case "Full4x4":
+                             MainForm.singleton.photomosaicImg
+                            = pmMethod.GenerateByNormalMethod4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version);
+                            break;
                         case "Flann":
                             MainForm.singleton.photomosaicImg
                             = pmMethod.GenerateByFlann(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 50);
