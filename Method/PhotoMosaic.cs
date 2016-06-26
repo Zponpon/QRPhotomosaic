@@ -115,15 +115,15 @@ namespace QRPhotoMosaic.Method
                 int index = 0;
                 for (int x = 0; x < dst.Width; x += tileSize)
                 {
-                    int tileIdx = 0;
+                    //int tileIdx = 0;
                     for (int l = 0; l < k; ++l)
                     {
                         if (candicatetiles.Contains(tiles[FLANN.Indices4x4.Data[currBlockIdx, l]].Name))
                             continue;
                         else
                         {
-                            tileIdx = l;
-                            index = FLANN.Indices4x4.Data[currBlockIdx, tileIdx];
+                            //tileIdx = l;
+                            index = FLANN.Indices4x4.Data[currBlockIdx, l];
                             candicatetiles.Add(tiles[index].Name);
                             break;
                         }
@@ -424,17 +424,18 @@ namespace QRPhotoMosaic.Method
                     foreach (Tile tile in tiles)
                     {
                         if (MainForm.singleton.isCancel) return null;
+                        //candidateImg = Image.FromFile("..\\data\\2957.jpg") as Bitmap;
                         if (tile.UseTimes == 1)
                             continue;
                         double d = 0;
                         for (int t = 0; t < 16; ++t)
                         {
-                            double r = Math.Pow((tile.rgb4x4[t].R - vec[t].R), 2);
-                            double g = Math.Pow((tile.rgb4x4[t].G - vec[t].G), 2);
-                            double b = Math.Pow((tile.rgb4x4[t].B - vec[t].B), 2);
-                            d += Math.Sqrt(r + g + b);
+                            double r = Math.Pow(Math.Abs(tile.rgb4x4[t].R - vec[t].R), 2);
+                            double g = Math.Pow(Math.Abs(tile.rgb4x4[t].G - vec[t].G), 2);
+                            double b = Math.Pow(Math.Abs(tile.rgb4x4[t].B - vec[t].B), 2);
+                            d += (r + g + b);
                         }
-
+                        d = Math.Sqrt(d);
                         if (d < min)
                         {
                             min = d;

@@ -170,7 +170,7 @@ namespace QRPhotoMosaic.Method
                                     //result = BlackDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
                                     Utility.BlackDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, plusb);
                                     break;
-                                case "Corner":
+                                case "Star":
                                     //result = BlackDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
                                     Utility.BlackCorner(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, plusb);
                                     break;
@@ -197,7 +197,7 @@ namespace QRPhotoMosaic.Method
                                     //result = WhiteDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize);
                                     Utility.WhiteDiamond(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, minusb);
                                     break;
-                                case "Corner":
+                                case "Star":
                                     Utility.WhiteCorner(result, pmBitmap, mask, matX, matY, centerSize, tileSize, robustVal, colorSpace, a, minusb);
                                     break;
                                 default:
@@ -268,7 +268,7 @@ namespace QRPhotoMosaic.Method
                 thresholdMask.Save(file, System.Drawing.Imaging.ImageFormat.Bmp);
             }
 
-            if(shape != "Corner")
+            if(shape != "Star")
                 //Utility.ParamsAB(tileSize.Value * 9 / 16, tileSize.Value * 5 / 16, 255.0f, 0.0f, colorSpace, out a, out minusb, out plusb);
                 Utility.ParamsAB(tileSize.Value * 9 / 16, tileSize.Value * 5 / 16, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
                 //Utility.ParamsAB(tileSize.Value, tileSize.Value * 5 / 16, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
