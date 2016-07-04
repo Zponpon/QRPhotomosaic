@@ -796,6 +796,18 @@ namespace QRPhotoMosaic.Method
 
             double radius = (double)centerSize / 2;
 
+            int quater = centerSize / 4;
+            int xLeft1 = x * moduleLength + Around + quater;
+            int xRight1 = xLeft1 + quater * 2;
+            int yTop1 = y * moduleLength + Around + quater;
+            int yDown1 = yTop1 + quater * 2;
+
+            int eighter = quater / 4;
+            int xLeft2 = x * moduleLength + Around + eighter;
+            int xRight2 = xLeft2 + eighter * 2 - 1;
+            int yTop2 = y * moduleLength + Around + eighter;
+            int yDown2 = yTop2 + eighter * 2 - 1;
+
             int xLeft = x * moduleLength + Around;
             int xRight = x * moduleLength + Around + centerSize - 1;
             int yTop = y * moduleLength + Around;
@@ -803,6 +815,10 @@ namespace QRPhotoMosaic.Method
 
             int cx = x * moduleLength + Around + centerSize / 2;
             int cy = y * moduleLength + Around + centerSize / 2;
+
+            double sizeCount1 = radius / 3;
+            double sizeCount2 = radius * 2 / 3;
+            double sizeCount3 = radius;
 
             /*
             double sizeCount1 = radius / 3;
@@ -847,12 +863,14 @@ namespace QRPhotoMosaic.Method
                                     ACS.YUV = CSC.RGB2YUV(SourceImageColor.R, SourceImageColor.G, SourceImageColor.B);
                                     luminance = ACS.YUV.Y / 255.0;
                                 }
-
+                                double layer = 0.0f;
+                                if (CornerRadius(quater, xLeft1, xRight1, yTop1, yDown1, px, py) && px >= xLeft1 && px <= xRight1 && py >= yTop1 && py <= yDown1)
+                                    layer = 1.0f;
                                 double T = LocalThresHoldImageColor.R / 255.0;
-                                double layer = (Math.Abs(radius - d)) / 3;
 
+                                double luminance2 = T - UserSetRobustnesspercent * (layer + 1);
                                 //double luminance2 = T - UserSetRobustnesspercent - (0.4 * layer * UserSetRobustnesspercent);
-                                double luminance2 = T - UserSetRobustnesspercent * 1.5;
+                                //double luminance2 = T - UserSetRobustnesspercent * 1.5;
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 0, colorSpace);
                                 result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                             }
@@ -898,10 +916,20 @@ namespace QRPhotoMosaic.Method
             //double radius = (double)moduleLength / 2;
             double radius = (double)centerSize / 2;
             //double maxDistance = Math.Sqrt((moduleLength / 2) * (moduleLength / 2) * 2);
-            //int xLeft = x * moduleLength;
-            //int xRight = x * moduleLength + moduleLength - 1;
-            //int yTop = y * moduleLength;
-            //int yDown = y * moduleLength + moduleLength - 1;
+
+
+
+            int quater = centerSize / 4;
+            int xLeft1 = x * moduleLength + Around + quater;
+            int xRight1 = xLeft1 + quater * 2 - 1;
+            int yTop1 = y * moduleLength + Around + quater;
+            int yDown1 = yTop1 + quater * 2 - 1;
+
+            int eighter = quater / 4;
+            int xLeft2 = x * moduleLength + Around + eighter;
+            int xRight2 = xLeft2 + eighter * 2 - 1;
+            int yTop2 = y * moduleLength + Around + eighter;
+            int yDown2 = yTop2 + eighter * 2 - 1;
 
             int xLeft = x * moduleLength + Around;
             int xRight = x * moduleLength + Around + centerSize - 1;
@@ -954,7 +982,10 @@ namespace QRPhotoMosaic.Method
                                 }
 
                                 double T = LocalThresHoldImageColor.R / 255.0;
-                                double layer = (Math.Abs(radius - d)) / 3;
+                                //double layer = (Math.Abs(radius - d)) / 3;
+                                double layer = 0.0f;
+                                if (CornerRadius(quater, xLeft1, xRight1, yTop1, yDown1, px, py) && px >= xLeft1 && px <= xRight1 && py >= yTop1 && py <= yDown1)
+                                    layer = 1.0f;
 
                                 /*
                                 if (d <= sizeCount1) layer *= (0.4 * 3);
@@ -964,7 +995,7 @@ namespace QRPhotoMosaic.Method
 
                                 //double luminance2 = T + UserSetRobustnesspercent + (0.4 * layer * UserSetRobustnesspercent);
 
-                                double luminance2 = T + UserSetRobustnesspercent * 1.5 ;
+                                double luminance2 = T + UserSetRobustnesspercent * (layer + 1);
                                 ACS = luminance_adjustment(ACS, centerSize, luminance2, 1, colorSpace);
                                 result.SetPixel(px, py, Color.FromArgb(ACS.RGB.R, ACS.RGB.G, ACS.RGB.B));
                             }
