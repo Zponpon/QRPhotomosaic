@@ -216,7 +216,7 @@ namespace QRPhotoMosaic.Method
             return result;
         }
         
-        public Bitmap Generate(BackgroundWorker worker, QRCodeInfo info, Bitmap QRBitmap, Bitmap pmBitmap, int? tileSize, int? centerSize, int? robustVal, string colorSpace, string shape, string check, double minLum, double maxLum)
+        public Bitmap Generate(BackgroundWorker worker, QRCodeInfo info, Bitmap QRBitmap, Bitmap pmBitmap, int? tileSize, int? centerSize, int? robustVal, string colorSpace, string shape, string check, double minLum, double maxLum, int minSize, int maxSize)
         {
             if (!tileSize.HasValue || !centerSize.HasValue || !robustVal.HasValue) return null;
             this.centerSize = centerSize.Value;
@@ -270,11 +270,13 @@ namespace QRPhotoMosaic.Method
 
             if(shape != "Star")
                 //Utility.ParamsAB(tileSize.Value * 9 / 16, tileSize.Value * 5 / 16, 255.0f, 0.0f, colorSpace, out a, out minusb, out plusb);
-                Utility.ParamsAB(tileSize.Value * 9 / 16, tileSize.Value * 5 / 16, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
+                //Utility.ParamsAB(tileSize.Value *12 / 16, tileSize.Value * 5/16, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
+                Utility.ParamsAB(maxSize, minSize, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
                 //Utility.ParamsAB(tileSize.Value, tileSize.Value * 5 / 16, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
             else
                 //Utility.ParamsAB(tileSize.Value * 3 / 4, tileSize.Value * 1 / 2, 255.0f, 0.0f, colorSpace, out a, out minusb, out plusb);
-                Utility.ParamsAB(tileSize.Value * 3 / 4, tileSize.Value * 1 / 2, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
+                //Utility.ParamsAB(tileSize.Value * 12 / 16, tileSize.Value * 5 / 16, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
+                Utility.ParamsAB(maxSize, minSize, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
                 //Utility.ParamsAB(tileSize.Value , tileSize.Value * 1 / 2, maxLum, minLum, colorSpace, out a, out minusb, out plusb);
 
             Bitmap prevWork = GeneratingProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value, shape);

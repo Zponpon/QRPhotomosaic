@@ -349,8 +349,14 @@ namespace QRPhotoMosaic
             //embedding.robustVal = Convert.ToInt32(RobustValue.Value);
             embedding.centerSize = 26;
             embedding.robustVal = 64;
-            embedding.minLum = Convert.ToDouble(this.MinLum.Value);
-            embedding.maxLum = Convert.ToDouble(this.MaxLum.Value);
+            //embedding.minLum = Convert.ToDouble(this.MinLum.Value);
+            //embedding.maxLum = Convert.ToDouble(this.MaxLum.Value);
+            //embedding.minLum = 0;
+            //embedding.maxLum = 255;
+            embedding.minSize = (int)this.MinSize.Value;
+            embedding.maxSize = (int)this.MaxSize.Value;
+            embedding.minLum = 30;
+            embedding.maxLum = 220;
             
             //embedding.ColorSpace = ColorSpaceComboBox.Text;
             embedding.ColorSpace = "YUV";
