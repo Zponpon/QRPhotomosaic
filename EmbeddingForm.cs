@@ -58,7 +58,7 @@ namespace QRPhotoMosaic
 
                 MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);
                 MainForm.singleton.result = new Bitmap(result);
-
+                result.Dispose();
                 System.Threading.Thread.Sleep(500);
             }
         }

@@ -99,12 +99,15 @@ namespace QRPhotoMosaic.Method
 
         }
 
-        public Bitmap GenerateByFlann4x4(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k)
+        public Bitmap GenerateByFlann4x4(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k, string space)
         {
             int dstSize = ((version * 4 + 17) + 1) * tileSize; // Depend on qr version
             Bitmap dst = new Bitmap(dstSize, dstSize); // final result
             List<string> candicatetiles = new List<string>();
-            FLANN.Search4x4(src, version, k);
+            if(space == "RGB")
+                FLANN.Search4x4(src, version, k);
+            else if(space == "Lab")
+                FLANN.Search4x4Lab(src, version, k);
 
             int currBlockIdx = 0;
             Bitmap candidateImg = null;

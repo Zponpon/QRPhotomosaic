@@ -184,7 +184,7 @@ namespace QRPhotoMosaic
         {
             LevelComboBox.SelectedIndex = 0;
             SearchMethodComboBox.SelectedIndex = 0;
-            //ColorSpaceComboBox.SelectedIndex = 1;
+            ColorSpaceBox.SelectedIndex = 0;
             CheckInputComboBox.SelectedIndex = 1;
             ShapeCombobox.SelectedIndex = 1;
             this.ProcessTime.Text = "";
@@ -202,7 +202,8 @@ namespace QRPhotoMosaic
             // Calculate avg color of tile's size : 64, 32, 16, 8
             BasicProcessForm.calcTileSize = Convert.ToInt32(numericUpDown1.Value);
             this.Text = "Photomosaic with embedded QR Code Application";
-            QRCodeContentBox.Text = "http://www.cse.yzu.edu.tw/";
+            //QRCodeContentBox.Text = "http://www.cse.yzu.edu.tw/";'
+            QRCodeContentBox.Text = "https://iamchucky.github.io/PttChrome/index.html";
         }
 
         private void EmbeddingEventRegister()
@@ -249,6 +250,7 @@ namespace QRPhotoMosaic
                 masterImgName = loadingFile.FileName;
                 int lastindex = masterImgName.LastIndexOf("\\");
                 masterImgName = masterImgName.Substring(lastindex + 1);
+                GC.Collect();
             }
         }
         private void SaveMosaicBtn_Click(object sender, EventArgs e)
@@ -320,6 +322,7 @@ namespace QRPhotoMosaic
             basicProcess.ecLevel = QRECLevel;
             basicProcess.search = SearchMethodComboBox.Text;
             basicProcess.check = this.CheckInputComboBox.Text;
+            basicProcess.space = this.ColorSpaceBox.Text;
             tileSize = TileSize;
             //BlockSize = Convert.ToInt32(BlockcomboBox.SelectedValue);
             BlockSize = 4;
@@ -464,16 +467,26 @@ namespace QRPhotoMosaic
 
             basicProcess = new BasicProcessForm();
             basicMethod = new BasicMethod();
+            basicProcess.space = ColorSpaceBox.Text;
             basicProcess.Canceled -= CancelBtn_Click;
             basicProcess.Canceled += CancelBtn_Click;
             basicProcess.Show();
+            
             // Register callback function
             //tileCB -= basicMethod.CalcAvgRGB;
             //tileCB += basicMethod.CalcAvgRGB;
-            tileCB -= basicMethod.CalcAvgRGB4x4;
-            tileCB += basicMethod.CalcAvgRGB4x4;
-            basicMethod.stringCB -= SavingFileName;
-            basicMethod.stringCB += SavingFileName;
+            if(ColorSpaceBox.Text == "Lab")
+            {
+                tileCB -= basicMethod.CalcAvgLab4x4;
+                tileCB += basicMethod.CalcAvgLab4x4;
+            }
+            else if (ColorSpaceBox.Text == "RGB")
+            {
+                tileCB -= basicMethod.CalcAvgRGB4x4;
+                tileCB += basicMethod.CalcAvgRGB4x4;
+            }
+            basicMethod.stringCB -= SavingFileNameLab;
+            basicMethod.stringCB += SavingFileNameLab;
             stopWatch.Start();
             TileWorker.RunWorkerAsync();
         }
@@ -505,6 +518,12 @@ namespace QRPhotoMosaic
         private string SavingFileName()
         {
             string fileName = "AvgColor.txt";
+            return Path() + fileName;
+        }
+
+        private string SavingFileNameLab()
+        {
+            string fileName = "AvgLab.txt";
             return Path() + fileName;
         }
         #endregion

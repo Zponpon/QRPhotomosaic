@@ -281,11 +281,12 @@ namespace QRPhotoMosaic.Method
 
             Bitmap prevWork = GeneratingProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value, shape);
 
+            GC.Collect();
             Bitmap resultQR = addQuietZone(prevWork, tileSize.Value);
 
-            greyImage = null;
-            overlapping = null;
-            prevWork = null;
+            greyImage.Dispose();
+            overlapping.Dispose();
+            prevWork.Dispose();
             GC.Collect();
             return resultQR;
         }

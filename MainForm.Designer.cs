@@ -30,6 +30,10 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.MinSize = new System.Windows.Forms.NumericUpDown();
+            this.MaxSize = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.SearchMethodComboBox = new System.Windows.Forms.ComboBox();
             this.SaveQRCodeBtn = new System.Windows.Forms.Button();
@@ -63,12 +67,11 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.MaxSize = new System.Windows.Forms.NumericUpDown();
-            this.MinSize = new System.Windows.Forms.NumericUpDown();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.ColorSpaceBox = new System.Windows.Forms.ComboBox();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.MinSize)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.resultPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PhotomosaicPicBox)).BeginInit();
@@ -76,8 +79,6 @@
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TilePicBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxSize)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MinSize)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -92,6 +93,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.ColorSpaceBox);
             this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.MinSize);
@@ -126,6 +128,70 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(330, 261);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(87, 23);
+            this.label4.TabIndex = 40;
+            this.label4.Text = "MinSize";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(330, 189);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(98, 23);
+            this.label2.TabIndex = 39;
+            this.label2.Text = "Max Size";
+            // 
+            // MinSize
+            // 
+            this.MinSize.Location = new System.Drawing.Point(319, 287);
+            this.MinSize.Maximum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
+            this.MinSize.Minimum = new decimal(new int[] {
+            8,
+            0,
+            0,
+            0});
+            this.MinSize.Name = "MinSize";
+            this.MinSize.Size = new System.Drawing.Size(120, 22);
+            this.MinSize.TabIndex = 38;
+            this.MinSize.Value = new decimal(new int[] {
+            40,
+            0,
+            0,
+            0});
+            // 
+            // MaxSize
+            // 
+            this.MaxSize.Location = new System.Drawing.Point(319, 215);
+            this.MaxSize.Maximum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
+            this.MaxSize.Minimum = new decimal(new int[] {
+            8,
+            0,
+            0,
+            0});
+            this.MaxSize.Name = "MaxSize";
+            this.MaxSize.Size = new System.Drawing.Size(120, 22);
+            this.MaxSize.TabIndex = 37;
+            this.MaxSize.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
             // 
             // label1
             // 
@@ -476,69 +542,17 @@
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
             // 
-            // MaxSize
+            // ColorSpaceBox
             // 
-            this.MaxSize.Location = new System.Drawing.Point(319, 215);
-            this.MaxSize.Maximum = new decimal(new int[] {
-            128,
-            0,
-            0,
-            0});
-            this.MaxSize.Minimum = new decimal(new int[] {
-            8,
-            0,
-            0,
-            0});
-            this.MaxSize.Name = "MaxSize";
-            this.MaxSize.Size = new System.Drawing.Size(120, 22);
-            this.MaxSize.TabIndex = 37;
-            this.MaxSize.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            // 
-            // MinSize
-            // 
-            this.MinSize.Location = new System.Drawing.Point(319, 287);
-            this.MinSize.Maximum = new decimal(new int[] {
-            128,
-            0,
-            0,
-            0});
-            this.MinSize.Minimum = new decimal(new int[] {
-            8,
-            0,
-            0,
-            0});
-            this.MinSize.Name = "MinSize";
-            this.MinSize.Size = new System.Drawing.Size(120, 22);
-            this.MinSize.TabIndex = 38;
-            this.MinSize.Value = new decimal(new int[] {
-            40,
-            0,
-            0,
-            0});
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(330, 189);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(98, 23);
-            this.label2.TabIndex = 39;
-            this.label2.Text = "Max Size";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(330, 261);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(87, 23);
-            this.label4.TabIndex = 40;
-            this.label4.Text = "MinSize";
+            this.ColorSpaceBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ColorSpaceBox.FormattingEnabled = true;
+            this.ColorSpaceBox.Items.AddRange(new object[] {
+            "RGB",
+            "Lab"});
+            this.ColorSpaceBox.Location = new System.Drawing.Point(319, 344);
+            this.ColorSpaceBox.Name = "ColorSpaceBox";
+            this.ColorSpaceBox.Size = new System.Drawing.Size(135, 31);
+            this.ColorSpaceBox.TabIndex = 41;
             // 
             // MainForm
             // 
@@ -553,6 +567,8 @@
             this.tabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.MinSize)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.resultPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.InputPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PhotomosaicPicBox)).EndInit();
@@ -561,8 +577,6 @@
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TilePicBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxSize)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MinSize)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -608,6 +622,7 @@
         private System.Windows.Forms.NumericUpDown MaxSize;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox ColorSpaceBox;
     }
 }
 

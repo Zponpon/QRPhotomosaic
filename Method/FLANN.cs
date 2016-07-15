@@ -121,7 +121,61 @@ namespace QRPhotoMosaic.Method
             FLANN.Indices4x4 = indices;
             GC.Collect();
         }
+
+        public static void Search4x4Lab(Bitmap src, int version, int k)
+        {
+            int blockSize = MainForm.singleton.BlockSize;
+            int v = (version * 4 + 17) + 1;
+            int dstSize = v * v;
+            float blockTotal = blockSize * blockSize;
+            int R = 0, G = 0, B = 0;
+            ColorSpace cs = new ColorSpace();
+
+            Matrix<int> indices = new Matrix<int>(dstSize, k);
+            Matrix<float> dist = new Matrix<float>(dstSize, k);
+            Matrix<float> query = new Matrix<float>(dstSize, 48);
+            Bitmap newSrc = ImageProc.ScaleImage(src, v * blockSize);
+            int quater = blockSize / 4;
+            int dq = quater * quater;
+            int index = 0;
+            for (int y = 0; y < newSrc.Height; y += blockSize)
+            {
+                for (int x = 0; x < newSrc.Height; x += blockSize)
+                {
+                    int blockIdx = 0;
+
+                    for (int i = y; i < y + blockSize; i += quater)
+                    {
+                        for (int j = x; j < x + blockSize; j += quater)
+                        {
+                            for (int m = 0; m < quater; m++)
+                            {
+                                for (int n = 0; n < quater; n++)
+                                {
+                                    Color pixel = newSrc.GetPixel(j + n, i + m);
+                                    R += Convert.ToInt32(pixel.R);
+                                    G += Convert.ToInt32(pixel.G);
+                                    B += Convert.ToInt32(pixel.B);
+                                }
+                            }
+
+                            R /= dq;
+                            G /= dq;
+                            B /= dq;
+                            ColorSpace.Lab lab = cs.RGB2Lab(R, G, B);
+                            query.Data[index, blockIdx++] = (float)lab.L;
+                            query.Data[index, blockIdx++] = (float)lab.a;
+                            query.Data[index, blockIdx++] = (float)lab.b;
+                            R = G = B = 0;
+                        }
+                    }
+                    index++;
+                }
+            }
+            kdtree.KnnSearch(query, indices, dist, k, 64);
+            FLANN.Query4x4 = query;
+            FLANN.Indices4x4 = indices;
+            GC.Collect();
+        }
     }
-
-
 }

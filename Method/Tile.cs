@@ -18,9 +18,11 @@ namespace QRPhotoMosaic.Method
 
         //public List<ColorSpace.RGB> rgb4x4 = new List<ColorSpace.RGB>();
         public List<ColorSpace.RGB> rgb4x4 = new List<ColorSpace.RGB>();
+        public List<ColorSpace.Lab> lab4x4 = new List<ColorSpace.Lab>();
         public static string avgtxt = "AvgColor.txt";
         public static string avgtxt128 = "AvgColor128.txt";
         public static string avgtxt4x4 = "AvgColor4x4.txt";
+        public static string avgLabtxt4x4 = "AvgLab4x4.txt";
 
 
         public struct TileType
@@ -50,12 +52,32 @@ namespace QRPhotoMosaic.Method
                     Name = "all",
                     Folder = "..\\all"
                 },*/
+
+                new TileType
+                {
+                    Name="Tile20000_128",
+                    Folder ="..\\Tile20000_128"
+                },
+                new TileType
+                {
+                    Name="Tile20000_64",
+                    Folder ="..\\Tile20000_64"
+                },
+                new TileType
+                {
+                    Name="Tile5000_128",
+                    Folder ="..\\Tile5000_128"
+                },
+                new TileType
+                {
+                    Name="Tile5000_64",
+                    Folder ="..\\Tile5000_64"
+                },
                 new TileType
                 {
                     Name="Data",
                     Folder ="..\\data"
                 },
-
                 new TileType
                 {
                     Name="Data128",
@@ -88,15 +110,61 @@ namespace QRPhotoMosaic.Method
             UseTimes = 0;
         }
 
-        public void CalcNonDivTileAvgRGB4x4(int s)
+        public void CalcNonDivTileAvgLab4x4(int s)
         {
             int r = 0, g = 0, b = 0;
+            ColorSpace cs = new ColorSpace();
             Bitmap tileImg = Image.FromFile(Name) as Bitmap;
 
             if (s != tileImg.Width || s != tileImg.Height)
                 tileImg = ImageProc.ScaleImage(tileImg, s);
+            /*
+            int size = tileImg.Height * tileImg.Height;
+            MemoryStream ms = new MemoryStream();
+            tileImg.Save("..\\Tile5000_64\\" + idx.ToString() + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            idx++;*/
+            int quater = tileImg.Height / 4;
+            int dq = quater * quater;
+            for (int y = 0; y < tileImg.Height; y += quater)
+            {
+                for (int x = 0; x < tileImg.Width; x += quater)
+                {
+                    for (int i = 0; i < quater; ++i)
+                    {
+                        for (int j = 0; j < quater; ++j)
+                        {
+                            r += (int)tileImg.GetPixel(x + j, y + i).R;
+                            g += (int)tileImg.GetPixel(x + j, y + i).G;
+                            b += (int)tileImg.GetPixel(x + j, y + i).B;
+                        }
+                    }
+                    r /= dq;
+                    g /= dq;
+                    b /= dq;
 
+                    ColorSpace.Lab Lab;
+                    Lab = cs.RGB2Lab(r, g, b);
+                    lab4x4.Add(Lab);
+                    r = g = b = 0;
+                }
+            }
 
+            tileImg.Dispose();
+        }
+
+        public void CalcNonDivTileAvgRGB4x4(int s)
+        {
+            int r = 0, g = 0, b = 0;
+            ColorSpace cs = new ColorSpace();
+            Bitmap tileImg = Image.FromFile(Name) as Bitmap;
+
+            if (s != tileImg.Width || s != tileImg.Height)
+                tileImg = ImageProc.ScaleImage(tileImg, s);
+            /*
+            int size = tileImg.Height * tileImg.Height;
+            MemoryStream ms = new MemoryStream();
+            tileImg.Save("..\\Tile5000_64\\" + idx.ToString() + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            idx++;*/
             int quater = tileImg.Height / 4;
             int dq = quater * quater;
             for (int y = 0; y < tileImg.Height; y += quater)
@@ -140,7 +208,7 @@ namespace QRPhotoMosaic.Method
             //int size = bitmap.Height * bitmap.Height;
             //MemoryStream ms = new MemoryStream();
             //tileImg.Save("..\\data128\\" + idx.ToString() + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
-            idx++;
+            //idx++;
             int size = tileImg.Height * tileImg.Height;
             for (int y = 0; y < tileImg.Height; ++y)
             {
@@ -194,6 +262,52 @@ namespace QRPhotoMosaic.Method
 
                 FLANN.features4x4 = new Emgu.CV.Matrix<float>(tiles.Count, 48);
                 transfeature(tiles);
+                FLANN.kdtree = new Emgu.CV.Flann.Index(FLANN.features4x4, 5);
+                file.Close();
+                file.Dispose();
+                reader.Close();
+                reader.Dispose();
+                GC.Collect();
+            }
+            catch (InvalidCastException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        public static void ReadFile4x4Lab(List<Tile> tiles, int tileSize, string folder)
+        {
+            //if (tiles.Count != 0) tiles.Clear();
+            //folder = "..\\data";
+            //tileSize = tiles.Count;i
+            int tmp = 0;
+            if (tiles.Count != 0)
+            {
+                tiles.Clear();
+            }
+
+            try
+            {
+                int total = System.IO.Directory.GetFiles(folder).Length;
+                string txtName = string.Empty;
+
+                txtName = folder + avgLabtxt4x4;
+                FileStream file = File.Open(txtName, FileMode.Open, FileAccess.Read);
+                BinaryReader reader = new BinaryReader(file);
+                tmp = Convert.ToInt32(reader.ReadByte());
+
+                //tileSize = 128;
+                foreach (string tileName in System.IO.Directory.GetFiles(folder))
+                {
+                    //Image img = Image.FromFile(tileName);
+                    Tile tile = new Tile(tileName);
+                    //tile.rgb4x4
+                    readtransLab(tile, reader);
+                    tiles.Add(tile);
+                }
+
+                FLANN.features4x4 = new Emgu.CV.Matrix<float>(tiles.Count, 48);
+                transfeatureLab(tiles);
                 FLANN.kdtree = new Emgu.CV.Flann.Index(FLANN.features4x4, 5);
                 file.Close();
                 file.Dispose();
@@ -310,6 +424,30 @@ namespace QRPhotoMosaic.Method
             }
         }
 
+        public static void SaveFile4x4Lab(List<Tile> tiles, int tileSize, string path)
+        {
+            try
+            {
+                FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                BinaryWriter writer = new BinaryWriter(file);
+                writer.Write(Convert.ToByte(tileSize));
+
+                foreach (Tile tile in tiles)
+                {
+                    transLab(tile, writer);
+                }
+                file.Close();
+                file.Dispose();
+                writer.Close();
+                writer.Dispose();
+                GC.Collect();
+            }
+            catch (InvalidCastException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
         private static void transfeature(List<Tile> tiles)
         {
             for (int i = 0; i < tiles.Count; ++i)
@@ -378,6 +516,191 @@ namespace QRPhotoMosaic.Method
                 FLANN.features4x4.Data[i, 46] = (float)tiles[i].rgb4x4[15].G;
                 FLANN.features4x4.Data[i, 47] = (float)tiles[i].rgb4x4[15].B;
             }
+        }
+
+        private static void transfeatureLab(List<Tile> tiles)
+        {
+            for (int i = 0; i < tiles.Count; ++i)
+            {
+                FLANN.features4x4.Data[i, 0] = (float)tiles[i].lab4x4[0].L;
+                FLANN.features4x4.Data[i, 1] = (float)tiles[i].lab4x4[0].a;
+                FLANN.features4x4.Data[i, 2] = (float)tiles[i].lab4x4[0].b;
+
+                FLANN.features4x4.Data[i, 3] = (float)tiles[i].lab4x4[1].L;
+                FLANN.features4x4.Data[i, 4] = (float)tiles[i].lab4x4[1].a;
+                FLANN.features4x4.Data[i, 5] = (float)tiles[i].lab4x4[1].b;
+
+                FLANN.features4x4.Data[i, 6] = (float)tiles[i].lab4x4[2].L;
+                FLANN.features4x4.Data[i, 7] = (float)tiles[i].lab4x4[2].a;
+                FLANN.features4x4.Data[i, 8] = (float)tiles[i].lab4x4[2].b;
+
+                FLANN.features4x4.Data[i, 9] = (float)tiles[i].lab4x4[3].L;
+                FLANN.features4x4.Data[i, 10] = (float)tiles[i].lab4x4[3].a;
+                FLANN.features4x4.Data[i, 11] = (float)tiles[i].lab4x4[3].b;
+
+                FLANN.features4x4.Data[i, 12] = (float)tiles[i].lab4x4[4].L;
+                FLANN.features4x4.Data[i, 13] = (float)tiles[i].lab4x4[4].a;
+                FLANN.features4x4.Data[i, 14] = (float)tiles[i].lab4x4[4].b;
+
+                FLANN.features4x4.Data[i, 15] = (float)tiles[i].lab4x4[5].L;
+                FLANN.features4x4.Data[i, 16] = (float)tiles[i].lab4x4[5].a;
+                FLANN.features4x4.Data[i, 17] = (float)tiles[i].lab4x4[5].b;
+
+                FLANN.features4x4.Data[i, 18] = (float)tiles[i].lab4x4[6].L;
+                FLANN.features4x4.Data[i, 19] = (float)tiles[i].lab4x4[6].a;
+                FLANN.features4x4.Data[i, 20] = (float)tiles[i].lab4x4[6].b;
+
+                FLANN.features4x4.Data[i, 21] = (float)tiles[i].lab4x4[7].L;
+                FLANN.features4x4.Data[i, 22] = (float)tiles[i].lab4x4[7].a;
+                FLANN.features4x4.Data[i, 23] = (float)tiles[i].lab4x4[7].b;
+
+                FLANN.features4x4.Data[i, 24] = (float)tiles[i].lab4x4[8].L;
+                FLANN.features4x4.Data[i, 25] = (float)tiles[i].lab4x4[8].a;
+                FLANN.features4x4.Data[i, 26] = (float)tiles[i].lab4x4[8].b;
+
+                FLANN.features4x4.Data[i, 27] = (float)tiles[i].lab4x4[9].L;
+                FLANN.features4x4.Data[i, 28] = (float)tiles[i].lab4x4[9].a;
+                FLANN.features4x4.Data[i, 29] = (float)tiles[i].lab4x4[9].b;
+
+                FLANN.features4x4.Data[i, 30] = (float)tiles[i].lab4x4[10].L;
+                FLANN.features4x4.Data[i, 31] = (float)tiles[i].lab4x4[10].a;
+                FLANN.features4x4.Data[i, 32] = (float)tiles[i].lab4x4[10].b;
+
+                FLANN.features4x4.Data[i, 33] = (float)tiles[i].lab4x4[11].L;
+                FLANN.features4x4.Data[i, 34] = (float)tiles[i].lab4x4[11].a;
+                FLANN.features4x4.Data[i, 35] = (float)tiles[i].lab4x4[11].b;
+
+                FLANN.features4x4.Data[i, 36] = (float)tiles[i].lab4x4[12].L;
+                FLANN.features4x4.Data[i, 37] = (float)tiles[i].lab4x4[12].a;
+                FLANN.features4x4.Data[i, 38] = (float)tiles[i].lab4x4[12].b;
+
+                FLANN.features4x4.Data[i, 39] = (float)tiles[i].lab4x4[13].L;
+                FLANN.features4x4.Data[i, 40] = (float)tiles[i].lab4x4[13].a;
+                FLANN.features4x4.Data[i, 41] = (float)tiles[i].lab4x4[13].b;
+
+                FLANN.features4x4.Data[i, 42] = (float)tiles[i].lab4x4[14].L;
+                FLANN.features4x4.Data[i, 43] = (float)tiles[i].lab4x4[14].a;
+                FLANN.features4x4.Data[i, 44] = (float)tiles[i].lab4x4[14].b;
+
+                FLANN.features4x4.Data[i, 45] = (float)tiles[i].lab4x4[15].L;
+                FLANN.features4x4.Data[i, 46] = (float)tiles[i].lab4x4[15].a;
+                FLANN.features4x4.Data[i, 47] = (float)tiles[i].lab4x4[15].b;
+            }
+        }
+
+        private static void readtransLab(Tile tile, BinaryReader reader)
+        {
+            ColorSpace.Lab lab;
+
+            //  0
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+            //  1
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  2
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  3
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  4
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  5
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  6
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  7
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  8
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  9
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  10
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  11
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  12
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  13
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  14
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
+
+
+            //  15
+            lab.L = reader.ReadDouble();
+            lab.a = reader.ReadDouble();
+            lab.b = reader.ReadDouble();
+            tile.lab4x4.Add(lab);
         }
 
         private static void readtrans(Tile tile, BinaryReader reader)
@@ -493,6 +816,82 @@ namespace QRPhotoMosaic.Method
             rgb.G = Convert.ToInt32(reader.ReadByte());
             rgb.B = Convert.ToInt32(reader.ReadByte());
             tile.rgb4x4.Add(rgb);
+        }
+
+
+        private static void transLab(Tile tile, BinaryWriter writer)
+        {/*
+            sbyte[] rgb = new sbyte[48];
+            rgb[0] = Convert.ToSByte(tile.lab4x4[0].L);
+            rgb[1] = Convert.ToSByte(tile.lab4x4[0].a);
+            rgb[2] = Convert.ToSByte(tile.lab4x4[0].b);
+
+            rgb[3] = Convert.ToSByte(tile.lab4x4[1].L);
+            rgb[4] = Convert.ToSByte(tile.lab4x4[1].a);
+            rgb[5] = Convert.ToSByte(tile.lab4x4[1].b);
+
+            rgb[6] = Convert.ToSByte(tile.lab4x4[2].L);
+            rgb[7] = Convert.ToSByte(tile.lab4x4[2].a);
+            rgb[8] = Convert.ToSByte(tile.lab4x4[2].b);
+
+            rgb[9] = Convert.ToSByte(tile.lab4x4[3].L);
+            rgb[10] = Convert.ToSByte(tile.lab4x4[3].a);
+            rgb[11] = Convert.ToSByte(tile.lab4x4[3].b);
+
+            rgb[12] = Convert.ToSByte(tile.lab4x4[4].L);
+            rgb[13] = Convert.ToSByte(tile.lab4x4[4].a);
+            rgb[14] = Convert.ToSByte(tile.lab4x4[4].b);
+
+            rgb[15] = Convert.ToSByte(tile.lab4x4[5].L);
+            rgb[16] = Convert.ToSByte(tile.lab4x4[5].a);
+            rgb[17] = Convert.ToSByte(tile.lab4x4[5].b);
+
+            rgb[18] = Convert.ToSByte(tile.lab4x4[6].L);
+            rgb[19] = Convert.ToSByte(tile.lab4x4[6].a);
+            rgb[20] = Convert.ToSByte(tile.lab4x4[6].b);
+
+            rgb[21] = Convert.ToSByte(tile.lab4x4[7].L);
+            rgb[22] = Convert.ToSByte(tile.lab4x4[7].a);
+            rgb[23] = Convert.ToSByte(tile.lab4x4[7].b);
+
+            rgb[24] = Convert.ToSByte(tile.lab4x4[8].L);
+            rgb[25] = Convert.ToSByte(tile.lab4x4[8].a);
+            rgb[26] = Convert.ToSByte(tile.lab4x4[8].b);
+
+            rgb[27] = Convert.ToSByte(tile.lab4x4[9].L);
+            rgb[28] = Convert.ToSByte(tile.lab4x4[9].a);
+            rgb[29] = Convert.ToSByte(tile.lab4x4[9].b);
+
+            rgb[30] = Convert.ToSByte(tile.lab4x4[10].L);
+            rgb[31] = Convert.ToSByte(tile.lab4x4[10].a);
+            rgb[32] = Convert.ToSByte(tile.lab4x4[10].b);
+
+            rgb[33] = Convert.ToSByte(tile.lab4x4[11].L);
+            rgb[34] = Convert.ToSByte(tile.lab4x4[11].a);
+            rgb[35] = Convert.ToSByte(tile.lab4x4[11].b);
+
+            rgb[36] = Convert.ToSByte(tile.lab4x4[12].L);
+            rgb[37] = Convert.ToSByte(tile.lab4x4[12].a);
+            rgb[38] = Convert.ToSByte(tile.lab4x4[12].b);
+
+            rgb[39] = Convert.ToSByte(tile.lab4x4[13].L);
+            rgb[40] = Convert.ToSByte(tile.lab4x4[13].a);
+            rgb[41] = Convert.ToSByte(tile.lab4x4[13].b);
+
+            rgb[42] = Convert.ToSByte(tile.lab4x4[14].L);
+            rgb[43] = Convert.ToSByte(tile.lab4x4[14].a);
+            rgb[44] = Convert.ToSByte(tile.lab4x4[14].b);
+
+            rgb[45] = Convert.ToSByte(tile.lab4x4[15].L);
+            rgb[46] = Convert.ToSByte(tile.lab4x4[15].a);
+            rgb[47] = Convert.ToSByte(tile.lab4x4[15].b);*/
+            for(int i = 0; i < 16; ++i)
+            {
+                writer.Write(tile.lab4x4[i].L);
+                writer.Write(tile.lab4x4[i].a);
+                writer.Write(tile.lab4x4[i].b);
+            }
+            //writer.Write(rgb, 0, 48);
         }
 
         private static void trans(Tile tile, BinaryWriter writer)

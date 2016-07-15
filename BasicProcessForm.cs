@@ -28,6 +28,7 @@ namespace QRPhotoMosaic
         public string ecLevel;
         public string check;
         public string search;
+        public string space;
         
         public PictureBox QRCodePicBox;
         public PictureBox PhotomosaicPicBox;
@@ -149,7 +150,12 @@ namespace QRPhotoMosaic
                     // Generate basic photomosaic
                     MainForm.singleton.StopWatch.Start();
                     if (search == "Flann4x4" || search == "Full4x4")
-                        Tile.ReadFile4x4(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
+                    {
+                        if(space == "RGB")
+                            Tile.ReadFile4x4(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
+                        else if(space =="Lab")
+                            Tile.ReadFile4x4Lab(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
+                    }
                     else
                         Tile.ReadFile(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
                     //if (tileSize == 0) return;
@@ -161,8 +167,12 @@ namespace QRPhotoMosaic
                     { 
                             
                         case "Flann4x4":
+                            if(space == "RGB")
                             MainForm.singleton.photomosaicImg
-                            = pmMethod.GenerateByFlann4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000);
+                            = pmMethod.GenerateByFlann4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000, "RGB");
+                            else if(space == "Lab")
+                                MainForm.singleton.photomosaicImg
+                            = pmMethod.GenerateByFlann4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000, "Lab");
                             break;
                         case "Full4x4":
                              MainForm.singleton.photomosaicImg
