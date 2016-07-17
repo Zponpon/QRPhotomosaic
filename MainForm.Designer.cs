@@ -548,6 +548,7 @@
             this.ColorSpaceBox.FormattingEnabled = true;
             this.ColorSpaceBox.Items.AddRange(new object[] {
             "RGB",
+            "YUV",
             "Lab"});
             this.ColorSpaceBox.Location = new System.Drawing.Point(319, 344);
             this.ColorSpaceBox.Name = "ColorSpaceBox";

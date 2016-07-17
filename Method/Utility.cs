@@ -153,16 +153,26 @@ namespace QRPhotoMosaic.Method
         public static void BlackDiamond(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
             double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
-            moduleAvgLum *= 255.0f;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+                moduleAvgLum *= 255.0f;
+            else if (colorSpace == "Lab")
+                moduleAvgLum *= 100.0f;
             centerSize = Utility.ExpPlus(a, b, moduleAvgLum);
-            robustVal = (int)(((double)(centerSize-Utility.min) / (double)(Utility.max-Utility.min)) * 16) + 48;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            }
+            else if (colorSpace == "Lab")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 10) + 20;
+            }
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
             ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
-            double UserSetRobustnesspercent = robustVal / 255.0;
+            double UserSetRobustnesspercent = Convert.ToDouble(robustVal);;
             double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
-            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0f;
             int halfCenterSize = centerSize / 2;
             int centerX = x * moduleLength + Around + (halfCenterSize);
             int centerY = y * moduleLength + Around + (halfCenterSize);
@@ -170,6 +180,15 @@ namespace QRPhotoMosaic.Method
             double sizeCount1 = halfCenterSize / 3;
             double sizeCount2 = halfCenterSize * 2 / 3;
             double sizeCount3 = halfCenterSize;
+
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                UserSetRobustnesspercent /= 255;
+            }
+            else if (colorSpace == "Lab")
+            {
+                UserSetRobustnesspercent /= 100;
+            }
 
             if (Lmean + UserSetRobustnesspercent > Tmean)
             {
@@ -251,16 +270,26 @@ namespace QRPhotoMosaic.Method
         public static void WhiteDiamond(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
             double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
-            moduleAvgLum *= 255.0f;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+                moduleAvgLum *= 255.0f;
+            else if (colorSpace == "Lab")
+                moduleAvgLum *= 100.0f;
             centerSize = Utility.ExpMinus(a, b, moduleAvgLum);
-            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            }
+            else if (colorSpace == "Lab")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 10) + 20;
+            }
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
             ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
-            double UserSetRobustnesspercent = robustVal / 255.0;
+            double UserSetRobustnesspercent = Convert.ToDouble(robustVal);
             double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
-            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0f;
             int halfCenterSize = centerSize / 2;
             int centerX = x * moduleLength + Around + (halfCenterSize);
             int centerY = y * moduleLength + Around + (halfCenterSize);
@@ -268,7 +297,16 @@ namespace QRPhotoMosaic.Method
             double sizeCount1 = halfCenterSize / 3;
             double sizeCount2 = halfCenterSize * 2 / 3;
             double sizeCount3 = halfCenterSize;
-            
+
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                UserSetRobustnesspercent /= 255.0f;
+            }
+            else if (colorSpace == "Lab")
+            {
+                UserSetRobustnesspercent /= 100.0f;
+            }
+
             if (Lmean + UserSetRobustnesspercent > Tmean)
             {
                 for (int i = 0; i < moduleLength; i++)
@@ -352,16 +390,26 @@ namespace QRPhotoMosaic.Method
         public static void BlackCircle(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
             double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
-            moduleAvgLum *= 255.0f;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+                moduleAvgLum *= 255.0f;
+            else if (colorSpace == "Lab")
+                moduleAvgLum *= 100.0f;
             centerSize = Utility.ExpPlus(a, b, moduleAvgLum);
-            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            }
+            else if (colorSpace == "Lab")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 10) + 20;
+            }
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
             ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
-            double UserSetRobustnesspercent = robustVal / 255.0;
+            double UserSetRobustnesspercent = Convert.ToDouble(robustVal);
             double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
-            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0f;
             int radius = centerSize / 2;
             int centerX = x * moduleLength + Around + (radius);
             int centerY = y * moduleLength + Around + (radius);
@@ -369,6 +417,15 @@ namespace QRPhotoMosaic.Method
             double sizeCount1 = radius / 3;
             double sizeCount2 = radius * 2 / 3;
             double sizeCount3 = radius;
+
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                UserSetRobustnesspercent /= 255;
+            }
+            else if (colorSpace == "Lab")
+            {
+                UserSetRobustnesspercent /= 100;
+            }
 
             if (Lmean + UserSetRobustnesspercent > Tmean)
             {
@@ -450,16 +507,26 @@ namespace QRPhotoMosaic.Method
         public static void WhiteCircle(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
             double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
-            moduleAvgLum *= 255.0f;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+                moduleAvgLum *= 255.0f;
+            else if (colorSpace == "Lab")
+                moduleAvgLum *= 100.0f;
             centerSize = Utility.ExpMinus(a, b, moduleAvgLum);
-            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            }
+            else if (colorSpace == "Lab")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 10) + 20;
+            }
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
             ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
-            double UserSetRobustnesspercent = robustVal / 255.0;
+            double UserSetRobustnesspercent = Convert.ToDouble(robustVal);
             double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
-            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0f;
             int radius = centerSize / 2;
             int centerX = x * moduleLength + Around + radius;
             int centerY = y * moduleLength + Around + radius;
@@ -467,6 +534,15 @@ namespace QRPhotoMosaic.Method
             double sizeCount1 = radius / 3;
             double sizeCount2 = radius * 2 / 3;
             double sizeCount3 = radius;
+
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                UserSetRobustnesspercent /= 255;
+            }
+            else if (colorSpace == "Lab")
+            {
+                UserSetRobustnesspercent /= 100;
+            }
 
             if (Lmean + UserSetRobustnesspercent > Tmean)
             {
@@ -546,9 +622,19 @@ namespace QRPhotoMosaic.Method
         public static void BlackSquare(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)  //黑
         {
             double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
-            moduleAvgLum *= 255.0f;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+                moduleAvgLum *= 255.0f;
+            else if (colorSpace == "Lab")
+                moduleAvgLum *= 100.0f;
             centerSize = Utility.ExpPlus(a, b, moduleAvgLum);
-            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            }
+            else if (colorSpace == "Lab")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 10) + 20;
+            }
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
@@ -560,9 +646,17 @@ namespace QRPhotoMosaic.Method
             int centerX = x * moduleLength + Around + centerSize/2;
             int centerY = y * moduleLength + Around + centerSize/2;
 
-            double UserSetRobustnesspercent = robustVal / 255.0;
+            double UserSetRobustnesspercent = (double)robustVal;
             double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
-            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R /255.0f;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                UserSetRobustnesspercent /= 255;
+            }
+            else if (colorSpace == "Lab")
+            {
+                UserSetRobustnesspercent /= 100;
+            }
             if (Lmean + UserSetRobustnesspercent > Tmean)
             {
                 for (int i = 0; i < moduleLength; i++)
@@ -649,23 +743,40 @@ namespace QRPhotoMosaic.Method
         public static void WhiteSquare(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b) //白
         {
             double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
-            moduleAvgLum *= 255.0f;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+                moduleAvgLum *= 255.0f;
+            else if (colorSpace == "Lab")
+                moduleAvgLum *= 100.0f;
             centerSize = Utility.ExpMinus(a, b, moduleAvgLum);
-            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            }
+            else if (colorSpace == "Lab")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 10) + 20;
+            }
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
             ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
-            double UserSetRobustnesspercent = Convert.ToDouble(robustVal) / 255.0;
+            double UserSetRobustnesspercent = Convert.ToDouble(robustVal);
             double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
-            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0f;
 
             double sizeCount1 = centerSize / 6;
             double sizeCount2 = centerSize / 3;
             double sizeCount3 = centerSize / 2;
             int centerX = x * moduleLength + Around + (centerSize)/2;
             int centerY = y * moduleLength + Around + (centerSize)/2;
-
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                UserSetRobustnesspercent /= 255;
+            }
+            else if (colorSpace == "Lab")
+            {
+                UserSetRobustnesspercent /= 100;
+            }
 
             if (Lmean - UserSetRobustnesspercent < Tmean)
             {
@@ -783,16 +894,34 @@ namespace QRPhotoMosaic.Method
         public static void BlackCorner(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace, double a, double b)
         {
             double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
-            moduleAvgLum *= 255.0f;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+                moduleAvgLum *= 255.0f;
+            else if (colorSpace == "Lab")
+                moduleAvgLum *= 100.0f;
             centerSize = Utility.ExpPlus(a, b, moduleAvgLum);
-            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            }
+            else if (colorSpace == "Lab")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 10) + 20;
+            }
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
             ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
-            double UserSetRobustnesspercent = Convert.ToDouble(robustVal) / 255.0;
+            double UserSetRobustnesspercent = Convert.ToDouble(robustVal);
             double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
-            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0f;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                UserSetRobustnesspercent /= 255;
+            }
+            else if (colorSpace == "Lab")
+            {
+                UserSetRobustnesspercent /= 100;
+            }
 
             double radius = (double)centerSize / 2;
 
@@ -903,17 +1032,35 @@ namespace QRPhotoMosaic.Method
         public static void WhiteCorner(Bitmap result, Bitmap pmBitmap, Bitmap mask, int x, int y, int centerSize, int moduleLength, int robustVal, string colorSpace,double a, double b)
         {
             double moduleAvgLum = Utility.AvgMoudleLum(pmBitmap, x, y, moduleLength, colorSpace);
-            moduleAvgLum *= 255.0f;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+                moduleAvgLum *= 255.0f;
+            else if (colorSpace == "Lab")
+                moduleAvgLum *= 100.0f;
             centerSize = Utility.ExpMinus(a, b, moduleAvgLum);
-            robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 16) + 48;
+            }
+            else if (colorSpace == "Lab")
+            {
+                robustVal = (int)(((double)(centerSize - Utility.min) / (double)(Utility.max - Utility.min)) * 10) + 20;
+            }
             int Around = (moduleLength - centerSize) / 2;
             Color SourceImageColor, LocalThresHoldImageColor;
             ColorSpace CSC = new ColorSpace();
             ColorSpace.AllColorSpace ACS = new ColorSpace.AllColorSpace();
-            double UserSetRobustnesspercent = Convert.ToDouble(robustVal) / 255.0;
+            double UserSetRobustnesspercent = Convert.ToDouble(robustVal);
             double Lmean = calculateScore(pmBitmap, x, y, centerSize, moduleLength, Around, colorSpace);
-            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0;
+            double Tmean = mask.GetPixel(x * moduleLength + Around, y * moduleLength + Around).R / 255.0f;
             //double radius = (double)moduleLength / 2;
+            if (colorSpace == "YUV" || colorSpace == "RGB")
+            {
+                UserSetRobustnesspercent /= 255;
+            }
+            else if (colorSpace == "Lab")
+            {
+                UserSetRobustnesspercent /= 100;
+            }
             double radius = (double)centerSize / 2;
             //double maxDistance = Math.Sqrt((moduleLength / 2) * (moduleLength / 2) * 2);
 

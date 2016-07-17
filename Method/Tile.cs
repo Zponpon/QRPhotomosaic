@@ -113,7 +113,9 @@ namespace QRPhotoMosaic.Method
         public void CalcNonDivTileAvgLab4x4(int s)
         {
             int r = 0, g = 0, b = 0;
+            double l = 0, a = 0, B = 0;
             ColorSpace cs = new ColorSpace();
+            ColorSpace.Lab lab=new ColorSpace.Lab();
             Bitmap tileImg = Image.FromFile(Name) as Bitmap;
 
             if (s != tileImg.Width || s != tileImg.Height)
@@ -133,19 +135,19 @@ namespace QRPhotoMosaic.Method
                     {
                         for (int j = 0; j < quater; ++j)
                         {
-                            r += (int)tileImg.GetPixel(x + j, y + i).R;
-                            g += (int)tileImg.GetPixel(x + j, y + i).G;
-                            b += (int)tileImg.GetPixel(x + j, y + i).B;
+                            Color p = tileImg.GetPixel(x + j, y + i);
+                            lab = cs.RGB2Lab(p.R, p.G, p.B);
+                            l += lab.L;
+                            a += lab.a;
+                            B += lab.b;
                         }
                     }
-                    r /= dq;
-                    g /= dq;
-                    b /= dq;
+                    l /= dq;
+                    a /= dq;
+                    B /= dq;
 
-                    ColorSpace.Lab Lab;
-                    Lab = cs.RGB2Lab(r, g, b);
-                    lab4x4.Add(Lab);
-                    r = g = b = 0;
+                    lab4x4.Add(lab);
+                    l = a = B = 0;
                 }
             }
 
@@ -294,7 +296,7 @@ namespace QRPhotoMosaic.Method
                 txtName = folder + avgLabtxt4x4;
                 FileStream file = File.Open(txtName, FileMode.Open, FileAccess.Read);
                 BinaryReader reader = new BinaryReader(file);
-                tmp = Convert.ToInt32(reader.ReadByte());
+                //tmp = Convert.ToInt32(reader.ReadByte());
 
                 //tileSize = 128;
                 foreach (string tileName in System.IO.Directory.GetFiles(folder))
@@ -430,7 +432,7 @@ namespace QRPhotoMosaic.Method
             {
                 FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 BinaryWriter writer = new BinaryWriter(file);
-                writer.Write(Convert.ToByte(tileSize));
+                //writer.Write(Convert.ToByte(tileSize));
 
                 foreach (Tile tile in tiles)
                 {
@@ -820,71 +822,7 @@ namespace QRPhotoMosaic.Method
 
 
         private static void transLab(Tile tile, BinaryWriter writer)
-        {/*
-            sbyte[] rgb = new sbyte[48];
-            rgb[0] = Convert.ToSByte(tile.lab4x4[0].L);
-            rgb[1] = Convert.ToSByte(tile.lab4x4[0].a);
-            rgb[2] = Convert.ToSByte(tile.lab4x4[0].b);
-
-            rgb[3] = Convert.ToSByte(tile.lab4x4[1].L);
-            rgb[4] = Convert.ToSByte(tile.lab4x4[1].a);
-            rgb[5] = Convert.ToSByte(tile.lab4x4[1].b);
-
-            rgb[6] = Convert.ToSByte(tile.lab4x4[2].L);
-            rgb[7] = Convert.ToSByte(tile.lab4x4[2].a);
-            rgb[8] = Convert.ToSByte(tile.lab4x4[2].b);
-
-            rgb[9] = Convert.ToSByte(tile.lab4x4[3].L);
-            rgb[10] = Convert.ToSByte(tile.lab4x4[3].a);
-            rgb[11] = Convert.ToSByte(tile.lab4x4[3].b);
-
-            rgb[12] = Convert.ToSByte(tile.lab4x4[4].L);
-            rgb[13] = Convert.ToSByte(tile.lab4x4[4].a);
-            rgb[14] = Convert.ToSByte(tile.lab4x4[4].b);
-
-            rgb[15] = Convert.ToSByte(tile.lab4x4[5].L);
-            rgb[16] = Convert.ToSByte(tile.lab4x4[5].a);
-            rgb[17] = Convert.ToSByte(tile.lab4x4[5].b);
-
-            rgb[18] = Convert.ToSByte(tile.lab4x4[6].L);
-            rgb[19] = Convert.ToSByte(tile.lab4x4[6].a);
-            rgb[20] = Convert.ToSByte(tile.lab4x4[6].b);
-
-            rgb[21] = Convert.ToSByte(tile.lab4x4[7].L);
-            rgb[22] = Convert.ToSByte(tile.lab4x4[7].a);
-            rgb[23] = Convert.ToSByte(tile.lab4x4[7].b);
-
-            rgb[24] = Convert.ToSByte(tile.lab4x4[8].L);
-            rgb[25] = Convert.ToSByte(tile.lab4x4[8].a);
-            rgb[26] = Convert.ToSByte(tile.lab4x4[8].b);
-
-            rgb[27] = Convert.ToSByte(tile.lab4x4[9].L);
-            rgb[28] = Convert.ToSByte(tile.lab4x4[9].a);
-            rgb[29] = Convert.ToSByte(tile.lab4x4[9].b);
-
-            rgb[30] = Convert.ToSByte(tile.lab4x4[10].L);
-            rgb[31] = Convert.ToSByte(tile.lab4x4[10].a);
-            rgb[32] = Convert.ToSByte(tile.lab4x4[10].b);
-
-            rgb[33] = Convert.ToSByte(tile.lab4x4[11].L);
-            rgb[34] = Convert.ToSByte(tile.lab4x4[11].a);
-            rgb[35] = Convert.ToSByte(tile.lab4x4[11].b);
-
-            rgb[36] = Convert.ToSByte(tile.lab4x4[12].L);
-            rgb[37] = Convert.ToSByte(tile.lab4x4[12].a);
-            rgb[38] = Convert.ToSByte(tile.lab4x4[12].b);
-
-            rgb[39] = Convert.ToSByte(tile.lab4x4[13].L);
-            rgb[40] = Convert.ToSByte(tile.lab4x4[13].a);
-            rgb[41] = Convert.ToSByte(tile.lab4x4[13].b);
-
-            rgb[42] = Convert.ToSByte(tile.lab4x4[14].L);
-            rgb[43] = Convert.ToSByte(tile.lab4x4[14].a);
-            rgb[44] = Convert.ToSByte(tile.lab4x4[14].b);
-
-            rgb[45] = Convert.ToSByte(tile.lab4x4[15].L);
-            rgb[46] = Convert.ToSByte(tile.lab4x4[15].a);
-            rgb[47] = Convert.ToSByte(tile.lab4x4[15].b);*/
+        {
             for(int i = 0; i < 16; ++i)
             {
                 writer.Write(tile.lab4x4[i].L);

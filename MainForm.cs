@@ -358,11 +358,19 @@ namespace QRPhotoMosaic
             //embedding.maxLum = 255;
             embedding.minSize = (int)this.MinSize.Value;
             embedding.maxSize = (int)this.MaxSize.Value;
-            embedding.minLum = 30;
-            embedding.maxLum = 220;
+            if (ColorSpaceBox.Text == "RGB" || ColorSpaceBox.Text == "YUV")
+            {
+                embedding.minLum = 30;
+                embedding.maxLum = 220;
+            }
+            else if (ColorSpaceBox.Text=="Lab")
+            {
+                embedding.minLum = 12;
+                embedding.maxLum = 98;
+            }
             
             //embedding.ColorSpace = ColorSpaceComboBox.Text;
-            embedding.ColorSpace = "YUV";
+            embedding.ColorSpace = ColorSpaceBox.Text;
             embedding.method = new CreatingQRPhotomosaic();
             embedding.info = info;
             embedding.QRBitmap = QRBitmap;

@@ -129,6 +129,7 @@ namespace QRPhotoMosaic.Method
             int dstSize = v * v;
             float blockTotal = blockSize * blockSize;
             int R = 0, G = 0, B = 0;
+            double l = 0, a = 0, b = 0;
             ColorSpace cs = new ColorSpace();
 
             Matrix<int> indices = new Matrix<int>(dstSize, k);
@@ -153,20 +154,21 @@ namespace QRPhotoMosaic.Method
                                 for (int n = 0; n < quater; n++)
                                 {
                                     Color pixel = newSrc.GetPixel(j + n, i + m);
-                                    R += Convert.ToInt32(pixel.R);
-                                    G += Convert.ToInt32(pixel.G);
-                                    B += Convert.ToInt32(pixel.B);
+                                    ColorSpace.Lab lab = cs.RGB2Lab(pixel.R, pixel.G, pixel.B);
+                                    l += lab.L;
+                                    a += lab.a;
+                                    b += lab.b;
                                 }
                             }
 
-                            R /= dq;
-                            G /= dq;
-                            B /= dq;
-                            ColorSpace.Lab lab = cs.RGB2Lab(R, G, B);
-                            query.Data[index, blockIdx++] = (float)lab.L;
-                            query.Data[index, blockIdx++] = (float)lab.a;
-                            query.Data[index, blockIdx++] = (float)lab.b;
-                            R = G = B = 0;
+                            l /= dq;
+                            a /= dq;
+                            b /= dq;
+                            //ColorSpace.Lab lab = cs.RGB2Lab(R, G, B);
+                            query.Data[index, blockIdx++] = (float)l;
+                            query.Data[index, blockIdx++] = (float)a;
+                            query.Data[index, blockIdx++] = (float)b;
+                            l = a = b = 0;
                         }
                     }
                     index++;

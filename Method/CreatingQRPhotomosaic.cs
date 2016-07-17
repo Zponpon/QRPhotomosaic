@@ -47,7 +47,17 @@ namespace QRPhotoMosaic.Method
 
         private Bitmap addQuietZone(Bitmap prevWork, int tileSize)
         {
-            Bitmap qr = new Bitmap(prevWork.Width + tileSize * 4, prevWork.Height + tileSize * 4);
+            Bitmap qr=null;
+            try
+            {
+                qr = new Bitmap(prevWork.Width + tileSize * 4, prevWork.Height + tileSize * 4);
+            }
+            catch(System.ArgumentException)
+            {
+                GC.Collect();
+                return prevWork;
+                //qr = new Bitmap(prevWork.Width + tileSize * 4, prevWork.Height + tileSize * 4);
+            }
             int srcX = tileSize * 2;
             int srcY = srcX;
             for (int y = 0; y < qr.Height; y++ )
@@ -221,8 +231,8 @@ namespace QRPhotoMosaic.Method
             if (!tileSize.HasValue || !centerSize.HasValue || !robustVal.HasValue) return null;
             this.centerSize = centerSize.Value;
             this.robustVal = robustVal.Value;
-            //this.colorSpace = colorSpace;
-            this.colorSpace = "YUV";
+            this.colorSpace = colorSpace;
+            //this.colorSpace = "YUV";
             AlignmentPatternLocation_X = info.AlignmentPatternLocation_X * tileSize.Value;
             AlignmentPatternLocation_Y = info.AlignmentPatternLocation_Y * tileSize.Value;
             version = info.QRVersion;
@@ -237,7 +247,11 @@ namespace QRPhotoMosaic.Method
             }
 
             Bitmap greyImage = null;
-            string path = "..\\GreyImage\\" + MainForm.singleton.masterImgName;
+            string path = string.Empty;
+            /*if (colorSpace == "Lab")
+                path = "..\\GreyImage\\" +"Lab"+ MainForm.singleton.masterImgName;
+            else*/
+                path = "..\\GreyImage\\" + MainForm.singleton.masterImgName;
             //Console.WriteLine(path);
             try
             {
@@ -253,7 +267,10 @@ namespace QRPhotoMosaic.Method
                 greyImage.Save(file, System.Drawing.Imaging.ImageFormat.Bmp);
             }
 
-            path = "..\\ThresholdMask\\" + MainForm.singleton.masterImgName;
+            /*if (colorSpace == "Lab")
+                path = "..\\ThresholdMask\\" + "Lab" + MainForm.singleton.masterImgName;
+            else*/
+                path = "..\\ThresholdMask\\" + MainForm.singleton.masterImgName;
             Bitmap thresholdMask;
             try
             {
@@ -266,6 +283,7 @@ namespace QRPhotoMosaic.Method
                 thresholdMask = LocalThresholdMask(greyImage, 3, tileSize.Value);
                 FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.Write);
                 thresholdMask.Save(file, System.Drawing.Imaging.ImageFormat.Bmp);
+                file.Close();
             }
 
             if(shape != "Star")
@@ -281,12 +299,15 @@ namespace QRPhotoMosaic.Method
 
             Bitmap prevWork = GeneratingProcess(worker, info.QRmatrix, overlapping, thresholdMask, tileSize.Value, centerSize.Value, robustVal.Value, shape);
 
-            GC.Collect();
             Bitmap resultQR = addQuietZone(prevWork, tileSize.Value);
 
-            greyImage.Dispose();
-            overlapping.Dispose();
-            prevWork.Dispose();
+            //greyImage.Dispose();
+            //overlapping.Dispose();
+            //prevWork.Dispose();
+            greyImage = null;
+            overlapping = null;
+            prevWork=null;
+            thresholdMask = null;
             GC.Collect();
             return resultQR;
         }
