@@ -242,7 +242,7 @@ namespace QRPhotoMosaic.Method
             Bitmap overlapping = pmBitmap;
             if (check == "N")
             {
-                worker.ReportProgress(10, "Calculate the overlapping area");
+                worker.ReportProgress(10, "Generate a gray image");
                 overlapping = ImageProc.OverlappingArea(pmBitmap, size, size, tileSize.Value);
             }
 
@@ -261,7 +261,7 @@ namespace QRPhotoMosaic.Method
             catch(FileNotFoundException e)
             {
                 Console.WriteLine(e.Message);
-                worker.ReportProgress(20, "Generate a gray image of overlapping area");
+                worker.ReportProgress(20, "Generate a gray image");
                 greyImage = ImageProc.GrayImage(overlapping, colorSpace);
                 FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.Write);
                 greyImage.Save(file, System.Drawing.Imaging.ImageFormat.Bmp);

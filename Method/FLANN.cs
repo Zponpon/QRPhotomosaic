@@ -154,21 +154,20 @@ namespace QRPhotoMosaic.Method
                                 for (int n = 0; n < quater; n++)
                                 {
                                     Color pixel = newSrc.GetPixel(j + n, i + m);
-                                    ColorSpace.Lab lab = cs.RGB2Lab(pixel.R, pixel.G, pixel.B);
-                                    l += lab.L;
-                                    a += lab.a;
-                                    b += lab.b;
+                                    R += pixel.R;
+                                    G += pixel.G;
+                                    B += pixel.B;
                                 }
                             }
 
-                            l /= dq;
-                            a /= dq;
-                            b /= dq;
-                            //ColorSpace.Lab lab = cs.RGB2Lab(R, G, B);
-                            query.Data[index, blockIdx++] = (float)l;
-                            query.Data[index, blockIdx++] = (float)a;
-                            query.Data[index, blockIdx++] = (float)b;
-                            l = a = b = 0;
+                            R /= dq;
+                            G /= dq;
+                            B /= dq;
+                            ColorSpace.Lab lab = cs.RGB2Lab(R, G, B);
+                            query.Data[index, blockIdx++] = (float)lab.L;
+                            query.Data[index, blockIdx++] = (float)lab.a;
+                            query.Data[index, blockIdx++] = (float)lab.b;
+                            R = G = B = 0;
                         }
                     }
                     index++;

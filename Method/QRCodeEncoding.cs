@@ -33,7 +33,6 @@ namespace QRPhotoMosaic.Method
             IDictionary<EncodeHintType, object> hints = new Dictionary<EncodeHintType, object>();
             hints[EncodeHintType.ERROR_CORRECTION] = level;
             hints[EncodeHintType.CHARACTER_SET] = "UTF-8";
-            
             BitMatrix QRbitMatrix = null;
             int QRWeight = 200;
             int QRHeight = 200;

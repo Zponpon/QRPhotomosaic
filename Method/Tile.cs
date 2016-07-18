@@ -136,18 +136,21 @@ namespace QRPhotoMosaic.Method
                         for (int j = 0; j < quater; ++j)
                         {
                             Color p = tileImg.GetPixel(x + j, y + i);
-                            lab = cs.RGB2Lab(p.R, p.G, p.B);
-                            l += lab.L;
-                            a += lab.a;
-                            B += lab.b;
+                            //lab = cs.RGB2Lab(p.R, p.G, p.B);
+                            r += p.R;
+                            g += p.G;
+                            b += p.B;
                         }
                     }
-                    l /= dq;
-                    a /= dq;
-                    B /= dq;
+                    r /= dq;
+                    g /= dq;
+                    b /= dq;
+                    lab = cs.RGB2Lab(r, g, b);
+                   
 
                     lab4x4.Add(lab);
-                    l = a = B = 0;
+                    r = g = b;
+                    //l = a = B = 0;
                 }
             }
 
@@ -296,7 +299,7 @@ namespace QRPhotoMosaic.Method
                 txtName = folder + avgLabtxt4x4;
                 FileStream file = File.Open(txtName, FileMode.Open, FileAccess.Read);
                 BinaryReader reader = new BinaryReader(file);
-                //tmp = Convert.ToInt32(reader.ReadByte());
+                tmp = Convert.ToInt32(reader.ReadByte());
 
                 //tileSize = 128;
                 foreach (string tileName in System.IO.Directory.GetFiles(folder))
