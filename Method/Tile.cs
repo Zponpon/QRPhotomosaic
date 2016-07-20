@@ -23,6 +23,8 @@ namespace QRPhotoMosaic.Method
         public static string avgtxt128 = "AvgColor128.txt";
         public static string avgtxt4x4 = "AvgColor4x4.txt";
         public static string avgLabtxt4x4 = "AvgLab4x4.txt";
+        static string[] folders16 = {"0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111",
+                          "1000","1001", "1010", "1011", "1100", "1101", "1110", "1111"};
 
 
         public struct TileType
@@ -75,6 +77,16 @@ namespace QRPhotoMosaic.Method
                 },
                 new TileType
                 {
+                    Name="Tile2000_128",
+                    Folder ="..\\Tile2000_128"
+                },
+                new TileType
+                {
+                    Name="Tile2000_64",
+                    Folder ="..\\Tile2000_64"
+                },
+                new TileType
+                {
                     Name="Data",
                     Folder ="..\\data"
                 },
@@ -108,6 +120,11 @@ namespace QRPhotoMosaic.Method
             //bitmap = new Bitmap(s);
             avgRGB = new ColorSpace.RGB();
             UseTimes = 0;
+        }
+
+        public void ClassifyTile()
+        {
+
         }
 
         public void CalcNonDivTileAvgLab4x4(int s)
@@ -234,6 +251,27 @@ namespace QRPhotoMosaic.Method
             tileImg.Dispose();
         }
 
+        public static void ReadFile16Folder(string folder)
+        {
+            for(int i = 0; i < 16; ++i)
+            {
+                FileStream file = File.Open(folder+folders16[i]+"AvgLab.txt", FileMode.Open, FileAccess.Read);
+                BinaryReader reader = new BinaryReader(file);
+                int tmp = Convert.ToInt32(reader.ReadByte());
+                Console.Write(tmp);
+                FLANN.Newfeatures4x4[i] = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder + folders16[i]).Length, 48);
+                int count = 0;
+                foreach (string tileName in System.IO.Directory.GetFiles(folder + folders16[i]))
+                {
+                    for(int j = 0; j < 48; ++j)
+                    {
+                        FLANN.Newfeatures4x4[i].Data[count, j] = (float)reader.ReadDouble();
+                    }
+                    count++;
+                }
+            }
+            FLANN.buildTrees();
+        }
         public static void ReadFile4x4(List<Tile> tiles, int tileSize, string folder)
         {
             //if (tiles.Count != 0) tiles.Clear();
@@ -435,7 +473,7 @@ namespace QRPhotoMosaic.Method
             {
                 FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 BinaryWriter writer = new BinaryWriter(file);
-                //writer.Write(Convert.ToByte(tileSize));
+                writer.Write(Convert.ToByte(tileSize));
 
                 foreach (Tile tile in tiles)
                 {

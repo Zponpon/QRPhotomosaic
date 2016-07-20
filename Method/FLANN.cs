@@ -18,6 +18,7 @@ namespace QRPhotoMosaic.Method
     public static class FLANN
     {
         public static string avgtxt = "AvgColor.txt";
+        public static string ClassifyPath = "C:\\Users\\Zpon\\Documents\\GitHub\\QRPhotomosaic\\bin\\Classify\\";
         public static Matrix<float> features = null;
         public static Matrix<float> features4x4 = null;
         public static Index kdtree = null;
@@ -25,6 +26,10 @@ namespace QRPhotoMosaic.Method
         public static Matrix<float> Query = null;
         public static Matrix<float> Query4x4 = null;
         public static Matrix<int> Indices4x4 = null;
+
+        public static Matrix<float>[] Newfeatures4x4 = new Matrix<float>[16];
+        public static Index[] kdtrees = new Index[16];
+        private static Dictionary<int, List<string>> usedDict = new Dictionary<int, List<string>>();
 
         public static void Search(Bitmap src, int version, int k)
         {
@@ -177,6 +182,72 @@ namespace QRPhotoMosaic.Method
             FLANN.Query4x4 = query;
             FLANN.Indices4x4 = indices;
             GC.Collect();
+        }
+
+        public static void buildTrees()
+        {
+            for(int i = 0; i < 16; ++i)
+            {
+                kdtrees[i] = new Index(Newfeatures4x4[i], 5);
+            }
+        }
+
+        public static string Search4x4LabOther(Bitmap img, int x, int y, int blockSize, string[] names, int kdIndex, int k)
+        {
+            int quater = blockSize / 4;
+            int dq = quater * quater;
+            int R = 0, G = 0, B = 0;
+            Matrix<int> indices = new Matrix<int>(1, k);
+            Matrix<float> dist = new Matrix<float>(1, k);
+            Matrix<float> query = new Matrix<float>(1, 48);
+            ColorSpace cs = new ColorSpace();
+            int xb = x * blockSize;
+            int yb = y * blockSize;
+            int blockIdx = 0;
+            for (int i = yb; i < yb + blockSize; i += quater)
+            {
+                for (int j = xb; j < xb + blockSize; j += quater)
+                {
+                    
+                    for(int m = 0; m < quater; m++)
+                    {
+                        for (int n = 0; n < quater; n++)
+                        {
+                            Color pixel = img.GetPixel(j+n, i+m);
+                            R += (int)pixel.R;
+                            G += (int)pixel.G;
+                            B += (int)pixel.B;
+                        }
+                    }
+                    R /= dq;
+                    G /= dq;
+                    B /= dq;
+                    ColorSpace.Lab lab = cs.RGB2Lab(R, G, B);
+                    query.Data[0, blockIdx++] = (float)lab.L;
+                    query.Data[0, blockIdx++] = (float)lab.a;
+                    query.Data[0, blockIdx++] = (float)lab.b;
+                    R = G = B = 0;
+                }
+            }
+            kdtrees[kdIndex].KnnSearch(query, indices, dist, k, 64);//First time k = 1;
+            for (int i = 0; i < indices.Cols; ++i)
+            {
+                int index = indices.Data[0, i];
+                string name = names[index];
+                if(!usedDict.ContainsKey(kdIndex))
+                {
+                    usedDict.Add(kdIndex, new List<string>());
+                    usedDict[kdIndex].Add(name);
+                    return name;
+                }
+                else if (!usedDict[kdIndex].Contains(name))
+                {
+                    usedDict[kdIndex].Add(names[index]);
+                    return name;
+                }
+            }
+
+            return names[indices.Data[0, 0]];
         }
     }
 }

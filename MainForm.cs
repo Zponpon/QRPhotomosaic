@@ -184,7 +184,7 @@ namespace QRPhotoMosaic
         {
             LevelComboBox.SelectedIndex = 0;
             SearchMethodComboBox.SelectedIndex = 0;
-            ColorSpaceBox.SelectedIndex = 0;
+            ColorSpaceBox.SelectedIndex = 2;
             CheckInputComboBox.SelectedIndex = 1;
             ShapeCombobox.SelectedIndex = 1;
             this.ProcessTime.Text = "";
@@ -267,7 +267,7 @@ namespace QRPhotoMosaic
             }
             System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
             Bitmap savePic = ImageProc.ScaleImage(photomosaicImg, photomosaicImg.Width, photomosaicImg.Height);
-            savePic = ImageProc.OverlappingArea(savePic, savePic.Width - TileSize, savePic.Height - TileSize, TileSize);
+            //savePic = ImageProc.OverlappingArea(savePic, savePic.Width - TileSize, savePic.Height - TileSize, TileSize);
             savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
             saveFileDialog.Dispose();
             fs.Close();
@@ -436,8 +436,11 @@ namespace QRPhotoMosaic
                 TimeSpan ts = stopWatch.Elapsed;
                 string elapsedTime = String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
                 this.ProcessTimeText = elapsedTime;
+                basicProcess.ProgressValue = 0;
             }
             tileCB = null;
+            
+
             stopWatch.Reset();
             SrcPathLabel.Text = calcAvgFolderPath;
             basicProcess.Close();
@@ -469,6 +472,8 @@ namespace QRPhotoMosaic
             }
         }
 
+        
+
         private void CalcAvgBtn_Click(object sender, EventArgs e)
         {
             if (TileWorker.IsBusy || tiles.Count == 0) return;
@@ -488,7 +493,7 @@ namespace QRPhotoMosaic
                 tileCB -= basicMethod.CalcAvgLab4x4;
                 tileCB += basicMethod.CalcAvgLab4x4;
             }
-            else if (ColorSpaceBox.Text == "RGB")
+            else if (ColorSpaceBox.Text == "RGB" || ColorSpaceBox.Text == "YUV")
             {
                 tileCB -= basicMethod.CalcAvgRGB4x4;
                 tileCB += basicMethod.CalcAvgRGB4x4;
@@ -596,6 +601,31 @@ namespace QRPhotoMosaic
             source = new BitmapLuminanceSource(img);
             BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
             
+        }
+
+        private void ClassifyBtn_Click(object sender, EventArgs e)
+        {
+            basicProcess = new BasicProcessForm();
+            basicMethod = new BasicMethod();
+            basicProcess.space = ColorSpaceBox.Text;
+            basicProcess.Canceled -= CancelBtn_Click;
+            basicProcess.Canceled += CancelBtn_Click;
+            basicProcess.Show();
+
+            if (ColorSpaceBox.Text == "Lab")
+            {
+                tileCB  = null;
+                tileCB += basicMethod.CalcAvgLab4x4;
+            }
+            else if (ColorSpaceBox.Text == "RGB" || ColorSpaceBox.Text == "YUV")
+            {
+                tileCB = null;
+                tileCB += basicMethod.CalcAvgRGB4x4;
+            }
+            basicMethod.stringCB -= SavingFileNameLab;
+            basicMethod.stringCB += SavingFileNameLab;
+            stopWatch.Start();
+            TileWorker.RunWorkerAsync();
         }
     }
 }

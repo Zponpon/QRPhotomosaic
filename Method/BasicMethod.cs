@@ -68,6 +68,11 @@ namespace QRPhotoMosaic.Method
             Tile.SaveFile4x4(MainForm.singleton.tiles, BasicProcessForm.calcTileSize, savingPath);
         }
 
+        public void ClassifyLab(BackgroundWorker worker, string savingPath)
+        {
+
+        }
+
         public static void ReadFile(List<Tile> tiles, ref int tileSize, string folder)
         {
             if (tiles.Count != 0) tiles.Clear();

@@ -74,7 +74,10 @@ namespace QRPhotoMosaic
 
         public int ProgressValue
         {
-            set { progressBar1.Value = value; }
+            set 
+            {
+                progressBar1.Value = value;
+            }
         }
 
         public BasicProcessForm()
@@ -151,10 +154,12 @@ namespace QRPhotoMosaic
                     MainForm.singleton.StopWatch.Start();
                     if (search == "Flann4x4" || search == "Full4x4")
                     {
-                        if(space == "RGB")
+                        if (space == "RGB" || space == "YUV")
                             Tile.ReadFile4x4(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
-                        else if(space =="Lab")
+                        else if (space == "Lab")
                             Tile.ReadFile4x4Lab(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
+                        else
+                            Tile.ReadFile16Folder(FLANN.ClassifyPath);
                     }
                     else
                         Tile.ReadFile(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
@@ -165,18 +170,33 @@ namespace QRPhotoMosaic
 
                     switch(search)
                     { 
-                            
                         case "Flann4x4":
-                            if(space == "RGB")
-                            MainForm.singleton.photomosaicImg
-                            = pmMethod.GenerateByFlann4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000, "RGB");
-                            else if(space == "Lab")
+                            //if (space == "RGB" || space == "YUV")
+                            if (space == "Other")
+                            {
+                                MainForm.singleton.info.GetQRCodeInfo(MainForm.singleton.info.QRmatrix, MainForm.singleton.info.QRVersion);
+                                MainForm.singleton.result
+                                = pmMethod.GenerateByFlannCombine(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000, space, MainForm.singleton.info.QRmatrix);
+                                MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(MainForm.singleton.result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);
+
+                                int w = MainForm.singleton.QRCodePictureBox.Width;
+                                int h = MainForm.singleton.QRCodePictureBox.Height;
+                                MainForm.singleton.QRCodeImage = ImageProc.ScaleImage(MainForm.singleton.QRBitmap, w, h);
+                            }
+                            else
                                 MainForm.singleton.photomosaicImg
-                            = pmMethod.GenerateByFlann4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000, "Lab");
+                                = pmMethod.GenerateByFlann4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000, "Lab");
+                            //else if(space == "Lab")
+                            //    MainForm.singleton.photomosaicImg
+                            //= pmMethod.GenerateByFlann4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 1000, "Lab");
                             break;
                         case "Full4x4":
+                            if(space == "RGB" || space == "YUV")
                              MainForm.singleton.photomosaicImg
                             = pmMethod.GenerateByNormalMethod4x4(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version);
+                            else if(space=="Lab")
+                             MainForm.singleton.photomosaicImg
+                           = pmMethod.GenerateByNormalMethod4x4Lab(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version);
                             break;
                         case "Flann":
                             MainForm.singleton.photomosaicImg

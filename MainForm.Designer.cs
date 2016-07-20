@@ -30,6 +30,7 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.ColorSpaceBox = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.MinSize = new System.Windows.Forms.NumericUpDown();
@@ -58,6 +59,7 @@
             this.QRCodeContentBox = new System.Windows.Forms.TextBox();
             this.InputQRCodeLabel = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.ClassifyBtn = new System.Windows.Forms.Button();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.TilePicBox = new System.Windows.Forms.PictureBox();
             this.SrcPathLabel = new System.Windows.Forms.Label();
@@ -67,7 +69,6 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
-            this.ColorSpaceBox = new System.Windows.Forms.ComboBox();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MinSize)).BeginInit();
@@ -128,6 +129,20 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // ColorSpaceBox
+            // 
+            this.ColorSpaceBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ColorSpaceBox.FormattingEnabled = true;
+            this.ColorSpaceBox.Items.AddRange(new object[] {
+            "RGB",
+            "YUV",
+            "Lab",
+            "Other"});
+            this.ColorSpaceBox.Location = new System.Drawing.Point(319, 344);
+            this.ColorSpaceBox.Name = "ColorSpaceBox";
+            this.ColorSpaceBox.Size = new System.Drawing.Size(135, 31);
+            this.ColorSpaceBox.TabIndex = 41;
             // 
             // label4
             // 
@@ -435,6 +450,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.ClassifyBtn);
             this.tabPage2.Controls.Add(this.numericUpDown1);
             this.tabPage2.Controls.Add(this.TilePicBox);
             this.tabPage2.Controls.Add(this.SrcPathLabel);
@@ -448,6 +464,16 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // ClassifyBtn
+            // 
+            this.ClassifyBtn.Location = new System.Drawing.Point(687, 317);
+            this.ClassifyBtn.Name = "ClassifyBtn";
+            this.ClassifyBtn.Size = new System.Drawing.Size(207, 65);
+            this.ClassifyBtn.TabIndex = 6;
+            this.ClassifyBtn.Text = "Classfiy";
+            this.ClassifyBtn.UseVisualStyleBackColor = true;
+            this.ClassifyBtn.Click += new System.EventHandler(this.ClassifyBtn_Click);
             // 
             // numericUpDown1
             // 
@@ -468,7 +494,7 @@
             this.numericUpDown1.TabIndex = 5;
             this.numericUpDown1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.numericUpDown1.Value = new decimal(new int[] {
-            64,
+            128,
             0,
             0,
             0});
@@ -542,19 +568,6 @@
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
             // 
-            // ColorSpaceBox
-            // 
-            this.ColorSpaceBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ColorSpaceBox.FormattingEnabled = true;
-            this.ColorSpaceBox.Items.AddRange(new object[] {
-            "RGB",
-            "YUV",
-            "Lab"});
-            this.ColorSpaceBox.Location = new System.Drawing.Point(319, 344);
-            this.ColorSpaceBox.Name = "ColorSpaceBox";
-            this.ColorSpaceBox.Size = new System.Drawing.Size(135, 31);
-            this.ColorSpaceBox.TabIndex = 41;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -624,6 +637,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox ColorSpaceBox;
+        private System.Windows.Forms.Button ClassifyBtn;
     }
 }
 

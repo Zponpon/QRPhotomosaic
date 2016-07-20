@@ -25,6 +25,25 @@ namespace QRPhotoMosaic.Method
         static int min;
         static double minL;
         static double maxL;
+
+        public static Color waterMarkDarkPixel(Color p)
+        {
+            double weight = 0.2;
+            int R = Convert.ToInt32(p.R * weight);
+            int G = Convert.ToInt32(p.G * weight);
+            int B = Convert.ToInt32(p.B * weight);
+            return Color.FromArgb(R,G,B);
+        }
+
+        public static Color waterMarkWhitePixel(Color p)
+        {
+            double weight = 0.2;
+            int R = Convert.ToInt32(255 * (1.0 - weight) + p.R * weight);
+            int G = Convert.ToInt32(255 * (1.0 - weight) + p.G * weight);
+            int B = Convert.ToInt32(255 * (1.0 - weight) + p.B * weight);
+            return Color.FromArgb(R, G, B);
+        }
+
         public static void waterMarkDark(Bitmap result, Bitmap pmBitmap, int x, int y, int moduleLength)
         {
             Color SourceImageColor;
