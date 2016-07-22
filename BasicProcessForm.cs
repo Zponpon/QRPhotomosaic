@@ -76,7 +76,10 @@ namespace QRPhotoMosaic
         {
             set 
             {
-                progressBar1.Value = value;
+                if(value > 100)
+                    progressBar1.Value = value % 100 + 1;
+                else
+                    progressBar1.Value = value;
             }
         }
 
@@ -156,10 +159,13 @@ namespace QRPhotoMosaic
                     {
                         if (space == "RGB" || space == "YUV")
                             Tile.ReadFile4x4(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
-                        else if (space == "Lab")
+                        else if (space == "Lab" || space == "Mid4x4")
                             Tile.ReadFile4x4Lab(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
                         else
-                            Tile.ReadFile16Folder(FLANN.ClassifyPath);
+                            //Tile.ReadFile16Folder(PathConfig.ClassifyPathMin);
+                            //Tile.ReadFile16Folder(PathConfig.ClassifyPathQuater);
+                            //Tile.ReadFile16Folder(PathConfig.ClassifyPathHalf);
+                            Tile.ReadFile16Folder(PathConfig.ClassifyPathHalfRobust);
                     }
                     else
                         Tile.ReadFile(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
@@ -172,7 +178,17 @@ namespace QRPhotoMosaic
                     { 
                         case "Flann4x4":
                             //if (space == "RGB" || space == "YUV")
-                            if (space == "Other")
+                            if(space == "Mid4x4")
+                            {
+                                MainForm.singleton.info.GetQRCodeInfo(MainForm.singleton.info.QRmatrix, MainForm.singleton.info.QRVersion);
+                                MainForm.singleton.result
+                                = pmMethod.GenerateByFlann4x4MidMod(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, 10, space, MainForm.singleton.info.QRmatrix);
+                                MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(MainForm.singleton.result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);
+                                int w = MainForm.singleton.QRCodePictureBox.Width;
+                                int h = MainForm.singleton.QRCodePictureBox.Height;
+                                MainForm.singleton.QRCodeImage = ImageProc.ScaleImage(MainForm.singleton.QRBitmap, w, h);
+                            }
+                            else if (space == "Other")
                             {
                                 MainForm.singleton.info.GetQRCodeInfo(MainForm.singleton.info.QRmatrix, MainForm.singleton.info.QRVersion);
                                 MainForm.singleton.result

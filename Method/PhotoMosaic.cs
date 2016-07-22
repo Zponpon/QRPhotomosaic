@@ -55,10 +55,130 @@ namespace QRPhotoMosaic.Method
             };
         }
 
-        private Bitmap AddFunctionPatterns(BitMatrix matrix, Bitmap qr)
+        public Bitmap GenerateByFlann4x4MidMod(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k, string space, BitMatrix QRMatrix)
         {
+            int dstSize = (version * 4 + 17) * tileSize; // Depend on qr version
+            Bitmap dst = new Bitmap(dstSize, dstSize); // final result
+            List<string> candicatetiles = new List<string>();
 
-            return null;
+            FLANN.Search4x4MidLab(src, version, k, QRMatrix);
+
+            int currBlockIdx = 0;
+            Bitmap candidateImg = null;
+            int bitX = 0, bitY = 0;
+            int quater = tileSize / 4;
+            int half = tileSize / 2;
+            int AlignmentPatternLocation_X = MainForm.singleton.info.AlignmentPatternLocation_X*tileSize;
+            int AlignmentPatternLocation_Y = MainForm.singleton.info.AlignmentPatternLocation_Y*tileSize;
+            for (int y = 0; y < dst.Height; y += tileSize)
+            {
+
+                if (MainForm.singleton.isCancel) return null;
+                worker.ReportProgress((y * 80) / dst.Height);
+                for (int x = 0; x < dst.Width; x += tileSize)
+                {
+                    int index = -1;
+                    //for (int l = 0; l < k; ++l)
+                    //{
+                    //    if (candicatetiles.Contains(tiles[FLANN.Indices4x4.Data[currBlockIdx, l]].Name))
+                    //        continue;
+                    //    else
+                    //    {
+                    //        index = FLANN.Indices4x4.Data[currBlockIdx, l];
+                    //        candicatetiles.Add(tiles[index].Name);
+                    //        break;
+                    //    }
+                    //}
+                    if(index == -1)
+                        index = FLANN.Indices4x4.Data[currBlockIdx, 0];
+                    if (MainForm.singleton.isCancel) return null;
+                    candidateImg = Image.FromFile(tiles[index].Name) as Bitmap;
+
+                    for (int i = 0; i < tileSize; i++)
+                    {
+                        for (int j = 0; j < tileSize; j++)
+                        {
+                            if (MainForm.singleton.isCancel) return null;
+                            Color p = candidateImg.GetPixel(j, i);
+                            
+                            if(bitX < 8 && bitY < 8)
+                            {
+                                if (QRMatrix[bitX, bitY])
+                                {
+                                    dst.SetPixel(j + x, i + y, Utility.waterMarkDarkPixel(p));
+                                }
+                                else
+                                    dst.SetPixel(j + x, i + y, Utility.waterMarkWhitePixel(p));
+                            }
+                            else if (bitX >= QRMatrix.Width - 8 && bitY < 8)
+                            {
+                                if (QRMatrix[bitX, bitY])
+                                    dst.SetPixel(j + x, i + y, Utility.waterMarkDarkPixel(p));
+                                else
+                                    dst.SetPixel(j + x, i + y, Utility.waterMarkWhitePixel(p));
+                            }
+                            else if (bitX < 8 && bitY >= QRMatrix.Height - 8)
+                            {
+                                if (QRMatrix[bitX, bitY])
+                                    dst.SetPixel(j + x, i + y, Utility.waterMarkDarkPixel(p));
+                                else
+                                    dst.SetPixel(j + x, i + y, Utility.waterMarkWhitePixel(p));
+                            }
+                            else if (version > 1 && j + x >= AlignmentPatternLocation_X && j + x < AlignmentPatternLocation_X + tileSize * 5
+                        && i + y >= AlignmentPatternLocation_Y && i + y < AlignmentPatternLocation_X + tileSize * 5)
+                            {
+                                if (QRMatrix[bitX, bitY])
+                                    dst.SetPixel(j + x, i + y, Utility.waterMarkDarkPixel(p));
+                                else
+                                    dst.SetPixel(j + x, i + y, Utility.waterMarkWhitePixel(p));
+                            }
+                            else
+                            {
+                                //if (j >= quater && j <= quater + half - 1 && i >= quater && i <= quater + half - 1)
+                                //{
+                                //    if (QRMatrix[bitX, bitY])
+                                //    {
+                                //        int R = Convert.ToInt32(p.R * 0.8);
+                                //        int G = Convert.ToInt32(p.G * 0.8);
+                                //        int B = Convert.ToInt32(p.B * 0.8);
+                                //        dst.SetPixel(j + x, i + y, Color.FromArgb(R, G, B));
+                                //    }
+                                //    else
+                                //    {
+                                //        int R = Convert.ToInt32(p.R * 0.8 + 255 * 0.2);
+                                //        int G = Convert.ToInt32(p.G * 0.8 + 255 * 0.2);
+                                //        int B = Convert.ToInt32(p.B * 0.8 + 255 * 0.2);
+                                //        dst.SetPixel(j + x, i + y, Color.FromArgb(R, G, B));
+                                //    }
+                                //}
+                                //else
+                                    dst.SetPixel(j + x, i + y, p);
+                            }
+                        }
+                    }
+                    candidateImg.Dispose();
+                    currBlockIdx++;
+                    bitX++;
+                }
+                bitX = 0;
+                bitY++;
+            }
+            Bitmap result = new Bitmap(dst.Width + 8 * tileSize, dst.Height + 8 * tileSize);
+            for (int i = 0; i < result.Height; ++i)
+            {
+                worker.ReportProgress(i * 20 / result.Height + 80);
+                for (int j = 0; j < result.Width; ++j)
+                {
+                    if (i >= 4 * tileSize && i <= 4 * tileSize + dst.Height - 1 && j >= 4 * tileSize && j <= 4 * tileSize + dst.Width - 1)
+                    {
+                        result.SetPixel(j, i, dst.GetPixel(j-4*tileSize, i-4*tileSize));
+                    }
+                    else
+                        result.SetPixel(j, i, Color.White);
+                }
+            }
+            GC.Collect();
+            return result;
         }
 
         public Bitmap GenerateByFlannCombine(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k, string space, BitMatrix QRMatrix)
@@ -69,7 +189,6 @@ namespace QRPhotoMosaic.Method
             int dstSize = v * tileSize;
             Bitmap newSrc = ImageProc.ScaleImage(src, v * MainForm.singleton.BlockSize);
             Bitmap dst = new Bitmap(dstSize, dstSize);
-            Console.Write("\n");
             for (int y = 0; y < matrix.Height; ++y)
             {
                 for (int x = 0; x < matrix.Width; ++x)
@@ -77,15 +196,12 @@ namespace QRPhotoMosaic.Method
                     if (x != 0 && x != matrix.Width - 1 && y != 0 && y != matrix.Height - 1)
                     {
                         matrix[x, y] = QRMatrix[x-1, y-1];
-                        //Console.Write("1");
                     }
                     else
                     {
                         matrix[x, y] = false;
-                        //Console.Write("0");
                     }
                 }
-                //Console.Write("\n");
             }
             worker.ReportProgress(20);
             int []folderbits = {0,0,0,0};
@@ -124,8 +240,11 @@ namespace QRPhotoMosaic.Method
                     
                     string folder = folderbits[0].ToString() + folderbits[1].ToString() + folderbits[2].ToString()
                         + folderbits[3].ToString();
-                    string[] names = System.IO.Directory.GetFiles(FLANN.ClassifyPath + folder);
-                    string name = FLANN.Search4x4LabOther(newSrc, x, y, MainForm.singleton.BlockSize, names, kdIndex, 100);
+                    //string[] names = System.IO.Directory.GetFiles(PathConfig.ClassifyPathMin + folder);
+                    //string[] names = System.IO.Directory.GetFiles(PathConfig.ClassifyPathQuater + folder);
+                    //string[] names = System.IO.Directory.GetFiles(PathConfig.ClassifyPathHalf + folder);
+                    string[] names = System.IO.Directory.GetFiles(PathConfig.ClassifyPathHalfRobust + folder);
+                    string name = FLANN.Search4x4LabOther(newSrc, x, y, MainForm.singleton.BlockSize, names, kdIndex, 1);
                     Bitmap tile = Image.FromFile(name) as Bitmap;
                     int px = 0, py = 0;
                     int ytile = y * tileSize;
@@ -147,13 +266,13 @@ namespace QRPhotoMosaic.Method
                 }
             }
             int halftile = tileSize / 2;
-            Bitmap result = new Bitmap(dst.Width + 3 * tileSize, dst.Height + 3 * tileSize);
+            Bitmap result = new Bitmap(dst.Width + 7 * tileSize, dst.Height + 7 * tileSize);
             int AlignmentPatternLocation_X = MainForm.singleton.info.AlignmentPatternLocation_X * tileSize;
             int AlignmentPatternLocation_Y = MainForm.singleton.info.AlignmentPatternLocation_Y * tileSize;
-            int originX1 = tileSize + halftile;
-            int originY1 = tileSize + halftile;
-            int originX2 = result.Width - tileSize - halftile - 1;
-            int originY2 = result.Height - tileSize - halftile - 1;
+            int originX1 = 3 * tileSize + halftile;
+            int originY1 = 3 * tileSize + halftile;
+            int originX2 = result.Width - 3 * tileSize - halftile - 1;
+            int originY2 = result.Height - 3 * tileSize - halftile - 1;
             #region AddFunctionPatterns
                 for (int y = 0; y < QRMatrix.Height; ++y)
                 {
@@ -203,7 +322,7 @@ namespace QRPhotoMosaic.Method
                                     }
                                 }
                                 #endregion
-                                #region FormatInfo
+                                #region Version
                                 else if (y >= matrix.Height - 13 && y < matrix.Height - 10 && x>=0 && x <=5)
                                 {
                                     if (matrix[x + 1, y + 1])
@@ -212,6 +331,7 @@ namespace QRPhotoMosaic.Method
                                     }
                                     else
                                     {
+                                        //Color pixel = Utility.waterMarkDarkPixel(dst.GetPixel(j, i));
                                         dst.SetPixel(j, i, Color.White);
                                     }
                                 }
@@ -242,6 +362,7 @@ namespace QRPhotoMosaic.Method
                                     }
                                 }
                                 #endregion
+                                #region LeftDown
                                 else if (x < 9 && y >= matrix.Height - 10)
                                 {
                                     if (matrix[x + 1, y + 1]) //黑為1 白為0
@@ -255,6 +376,8 @@ namespace QRPhotoMosaic.Method
                                         dst.SetPixel(j, i, pixel);
                                     }
                                 }
+                                #endregion
+                                #region AlignmentPattern
                                 else if (version > 1 && j >= AlignmentPatternLocation_X + halftile && j < AlignmentPatternLocation_X + tileSize * 5+halftile
                         && i >= AlignmentPatternLocation_Y + halftile && i < AlignmentPatternLocation_X + tileSize * 5 + halftile)
                                 {
@@ -269,13 +392,14 @@ namespace QRPhotoMosaic.Method
                                         dst.SetPixel(j, i, pixel);
                                     }
                                 }
+                                #endregion
                             }
                         }
                     }
                 }
             #endregion
             
-            #region AddQuiet
+            #region AddQuietZone
             for (int m = 0; m < result.Height; ++m)
             {
                 worker.ReportProgress(m * 10 / result.Height + 80);
@@ -296,6 +420,8 @@ namespace QRPhotoMosaic.Method
             }
                 
             #endregion
+
+            matrix = null;
             GC.Collect();
             return result;
         }

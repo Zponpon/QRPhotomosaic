@@ -138,7 +138,8 @@
             "RGB",
             "YUV",
             "Lab",
-            "Other"});
+            "Other",
+            "Mid4x4"});
             this.ColorSpaceBox.Location = new System.Drawing.Point(319, 344);
             this.ColorSpaceBox.Name = "ColorSpaceBox";
             this.ColorSpaceBox.Size = new System.Drawing.Size(135, 31);

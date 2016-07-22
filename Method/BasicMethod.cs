@@ -23,6 +23,7 @@ namespace QRPhotoMosaic.Method
                 MainForm.singleton.tiles.Add(tile);
                 worker.ReportProgress((int)((MainForm.singleton.tiles.Count / total) * 100));
             }
+            worker.ReportProgress (0);
         }
         /// <summary>
         /// Calculate the avg rgb of tile image 

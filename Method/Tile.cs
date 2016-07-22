@@ -130,7 +130,6 @@ namespace QRPhotoMosaic.Method
         public void CalcNonDivTileAvgLab4x4(int s)
         {
             int r = 0, g = 0, b = 0;
-            double l = 0, a = 0, B = 0;
             ColorSpace cs = new ColorSpace();
             ColorSpace.Lab lab=new ColorSpace.Lab();
             Bitmap tileImg = Image.FromFile(Name) as Bitmap;
@@ -258,7 +257,6 @@ namespace QRPhotoMosaic.Method
                 FileStream file = File.Open(folder+folders16[i]+"AvgLab.txt", FileMode.Open, FileAccess.Read);
                 BinaryReader reader = new BinaryReader(file);
                 int tmp = Convert.ToInt32(reader.ReadByte());
-                Console.Write(tmp);
                 FLANN.Newfeatures4x4[i] = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder + folders16[i]).Length, 48);
                 int count = 0;
                 foreach (string tileName in System.IO.Directory.GetFiles(folder + folders16[i]))

@@ -93,6 +93,7 @@
     <Compile Include="Method\CreatingQRPhotomosaic.cs" />
     <Compile Include="Method\FLANN.cs" />
     <Compile Include="Method\ImageProc.cs" />
+    <Compile Include="Method\PathConfig.cs" />
     <Compile Include="Method\QRCodeInfo.cs" />
     <Compile Include="BasicProcessForm.cs">
       <SubType>Form</SubType>
