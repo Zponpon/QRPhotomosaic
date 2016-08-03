@@ -30,6 +30,14 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.RatioNumber = new System.Windows.Forms.NumericUpDown();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.HammingK = new System.Windows.Forms.NumericUpDown();
+            this.NormalK = new System.Windows.Forms.NumericUpDown();
+            this.DuplicateCount = new System.Windows.Forms.Label();
+            this.HammingCheck = new System.Windows.Forms.ComboBox();
+            this.HammingCountLabel = new System.Windows.Forms.Label();
             this.ColorSpaceBox = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -71,6 +79,9 @@
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.RatioNumber)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.HammingK)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NormalK)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MinSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MaxSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.resultPicBox)).BeginInit();
@@ -94,6 +105,14 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.RatioNumber);
+            this.tabPage1.Controls.Add(this.label7);
+            this.tabPage1.Controls.Add(this.label6);
+            this.tabPage1.Controls.Add(this.HammingK);
+            this.tabPage1.Controls.Add(this.NormalK);
+            this.tabPage1.Controls.Add(this.DuplicateCount);
+            this.tabPage1.Controls.Add(this.HammingCheck);
+            this.tabPage1.Controls.Add(this.HammingCountLabel);
             this.tabPage1.Controls.Add(this.ColorSpaceBox);
             this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.label2);
@@ -129,6 +148,112 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // RatioNumber
+            // 
+            this.RatioNumber.DecimalPlaces = 1;
+            this.RatioNumber.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.RatioNumber.Location = new System.Drawing.Point(963, 674);
+            this.RatioNumber.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.RatioNumber.Name = "RatioNumber";
+            this.RatioNumber.Size = new System.Drawing.Size(135, 22);
+            this.RatioNumber.TabIndex = 49;
+            this.RatioNumber.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(1340, 803);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(62, 12);
+            this.label7.TabIndex = 48;
+            this.label7.Text = "Hamming K";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(1135, 803);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(51, 12);
+            this.label6.TabIndex = 47;
+            this.label6.Text = "Normal K";
+            // 
+            // HammingK
+            // 
+            this.HammingK.Location = new System.Drawing.Point(1313, 828);
+            this.HammingK.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.HammingK.Name = "HammingK";
+            this.HammingK.Size = new System.Drawing.Size(120, 22);
+            this.HammingK.TabIndex = 46;
+            this.HammingK.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            // 
+            // NormalK
+            // 
+            this.NormalK.Location = new System.Drawing.Point(1108, 828);
+            this.NormalK.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.NormalK.Name = "NormalK";
+            this.NormalK.Size = new System.Drawing.Size(120, 22);
+            this.NormalK.TabIndex = 45;
+            this.NormalK.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            // 
+            // DuplicateCount
+            // 
+            this.DuplicateCount.AutoSize = true;
+            this.DuplicateCount.Location = new System.Drawing.Point(982, 851);
+            this.DuplicateCount.Name = "DuplicateCount";
+            this.DuplicateCount.Size = new System.Drawing.Size(33, 12);
+            this.DuplicateCount.TabIndex = 44;
+            this.DuplicateCount.Text = "label6";
+            this.DuplicateCount.Click += new System.EventHandler(this.DuplicateCount_Click);
+            // 
+            // HammingCheck
+            // 
+            this.HammingCheck.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.HammingCheck.FormattingEnabled = true;
+            this.HammingCheck.Items.AddRange(new object[] {
+            "N",
+            "Y"});
+            this.HammingCheck.Location = new System.Drawing.Point(963, 722);
+            this.HammingCheck.Name = "HammingCheck";
+            this.HammingCheck.Size = new System.Drawing.Size(135, 31);
+            this.HammingCheck.TabIndex = 43;
+            // 
+            // HammingCountLabel
+            // 
+            this.HammingCountLabel.AutoSize = true;
+            this.HammingCountLabel.Location = new System.Drawing.Point(816, 851);
+            this.HammingCountLabel.Name = "HammingCountLabel";
+            this.HammingCountLabel.Size = new System.Drawing.Size(33, 12);
+            this.HammingCountLabel.TabIndex = 42;
+            this.HammingCountLabel.Text = "label6";
             // 
             // ColorSpaceBox
             // 
@@ -224,6 +349,7 @@
             this.SearchMethodComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SearchMethodComboBox.FormattingEnabled = true;
             this.SearchMethodComboBox.Items.AddRange(new object[] {
+            "Flann4x4CombinedMethod",
             "Flann4x4",
             "Full4x4",
             "Flann",
@@ -350,7 +476,7 @@
             this.FolderComboBox.FormattingEnabled = true;
             this.FolderComboBox.Location = new System.Drawing.Point(305, 616);
             this.FolderComboBox.Name = "FolderComboBox";
-            this.FolderComboBox.Size = new System.Drawing.Size(135, 31);
+            this.FolderComboBox.Size = new System.Drawing.Size(288, 31);
             this.FolderComboBox.TabIndex = 11;
             // 
             // QRAndPhotmosaicBtn
@@ -582,6 +708,9 @@
             this.tabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.RatioNumber)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.HammingK)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NormalK)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MinSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MaxSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.resultPicBox)).EndInit();
@@ -639,6 +768,14 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox ColorSpaceBox;
         private System.Windows.Forms.Button ClassifyBtn;
+        public System.Windows.Forms.Label HammingCountLabel;
+        public System.Windows.Forms.ComboBox HammingCheck;
+        public System.Windows.Forms.Label DuplicateCount;
+        private System.Windows.Forms.NumericUpDown HammingK;
+        private System.Windows.Forms.NumericUpDown NormalK;
+        public System.Windows.Forms.Label label6;
+        public System.Windows.Forms.Label label7;
+        public System.Windows.Forms.NumericUpDown RatioNumber;
     }
 }
 

@@ -8,6 +8,8 @@ namespace QRPhotoMosaic.Method
 {
     public class ColorSpace
     {
+        public static double ref_a = 500.0f * 25.0f / 29.0f;
+        public static double ref_b = 200.0f * 25.0f / 29.0f;
         public struct AllColorSpace
         {
             public ColorSpace.RGB RGB;

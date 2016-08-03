@@ -17,6 +17,8 @@ namespace QRPhotoMosaic.Method
         public void LoadFolder(BackgroundWorker worker, string path)
         {
             double total = (double)System.IO.Directory.GetFiles(path).Length;
+            if (MainForm.singleton.tiles.Count > 0)
+                MainForm.singleton.tiles.Clear();
             foreach (string fileName in System.IO.Directory.GetFiles(path))
             {
                 Tile tile = new Tile(fileName);

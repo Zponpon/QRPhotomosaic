@@ -74,6 +74,7 @@ namespace QRPhotoMosaic.Method
                     }
                 }
             }
+            prevWork.Dispose();
             return qr;
         }
 
@@ -255,7 +256,9 @@ namespace QRPhotoMosaic.Method
             //Console.WriteLine(path);
             try
             {
-                greyImage = Image.FromFile(path) as Bitmap;
+                Image img = Image.FromFile(path);
+                greyImage = img as Bitmap;
+                img.Dispose();
             }
             //FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.Read);
             catch(FileNotFoundException e)
@@ -274,7 +277,10 @@ namespace QRPhotoMosaic.Method
             Bitmap thresholdMask;
             try
             {
+                //Image img = Image.FromFile(path);
                 thresholdMask = Image.FromFile(path) as Bitmap;
+                //thresholdMask = img as Bitmap;
+                //img.Dispose();
             }
             catch (FileNotFoundException e)
             {
@@ -301,12 +307,9 @@ namespace QRPhotoMosaic.Method
 
             Bitmap resultQR = addQuietZone(prevWork, tileSize.Value);
 
-            //greyImage.Dispose();
-            //overlapping.Dispose();
-            //prevWork.Dispose();
             greyImage = null;
             overlapping = null;
-            prevWork=null;
+            prevWork = null;
             thresholdMask = null;
             GC.Collect();
             return resultQR;

@@ -30,6 +30,7 @@ namespace QRPhotoMosaic
         //  TileProcessForm (Load & calc avg color) function register themselves into this callback function.
         public System.Action<BackgroundWorker, string> tileCB;
 
+        public int hammingcount = 0;
         public bool isCancel = false;
         public List<Tile> tiles = new List<Tile>();
         public QRCodeInfo info;
@@ -187,6 +188,7 @@ namespace QRPhotoMosaic
             ColorSpaceBox.SelectedIndex = 2;
             CheckInputComboBox.SelectedIndex = 1;
             ShapeCombobox.SelectedIndex = 1;
+            HammingCheck.SelectedIndex = 1;
             this.ProcessTime.Text = "";
             Console.Write(LevelComboBox.Text);
             basicProcess = new BasicProcessForm();
@@ -244,12 +246,13 @@ namespace QRPhotoMosaic
             {
                 Image masterImg = Image.FromFile(loadingFile.FileName);
                 masterBitmap = new Bitmap(masterImg);
-                Bitmap inputPic = new Bitmap(masterImg, InputPicBox.Width, InputPicBox.Height);
+                Bitmap inputPic = new Bitmap(masterBitmap, InputPicBox.Width, InputPicBox.Height);
                 InputPicBox.Image = inputPic;
 
                 masterImgName = loadingFile.FileName;
                 int lastindex = masterImgName.LastIndexOf("\\");
                 masterImgName = masterImgName.Substring(lastindex + 1);
+                masterImg.Dispose();
                 GC.Collect();
             }
         }
@@ -266,9 +269,10 @@ namespace QRPhotoMosaic
                 return;
             }
             System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
-            Bitmap savePic = ImageProc.ScaleImage(photomosaicImg, photomosaicImg.Width, photomosaicImg.Height);
+            //Bitmap savePic = ImageProc.ScaleImage(photomosaicImg, photomosaicImg.Width, photomosaicImg.Height);
             //savePic = ImageProc.OverlappingArea(savePic, savePic.Width - TileSize, savePic.Height - TileSize, TileSize);
-            savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            //savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            photomosaicImg.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
             saveFileDialog.Dispose();
             fs.Close();
             GC.Collect();
@@ -287,9 +291,11 @@ namespace QRPhotoMosaic
                 return;
             }
             System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
-            Bitmap savePic = ImageProc.ScaleImage(result, result.Width, result.Height);
-            savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            //Bitmap savePic = ImageProc.ScaleImage(result, result.Width, result.Height);
+            //savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            result.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
             saveFileDialog.Dispose();
+            //savePic.Dispose();
             fs.Close();
             GC.Collect();
         }
@@ -317,15 +323,25 @@ namespace QRPhotoMosaic
                 creatingFolderPath = FolderComboBox.SelectedValue.ToString();
                 tiles.Clear();
             }
+
+            FLANN.hammingcheck = HammingCheck.Text;
+            if (photomosaicImg != null)
+                photomosaicImg.Dispose();
+            if(result != null)
+                result.Dispose();
+            photomosaicImg = null;
+            result = null;
             basicProcess.Canceled -= CancelBtn_Click;
             basicProcess.Canceled += CancelBtn_Click;
             basicProcess.ecLevel = QRECLevel;
             basicProcess.search = SearchMethodComboBox.Text;
             basicProcess.check = this.CheckInputComboBox.Text;
             basicProcess.space = this.ColorSpaceBox.Text;
+            basicProcess.normalK = Convert.ToInt32(this.NormalK.Value);
+            basicProcess.hammingK = Convert.ToInt32(this.HammingK.Value);
             tileSize = TileSize;
             //BlockSize = Convert.ToInt32(BlockcomboBox.SelectedValue);
-            BlockSize = 4;
+            BlockSize = 8;
             basicProcess.Show();
             //stopWatch.Start();
             GC.Collect();
@@ -459,9 +475,10 @@ namespace QRPhotoMosaic
                 basicProcess = new BasicProcessForm();
                 basicProcess.Canceled -= CancelBtn_Click;
                 basicProcess.Canceled += CancelBtn_Click;
+                //basicProcess.ratio
                 calcAvgFolderPath = folderBrowser.SelectedPath;
                 basicProcess.Show();
-                tileCB -= basicMethod.LoadFolder;
+                tileCB = null;
                 tileCB += basicMethod.LoadFolder;
                 basicMethod.stringCB -= Path;
                 basicMethod.stringCB += Path;
@@ -490,16 +507,20 @@ namespace QRPhotoMosaic
             //tileCB += basicMethod.CalcAvgRGB;
             if(ColorSpaceBox.Text == "Lab")
             {
-                tileCB -= basicMethod.CalcAvgLab4x4;
+                tileCB = null;
                 tileCB += basicMethod.CalcAvgLab4x4;
+                basicMethod.stringCB = null;
+                basicMethod.stringCB += SavingFileNameLab;
             }
             else if (ColorSpaceBox.Text == "RGB" || ColorSpaceBox.Text == "YUV")
             {
-                tileCB -= basicMethod.CalcAvgRGB4x4;
+                tileCB = null;
                 tileCB += basicMethod.CalcAvgRGB4x4;
+                basicMethod.stringCB = null;
+                basicMethod.stringCB += SavingFileName;
             }
-            basicMethod.stringCB -= SavingFileNameLab;
-            basicMethod.stringCB += SavingFileNameLab;
+            //basicMethod.stringCB = null;
+            //basicMethod.stringCB += SavingFileNameLab;
             stopWatch.Start();
             TileWorker.RunWorkerAsync();
         }
@@ -626,6 +647,11 @@ namespace QRPhotoMosaic
             basicMethod.stringCB += SavingFileNameLab;
             stopWatch.Start();
             TileWorker.RunWorkerAsync();
+        }
+
+        private void DuplicateCount_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

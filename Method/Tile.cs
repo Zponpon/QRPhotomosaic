@@ -54,7 +54,21 @@ namespace QRPhotoMosaic.Method
                     Name = "all",
                     Folder = "..\\all"
                 },*/
-
+                new TileType
+                {
+                    Name = "MirFlickr_100000",
+                    Folder = PathConfig.Classifymirflickr100000
+                },
+                new TileType
+                {
+                    Name = "MirFlickr_1000000",
+                    Folder = PathConfig.Classifymirflickr1000000
+                },
+                new TileType
+                {
+                    Name = "Saliency_20000",
+                    Folder = PathConfig.ClassifySaliency20000
+                },
                 new TileType
                 {
                     Name="Tile20000_128",
@@ -130,8 +144,9 @@ namespace QRPhotoMosaic.Method
         public void CalcNonDivTileAvgLab4x4(int s)
         {
             int r = 0, g = 0, b = 0;
+            double L = 0, A = 0, B = 0;
             ColorSpace cs = new ColorSpace();
-            ColorSpace.Lab lab=new ColorSpace.Lab();
+            ColorSpace.Lab lab = new ColorSpace.Lab();
             Bitmap tileImg = Image.FromFile(Name) as Bitmap;
 
             if (s != tileImg.Width || s != tileImg.Height)
@@ -143,6 +158,8 @@ namespace QRPhotoMosaic.Method
             idx++;*/
             int quater = tileImg.Height / 4;
             int dq = quater * quater;
+            double ref_a = 500.0f * 25.0f / 29.0f;
+            double ref_b = 200.0f * 25.0f / 29.0f;
             for (int y = 0; y < tileImg.Height; y += quater)
             {
                 for (int x = 0; x < tileImg.Width; x += quater)
@@ -152,21 +169,38 @@ namespace QRPhotoMosaic.Method
                         for (int j = 0; j < quater; ++j)
                         {
                             Color p = tileImg.GetPixel(x + j, y + i);
-                            //lab = cs.RGB2Lab(p.R, p.G, p.B);
-                            r += p.R;
-                            g += p.G;
-                            b += p.B;
+                            lab = cs.RGB2Lab(p.R, p.G, p.B);
+                            //yuv = cs.RGB2YUV(p.R, p.B, p.G);
+                            //r += p.R;
+                            //g += p.G;
+                            //b += p.B;
+                            L += lab.L / 100.0f;
+                            A += (lab.a + ref_a) / (2 * ref_a);
+                            B += (lab.b + ref_b) / (2 * ref_b);
+                            //L += lab.L;
+                            //A += lab.a;
+                            //B += lab.b;
+                            //L += yuv.Y;
+                            //A += yuv.U;
+                            //B += yuv.V;
                         }
                     }
-                    r /= dq;
-                    g /= dq;
-                    b /= dq;
-                    lab = cs.RGB2Lab(r, g, b);
-                   
-
+                    //r /= dq;
+                    //g /= dq;
+                    //b /= dq;
+                    //lab = cs.RGB2Lab(r, g, b);
+                    L /= dq;
+                    A /= dq;
+                    B /= dq;
+                    lab.L = L;
+                    lab.a = A;
+                    lab.b = B;
+                    //lab.L /= 100.0f;
+                    //lab.a = (lab.a + 86.185f) / 184.439f;
+                    //lab.b = (lab.b + 107.863f) / 202.345f;
                     lab4x4.Add(lab);
-                    r = g = b;
-                    //l = a = B = 0;
+                    //r = g = b = 0;
+                    L = A = B = 0;
                 }
             }
 
@@ -250,26 +284,103 @@ namespace QRPhotoMosaic.Method
             tileImg.Dispose();
         }
 
-        public static void ReadFile16Folder(string folder)
+        public static void ReadFileFunctionRGB(string folder)
         {
+            FileStream file = File.Open(folder + "AvgColor.txt", FileMode.Open, FileAccess.Read);
+            BinaryReader reader = new BinaryReader(file);
+            FLANN.FunctionFeatures4x4 = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder).Length, 48);
+            int tmp = Convert.ToInt32(reader.ReadByte());
+
+            int count = 0;
+            foreach (string tileName in System.IO.Directory.GetFiles(folder))
+            {
+                for (int j = 0; j < 48; ++j)
+                {
+                    FLANN.FunctionFeatures4x4.Data[count, j] = (float)reader.ReadDouble();
+                }
+                count++;
+            }
+            file.Close();
+            reader.Close();
+        }
+
+        public static void ReadFileFunctionLab(string folder)
+        {
+            FileStream file = File.Open(folder + "AvgLab.txt", FileMode.Open, FileAccess.Read);
+            BinaryReader reader = new BinaryReader(file);
+            FLANN.FunctionFeatures4x4 = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder).Length, 48);
+            int tmp = Convert.ToInt32(reader.ReadByte());
+
+            float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
+            int count = 0;
+            foreach (string tileName in System.IO.Directory.GetFiles(folder))
+            {
+                for (int j = 0; j < 48;)
+                {
+                    FLANN.FunctionFeatures4x4.Data[count, j++] = (float)reader.ReadDouble() * ratio;
+                    FLANN.FunctionFeatures4x4.Data[count, j++] = (float)reader.ReadDouble();
+                    FLANN.FunctionFeatures4x4.Data[count, j++] = (float)reader.ReadDouble();
+                }
+                count++;
+            }
+            file.Close();
+            reader.Close();
+        }
+
+        public static void ReadFile16FolderLab(string folder)
+        {
+            BinaryReader reader = null;
+            FileStream file = null;
             for(int i = 0; i < 16; ++i)
             {
-                FileStream file = File.Open(folder+folders16[i]+"AvgLab.txt", FileMode.Open, FileAccess.Read);
-                BinaryReader reader = new BinaryReader(file);
+                file = File.Open(folder+folders16[i]+"AvgLab.txt", FileMode.Open, FileAccess.Read);
+                //file = File.Open(folder + folders16[i] + "AvgColor.txt", FileMode.Open, FileAccess.Read);
+                reader = new BinaryReader(file);
+                int tmp = Convert.ToInt32(reader.ReadByte());
+                FLANN.Newfeatures4x4[i] = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder + folders16[i]).Length, 48);
+                int count = 0;
+                float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
+                foreach (string tileName in System.IO.Directory.GetFiles(folder + folders16[i]))
+                {
+                    for(int j = 0; j < 48;)
+                    {
+                        FLANN.Newfeatures4x4[i].Data[count, j++] = (float)reader.ReadDouble() * ratio;
+                        FLANN.Newfeatures4x4[i].Data[count, j++] = (float)reader.ReadDouble();
+                        FLANN.Newfeatures4x4[i].Data[count, j++] = (float)reader.ReadDouble();
+                    }
+                    count++;
+                }
+            }
+            reader.Close();
+            file.Close();
+            FLANN.buildTrees();
+        }
+
+        public static void ReadFile16FolderRGB(string folder)
+        {
+            BinaryReader reader = null;
+            FileStream file = null;
+            for (int i = 0; i < 16; ++i)
+            {
+                file = File.Open(folder + folders16[i] + "AvgColor.txt", FileMode.Open, FileAccess.Read);
+                reader = new BinaryReader(file);
                 int tmp = Convert.ToInt32(reader.ReadByte());
                 FLANN.Newfeatures4x4[i] = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder + folders16[i]).Length, 48);
                 int count = 0;
                 foreach (string tileName in System.IO.Directory.GetFiles(folder + folders16[i]))
                 {
-                    for(int j = 0; j < 48; ++j)
+                    for (int j = 0; j < 48; ++j)
                     {
-                        FLANN.Newfeatures4x4[i].Data[count, j] = (float)reader.ReadDouble();
+                        FLANN.Newfeatures4x4[i].Data[count, j] = (float)reader.ReadByte();
                     }
                     count++;
                 }
             }
+            reader.Close();
+            file.Close();
             FLANN.buildTrees();
         }
+
         public static void ReadFile4x4(List<Tile> tiles, int tileSize, string folder)
         {
             //if (tiles.Count != 0) tiles.Clear();

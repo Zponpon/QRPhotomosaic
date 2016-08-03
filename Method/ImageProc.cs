@@ -11,13 +11,17 @@ namespace QRPhotoMosaic.Method
     {
         public static Bitmap ScaleImage(Bitmap image, int size)
         {
+            if (image == null)
+                return null;
             Bitmap ScaleImage = new Bitmap(image, size, size);
-            GC.Collect();
+            //GC.Collect();
             return ScaleImage;
         }
 
         public static Bitmap ScaleImage(Bitmap image, int width, int height)
         {
+            if (image == null)
+                return null;
             Bitmap ScaleImage = new Bitmap(image, width, height);
             GC.Collect();
             return ScaleImage;

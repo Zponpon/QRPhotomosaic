@@ -55,6 +55,136 @@ namespace QRPhotoMosaic.Method
             };
         }
 
+        private void InitDict()
+        {
+            if (FLANN.folderDict.Count > 0)
+                return;
+            for(int i = 0; i < 16; ++i)
+            {
+                int num = i;
+                FLANN.folderDict.Add(i, new List<int>());
+                for (int j = 0; j < 4; ++j)
+                {
+                    FLANN.folderDict[i].Add(0);
+                }
+                for (int j = 3; num > 1; --j)
+                {
+                    FLANN.folderDict[i][j] = (num % 2);
+                    num /= 2;
+                }
+                FLANN.folderDict[i][0] = (num);
+            }
+        }
+
+        private void FunctionPatternsByTile(Bitmap src, Bitmap module, int tileSize, int startX, int startY, int endX, int endY, string space)
+        {
+            string name = string.Empty;
+            if(space == "Lab")
+            {
+                name = FLANN.SearchFunctionPatternsLab(module, tileSize, 200);
+            }
+            else if (space == "RGB")
+            {
+
+            }
+
+            Image img = Image.FromFile(name);
+            Bitmap tile = img as Bitmap;
+            int tx = 0, ty = 0;
+            for (int y = startY; y < endY; ++y)
+            {
+                for (int x = startX; x < endX; ++x)
+                {
+                    Color pixel = tile.GetPixel(tx++, ty);
+                    src.SetPixel(x, y, pixel);
+                }
+                ty++;
+                tx = 0;
+            }
+
+            img.Dispose();
+            tile.Dispose();
+        }
+
+        private void FunctionPatternByTile(Bitmap img, BitMatrix matrix, int tileSize, int patternCount = 3)
+        {
+            int half = tileSize / 2;
+            int quater = tileSize / 4;
+            int eight = tileSize * 8;
+            Bitmap[] patterns = new Bitmap[patternCount];
+
+            int px = 0, py = 0;
+            #region LeftTop
+            for (int i = tileSize + half; i < tileSize + half + eight; ++i)
+            {
+                for (int j = tileSize + half; j < tileSize + half + eight; ++j)
+                {
+                    patterns[0].SetPixel(px++, py, img.GetPixel(j, i));
+                }
+                py++;
+                px = 0;
+            }
+            px = py = 0;
+            FLANN.Search4x4Lab(patterns[0], 0, 0);
+            #endregion
+
+            #region RightTop
+            for (int i = tileSize + half; i < tileSize + half + eight; ++i)
+            {
+                for (int j = img.Width - half - 1; j >= img.Width - half - eight; ++j)
+                {
+                    patterns[1].SetPixel(px++, py, img.GetPixel(j, i));
+                }
+                py++;
+                px = 0;
+            }
+            px = py = 0;
+            #endregion
+
+            #region LeftDown
+            for (int i = img.Height - half - 1; i >= img.Height - half - eight; ++i)
+            {
+                for (int j = tileSize + half; j < tileSize + half + eight; ++j)
+                {
+                    patterns[2].SetPixel(px++, py, img.GetPixel(j, i));
+                }
+                py++;
+                px = 0;
+            }
+            px = py = 0;
+            #endregion
+
+            #region Replace Region
+            for (int y = 0; y < matrix.Height; ++y)
+                {
+                    for (int x = 0; x < matrix.Width; ++x)
+                    {
+                        for (int i = y * tileSize + half; i < y * tileSize + half + tileSize; ++i)
+                        {
+                            for (int j = x * tileSize + half; j < x * tileSize + half + tileSize; ++j)
+                            {
+                                if (x < 8 && y < 8)
+                                {
+                                    if (matrix[x, y])
+                                    {
+
+                                    }
+                                    //else if (x < 8 && y >= matrix.Height - 9)
+                                    //{
+
+                                    //}
+                                    //else if (y < 8 && x >= matrix.Width - 9)
+                                    //{
+
+                                    //}
+                                }
+                            }
+                        }
+                    }
+                }
+            #endregion
+        }
+
         public Bitmap GenerateByFlann4x4MidMod(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k, string space, BitMatrix QRMatrix)
         {
             int dstSize = (version * 4 + 17) * tileSize; // Depend on qr version
@@ -189,6 +319,13 @@ namespace QRPhotoMosaic.Method
             int dstSize = v * tileSize;
             Bitmap newSrc = ImageProc.ScaleImage(src, v * MainForm.singleton.BlockSize);
             Bitmap dst = new Bitmap(dstSize, dstSize);
+            int halftile = tileSize / 2;
+            int AlignmentPatternLocation_X = MainForm.singleton.info.AlignmentPatternLocation_X * tileSize;
+            int AlignmentPatternLocation_Y = MainForm.singleton.info.AlignmentPatternLocation_Y * tileSize;
+            int count = 0;
+            //InitDict();
+
+            #region CreateMosaicQRCodeMatrix
             for (int y = 0; y < matrix.Height; ++y)
             {
                 for (int x = 0; x < matrix.Width; ++x)
@@ -199,22 +336,29 @@ namespace QRPhotoMosaic.Method
                     }
                     else
                     {
-                        matrix[x, y] = false;
+                        if(x % 2 == 0)
+                            matrix[x, y] = true;
+                        else
+                            matrix[x, y] = false;
                     }
                 }
             }
+            #endregion
+
             worker.ReportProgress(20);
-            int []folderbits = {0,0,0,0};
+            int[] folderbits = { 0, 0, 0, 0 };
             int total = matrix.Height * matrix.Width;
+            int bitX = 0, bitY = 0;
             for (int y = 0; y < matrix.Height - 1; ++y)
             {
+                if (MainForm.singleton.isCancel) return null;
                 worker.ReportProgress(y * 50 / matrix.Height + 20);
                 for (int x = 0; x < matrix.Width - 1; ++x)
                 {
                     int kdIndex = 0;
                     if (!matrix[x, y])
                     {
-                        // folderbit from left to right
+                        // Left Top [0] -> Right Top [1] -> Right Down [2] -> Left Down [3]
                         folderbits[0] = 1;
                         kdIndex += 8;
                     }
@@ -236,16 +380,25 @@ namespace QRPhotoMosaic.Method
                         folderbits[3] = 1;
                         kdIndex += 1;
                     }
-
+                    if (kdIndex == 10)
+                        count++;
+                    bool isFunction = false;
+                    if((x < 8 && y < 8) || (x < 8 && y >= matrix.Height - 9) || (y < 8 && x >= matrix.Width - 9))
+                    {
+                        isFunction = true;
+                    }
+                    
                     
                     string folder = folderbits[0].ToString() + folderbits[1].ToString() + folderbits[2].ToString()
                         + folderbits[3].ToString();
-                    //string[] names = System.IO.Directory.GetFiles(PathConfig.ClassifyPathMin + folder);
-                    //string[] names = System.IO.Directory.GetFiles(PathConfig.ClassifyPathQuater + folder);
-                    //string[] names = System.IO.Directory.GetFiles(PathConfig.ClassifyPathHalf + folder);
-                    string[] names = System.IO.Directory.GetFiles(PathConfig.ClassifyPathHalfRobust + folder);
-                    string name = FLANN.Search4x4LabOther(newSrc, x, y, MainForm.singleton.BlockSize, names, kdIndex, 1);
-                    Bitmap tile = Image.FromFile(name) as Bitmap;
+                    string[] names = System.IO.Directory.GetFiles(MainForm.singleton.CreatingFolderPath + folder);
+                    string name = string.Empty;
+                    if(space == "RGB")
+                        name = FLANN.Search4x4RGBOther(newSrc, x, y, MainForm.singleton.BlockSize, names, kdIndex, k, isFunction, folderbits);
+                    else if(space == "Lab")
+                        name = FLANN.Search4x4LabOther(newSrc, x, y, MainForm.singleton.BlockSize, names, kdIndex, k, isFunction, folderbits);
+                    Image img = Image.FromFile(name);
+                    Bitmap tile = img as Bitmap;
                     int px = 0, py = 0;
                     int ytile = y * tileSize;
                     int xtile = x * tileSize;
@@ -254,6 +407,7 @@ namespace QRPhotoMosaic.Method
                     
                     for (int i = ytile; i < totaly; ++i)
                     {
+                        if (MainForm.singleton.isCancel) return null;
                         for (int j = xtile; j < totalx; ++j)
                         {
                             dst.SetPixel(j, i, tile.GetPixel(px, py));
@@ -263,151 +417,213 @@ namespace QRPhotoMosaic.Method
                         py++;
                     }
                     folderbits[0] = folderbits[1] = folderbits[2] = folderbits[3] = 0;
+                    bitX++;
+                    img.Dispose();
+                    tile.Dispose();
                 }
+                bitX = 0;
+                bitY++;
             }
-            int halftile = tileSize / 2;
             Bitmap result = new Bitmap(dst.Width + 7 * tileSize, dst.Height + 7 * tileSize);
-            int AlignmentPatternLocation_X = MainForm.singleton.info.AlignmentPatternLocation_X * tileSize;
-            int AlignmentPatternLocation_Y = MainForm.singleton.info.AlignmentPatternLocation_Y * tileSize;
             int originX1 = 3 * tileSize + halftile;
             int originY1 = 3 * tileSize + halftile;
             int originX2 = result.Width - 3 * tileSize - halftile - 1;
             int originY2 = result.Height - 3 * tileSize - halftile - 1;
-            #region AddFunctionPatterns
-                for (int y = 0; y < QRMatrix.Height; ++y)
+
+            bool byTile = false;
+            if (byTile)
+            {
+                FLANN.functionList.Clear();
+                if (FLANN.kdtree_Patterns == null)
                 {
-                    worker.ReportProgress(y * 10 / QRMatrix.Height + 70);
-                    for (int x = 0; x < QRMatrix.Width; ++x)
+                    if (space == "Lab")
                     {
-                        for (int i = y * tileSize + halftile; i < y * tileSize + halftile + tileSize; ++i)
+                        Tile.ReadFileFunctionLab(PathConfig.FunctionDarkPath);
+                    }
+                    else if (space == "RGB")
+                    {
+                        Tile.ReadFileFunctionRGB(PathConfig.FunctionDarkPath);
+                    }
+                    FLANN.kdtree_Patterns = new Index(FLANN.FunctionFeatures4x4, 5);
+                }
+            }
+
+            #region AddFunctionPatterns
+            
+            for (int y = 0; y < QRMatrix.Height; ++y)
+            {
+                if (MainForm.singleton.isCancel) return null;
+                worker.ReportProgress(y * 10 / QRMatrix.Height + 70);
+                for (int x = 0; x < QRMatrix.Width; ++x)
+                {
+                    Bitmap module = new Bitmap(tileSize, tileSize);
+                    int mx = 0, my = 0;
+                    bool isBlack = false;
+                    int startX = x * tileSize + halftile;
+                    int startY = y * tileSize + halftile;
+                    int endX = x * tileSize + halftile + tileSize;
+                    int endY = y * tileSize + halftile + tileSize;
+                    for (int i = startY; i < endY; ++i)
+                    {
+                        for (int j = startX; j < endX; ++j)
                         {
-                            for (int j = x * tileSize + halftile; j < x * tileSize + halftile + tileSize; ++j)
+                            #region Left
+                            if (x < 8 && y < 8)
                             {
-                                #region Left
-                                if (x < 9 && y < 9)
+                                if (matrix[x + 1, y + 1]) //黑為1 白為0
                                 {
-                                    if (matrix[x + 1, y + 1]) //黑為1 白為0
-                                    {
-                                        Color pixel = Utility.waterMarkDarkPixel(dst.GetPixel(j, i));
-                                        dst.SetPixel(j, i, pixel);
-                                    }
-                                    else
-                                    {
-                                        Color pixel = Utility.waterMarkWhitePixel(dst.GetPixel(j, i));
-                                        dst.SetPixel(j, i, pixel);
-                                    }
-                                }
-                                #endregion
-                                #region Timing
-                                else if (y == 6 && x >= 9 && x < matrix.Width - 10)
-                                {
-                                    if (matrix[x + 1, y + 1])
+                                    Color pixel = dst.GetPixel(j, i);
+                                    if (!byTile)
                                     {
                                         dst.SetPixel(j, i, Color.Black);
                                     }
                                     else
                                     {
-                                        dst.SetPixel(j, i, Color.White);
+                                        module.SetPixel(mx++, my, pixel);
+                                        isBlack = true;
                                     }
                                 }
-                                else if (x == 6 && y >= 9 && y < matrix.Height - 10)
+                                else
                                 {
-                                    if (matrix[x + 1, y + 1])
-                                    {
-                                        dst.SetPixel(j, i, Color.Black);
-                                    }
-                                    else
-                                    {
-                                        dst.SetPixel(j, i, Color.White);
-                                    }
+                                    dst.SetPixel(j, i, Color.White);
                                 }
-                                #endregion
-                                #region Version
-                                else if (y >= matrix.Height - 13 && y < matrix.Height - 10 && x>=0 && x <=5)
-                                {
-                                    if (matrix[x + 1, y + 1])
-                                    {
-                                        dst.SetPixel(j, i, Color.Black);
-                                    }
-                                    else
-                                    {
-                                        //Color pixel = Utility.waterMarkDarkPixel(dst.GetPixel(j, i));
-                                        dst.SetPixel(j, i, Color.White);
-                                    }
-                                }
-                                else if (x >= matrix.Width - 13 && x < matrix.Width - 10 && y >= 0 && y <= 5)
-                                {
-                                    if (matrix[x + 1, y + 1])
-                                    {
-                                        dst.SetPixel(j, i, Color.Black);
-                                    }
-                                    else
-                                    {
-                                        dst.SetPixel(j, i, Color.White);
-                                    }
-                                }
-                                #endregion
-                                #region right
-                                else if (y < 9 && x >= matrix.Width - 10)
-                                {
-                                    if (matrix[x + 1, y + 1]) //黑為1 白為0
-                                    {
-                                        Color pixel = Utility.waterMarkDarkPixel(dst.GetPixel(j, i));
-                                        dst.SetPixel(j, i, pixel);
-                                    }
-                                    else
-                                    {
-                                        Color pixel = Utility.waterMarkWhitePixel(dst.GetPixel(j, i));
-                                        dst.SetPixel(j, i, pixel);
-                                    }
-                                }
-                                #endregion
-                                #region LeftDown
-                                else if (x < 9 && y >= matrix.Height - 10)
-                                {
-                                    if (matrix[x + 1, y + 1]) //黑為1 白為0
-                                    {
-                                        Color pixel = Utility.waterMarkDarkPixel(dst.GetPixel(j, i));
-                                        dst.SetPixel(j, i, pixel);
-                                    }
-                                    else
-                                    {
-                                        Color pixel = Utility.waterMarkWhitePixel(dst.GetPixel(j, i));
-                                        dst.SetPixel(j, i, pixel);
-                                    }
-                                }
-                                #endregion
-                                #region AlignmentPattern
-                                else if (version > 1 && j >= AlignmentPatternLocation_X + halftile && j < AlignmentPatternLocation_X + tileSize * 5+halftile
-                        && i >= AlignmentPatternLocation_Y + halftile && i < AlignmentPatternLocation_X + tileSize * 5 + halftile)
-                                {
-                                    if (matrix[x + 1, y + 1]) //黑為1 白為0
-                                    {
-                                        Color pixel = Utility.waterMarkDarkPixel(dst.GetPixel(j, i));
-                                        dst.SetPixel(j, i, pixel);
-                                    }
-                                    else
-                                    {
-                                        Color pixel = Utility.waterMarkWhitePixel(dst.GetPixel(j, i));
-                                        dst.SetPixel(j, i, pixel);
-                                    }
-                                }
-                                #endregion
                             }
+                            #endregion
+                            #region Time+format+version
+                            /*
+                            #region Timing
+                            else if (y == 6 && x >= 9 && x < matrix.Width - 10)
+                            {
+                                if (matrix[x + 1, y + 1])
+                                {
+                                    dst.SetPixel(j, i, Color.Black);
+                                }
+                                else
+                                {
+                                    dst.SetPixel(j, i, Color.White);
+                                }
+                            }
+                            else if (x == 6 && y >= 9 && y < matrix.Height - 10)
+                            {
+                                if (matrix[x + 1, y + 1])
+                                {
+                                    dst.SetPixel(j, i, Color.Black);
+                                }
+                                else
+                                {
+                                    dst.SetPixel(j, i, Color.White);
+                                }
+                            }
+                            #endregion
+                            #region Version
+                            else if (y >= matrix.Height - 13 && y < matrix.Height - 10 && x >= 0 && x <= 5)
+                            {
+                                if (matrix[x + 1, y + 1])
+                                {
+                                    dst.SetPixel(j, i, Color.Black);
+                                }
+                                else
+                                {
+                                    //Color pixel = Utility.waterMarkDarkPixel(dst.GetPixel(j, i));
+                                    dst.SetPixel(j, i, Color.White);
+                                }
+                            }
+                            else if (x >= matrix.Width - 13 && x < matrix.Width - 10 && y >= 0 && y <= 5)
+                            {
+                                if (matrix[x + 1, y + 1])
+                                {
+                                    dst.SetPixel(j, i, Color.Black);
+                                }
+                                else
+                                {
+                                    dst.SetPixel(j, i, Color.White);
+                                }
+                            }
+                            #endregion
+                            */
+                            #endregion
+
+                            #region right
+                            else if (y < 8 && x >= matrix.Width - 10)
+                            {
+                                if (matrix[x + 1, y + 1]) //黑為1 白為0
+                                {
+                                    Color pixel = Utility.waterMarkDarkPixel(dst.GetPixel(j, i));
+                                    dst.SetPixel(j, i, pixel);
+                                    //dst.SetPixel(j, i, Color.Black);
+                                }
+                                else
+                                {
+                                    Color pixel = Utility.waterMarkWhitePixel(dst.GetPixel(j, i));
+                                    dst.SetPixel(j, i, pixel);
+                                    //dst.SetPixel(j, i, Color.White);
+                                }
+                            }
+                                #endregion
+                            #region LeftDown
+                            else if (x < 8 && y >= matrix.Height - 10)
+                            {
+                                if (matrix[x + 1, y + 1]) //黑為1 白為0
+                                {
+                                    Color pixel = Utility.waterMarkDarkPixel(dst.GetPixel(j, i));
+                                    dst.SetPixel(j, i, pixel);
+                                    //dst.SetPixel(j, i, Color.Black);
+                                }
+                                else
+                                {
+                                    Color pixel = Utility.waterMarkWhitePixel(dst.GetPixel(j, i));
+                                    dst.SetPixel(j, i, pixel);
+                                    //dst.SetPixel(j, i, Color.White);
+                                }
+                            }
+                                #endregion
+                            #region AlignmentPattern
+                            else if (version > 1 && j >= AlignmentPatternLocation_X + halftile && j < AlignmentPatternLocation_X + tileSize * 5 + halftile
+                    && i >= AlignmentPatternLocation_Y + halftile && i < AlignmentPatternLocation_X + tileSize * 5 + halftile)
+                            {
+                                if (matrix[x + 1, y + 1]) //黑為1 白為0
+                                {
+                                    Color pixel = Utility.waterMarkDarkPixel(dst.GetPixel(j, i));
+                                    dst.SetPixel(j, i, pixel);
+                                    //dst.SetPixel(j, i, Color.Black);
+                                }
+                                else
+                                {
+                                    Color pixel = Utility.waterMarkWhitePixel(dst.GetPixel(j, i));
+                                    dst.SetPixel(j, i, pixel);
+                                    //dst.SetPixel(j, i, Color.White);
+                                }
+                            }
+                                #endregion
+                        }
+                        if (byTile)
+                        {
+                            mx = 0;
+                            my++;
                         }
                     }
+                    if(isBlack)
+                    {
+                        FunctionPatternsByTile(dst, module, tileSize, startX, startY, endX, endY, space);
+                    }
                 }
+            }
+            
             #endregion
+  
+
             
             #region AddQuietZone
             for (int m = 0; m < result.Height; ++m)
             {
-                worker.ReportProgress(m * 10 / result.Height + 80);
+                if (MainForm.singleton.isCancel) return null;
+                worker.ReportProgress(m * 20 / result.Height + 80);
                 if (MainForm.singleton.isCancel)
                     return null;
                 for (int n = 0; n < result.Width; ++n)
                 {
                     if (n >= originX1 + halftile && n <= originX2 - halftile && m >= originY1 + halftile && m <= originY2 - halftile)
+                    //if (n >= originX1 && n <= originX2 && m >= originY1 && m <= originY2)
                     {
                         Color pixel = dst.GetPixel(n - originX1, m - originY1);
                         result.SetPixel(n, m, pixel);
@@ -418,10 +634,12 @@ namespace QRPhotoMosaic.Method
                     }
                 }
             }
-                
             #endregion
-
-            matrix = null;
+            
+            FLANN.usedDict.Clear();
+            matrix.clear();
+            dst.Dispose();
+            newSrc.Dispose();
             GC.Collect();
             return result;
         }
@@ -459,8 +677,8 @@ namespace QRPhotoMosaic.Method
                         }
                     }
                     if (MainForm.singleton.isCancel) return null;
-                    candidateImg = Image.FromFile(tiles[index].Name) as Bitmap;
-                    //tryMethod(tiles[FLANN.Indices4x4.Data[currBlockIdx, tileIdx]], currBlockIdx, y, x, candidateImg, dst);
+                    Image img = Image.FromFile(tiles[index].Name);
+                    candidateImg = img as Bitmap;
                     
                     for (int i = 0; i < tileSize; i++)
                     {
@@ -472,6 +690,7 @@ namespace QRPhotoMosaic.Method
                             dst.SetPixel(j + x, i + y, candidateImg.GetPixel(j, i));
                         }
                     }
+                    img.Dispose();
                     candidateImg.Dispose();
                     currBlockIdx++;
                 }
@@ -694,6 +913,7 @@ namespace QRPhotoMosaic.Method
                 GC.Collect();
                 return null; 
             }
+            GC.Collect();
             return dst;
         }
 
