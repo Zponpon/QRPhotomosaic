@@ -32,6 +32,8 @@ namespace QRPhotoMosaic
         public int normalK = 1;
         public int hammingK = 1;
         public float ratio = 1.0f;
+        public string functionPattern = string.Empty;
+        public string versionModule = string.Empty;
         
         public PictureBox QRCodePicBox;
         public PictureBox PhotomosaicPicBox;
@@ -202,6 +204,8 @@ namespace QRPhotoMosaic
                                 MainForm.singleton.info.GetQRCodeInfo(MainForm.singleton.info.QRmatrix, MainForm.singleton.info.QRVersion);
                                 if (space == "RGB")
                                 {
+                                    pmMethod.versionModule = versionModule;
+                                    pmMethod.functionPattern = functionPattern;
                                     MainForm.singleton.result
                                     = pmMethod.GenerateByFlannCombine(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, normalK, "RGB", MainForm.singleton.info.QRmatrix);
                                     MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(MainForm.singleton.result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);
@@ -212,6 +216,8 @@ namespace QRPhotoMosaic
                                 }
                                 else if(space == "Lab")
                                 {
+                                    pmMethod.versionModule = versionModule;
+                                    pmMethod.functionPattern = functionPattern;
                                     MainForm.singleton.result
                                     = pmMethod.GenerateByFlannCombine(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, normalK, "Lab", MainForm.singleton.info.QRmatrix);
                                     MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(MainForm.singleton.result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);

@@ -30,6 +30,13 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label11 = new System.Windows.Forms.Label();
+            this.VersionModuleBox = new System.Windows.Forms.ComboBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.FunctionPatternRatio = new System.Windows.Forms.NumericUpDown();
+            this.label8 = new System.Windows.Forms.Label();
+            this.FunctionPatternBox = new System.Windows.Forms.ComboBox();
             this.RatioNumber = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -79,6 +86,7 @@
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.FunctionPatternRatio)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.RatioNumber)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.HammingK)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NormalK)).BeginInit();
@@ -105,6 +113,13 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.label11);
+            this.tabPage1.Controls.Add(this.VersionModuleBox);
+            this.tabPage1.Controls.Add(this.label10);
+            this.tabPage1.Controls.Add(this.label9);
+            this.tabPage1.Controls.Add(this.FunctionPatternRatio);
+            this.tabPage1.Controls.Add(this.label8);
+            this.tabPage1.Controls.Add(this.FunctionPatternBox);
             this.tabPage1.Controls.Add(this.RatioNumber);
             this.tabPage1.Controls.Add(this.label7);
             this.tabPage1.Controls.Add(this.label6);
@@ -149,6 +164,98 @@
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(573, 765);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(186, 23);
+            this.label11.TabIndex = 56;
+            this.label11.Text = "Important Module";
+            // 
+            // VersionModuleBox
+            // 
+            this.VersionModuleBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.VersionModuleBox.FormattingEnabled = true;
+            this.VersionModuleBox.Items.AddRange(new object[] {
+            "Tile",
+            "SpecialTile",
+            "Normal"});
+            this.VersionModuleBox.Location = new System.Drawing.Point(532, 797);
+            this.VersionModuleBox.Name = "VersionModuleBox";
+            this.VersionModuleBox.Size = new System.Drawing.Size(246, 31);
+            this.VersionModuleBox.TabIndex = 55;
+            this.VersionModuleBox.SelectedIndexChanged += new System.EventHandler(this.VersionModuleBox_SelectedIndexChanged);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(959, 638);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(153, 23);
+            this.label10.TabIndex = 54;
+            this.label10.Text = "Normal Module";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Location = new System.Drawing.Point(1133, 638);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(186, 23);
+            this.label9.TabIndex = 53;
+            this.label9.Text = "FunctionPatterns";
+            // 
+            // FunctionPatternRatio
+            // 
+            this.FunctionPatternRatio.DecimalPlaces = 1;
+            this.FunctionPatternRatio.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.FunctionPatternRatio.Location = new System.Drawing.Point(1154, 675);
+            this.FunctionPatternRatio.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.FunctionPatternRatio.Name = "FunctionPatternRatio";
+            this.FunctionPatternRatio.Size = new System.Drawing.Size(135, 22);
+            this.FunctionPatternRatio.TabIndex = 52;
+            this.FunctionPatternRatio.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.FunctionPatternRatio.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            65536});
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Location = new System.Drawing.Point(301, 765);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(197, 23);
+            this.label8.TabIndex = 51;
+            this.label8.Text = "Function Patterns";
+            // 
+            // FunctionPatternBox
+            // 
+            this.FunctionPatternBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FunctionPatternBox.FormattingEnabled = true;
+            this.FunctionPatternBox.Items.AddRange(new object[] {
+            "None",
+            "WB",
+            "W",
+            "B"});
+            this.FunctionPatternBox.Location = new System.Drawing.Point(304, 797);
+            this.FunctionPatternBox.Name = "FunctionPatternBox";
+            this.FunctionPatternBox.Size = new System.Drawing.Size(135, 31);
+            this.FunctionPatternBox.TabIndex = 50;
+            // 
             // RatioNumber
             // 
             this.RatioNumber.DecimalPlaces = 1;
@@ -166,11 +273,12 @@
             this.RatioNumber.Name = "RatioNumber";
             this.RatioNumber.Size = new System.Drawing.Size(135, 22);
             this.RatioNumber.TabIndex = 49;
+            this.RatioNumber.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.RatioNumber.Value = new decimal(new int[] {
-            1,
+            2,
             0,
             0,
-            0});
+            65536});
             // 
             // label7
             // 
@@ -201,6 +309,7 @@
             this.HammingK.Name = "HammingK";
             this.HammingK.Size = new System.Drawing.Size(120, 22);
             this.HammingK.TabIndex = 46;
+            this.HammingK.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.HammingK.Value = new decimal(new int[] {
             50,
             0,
@@ -218,6 +327,7 @@
             this.NormalK.Name = "NormalK";
             this.NormalK.Size = new System.Drawing.Size(120, 22);
             this.NormalK.TabIndex = 45;
+            this.NormalK.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.NormalK.Value = new decimal(new int[] {
             10,
             0,
@@ -482,7 +592,7 @@
             // QRAndPhotmosaicBtn
             // 
             this.QRAndPhotmosaicBtn.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.QRAndPhotmosaicBtn.Location = new System.Drawing.Point(558, 700);
+            this.QRAndPhotmosaicBtn.Location = new System.Drawing.Point(558, 675);
             this.QRAndPhotmosaicBtn.Name = "QRAndPhotmosaicBtn";
             this.QRAndPhotmosaicBtn.Size = new System.Drawing.Size(339, 72);
             this.QRAndPhotmosaicBtn.TabIndex = 10;
@@ -708,6 +818,7 @@
             this.tabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.FunctionPatternRatio)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RatioNumber)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.HammingK)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NormalK)).EndInit();
@@ -776,6 +887,13 @@
         public System.Windows.Forms.Label label6;
         public System.Windows.Forms.Label label7;
         public System.Windows.Forms.NumericUpDown RatioNumber;
+        public System.Windows.Forms.ComboBox FunctionPatternBox;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label9;
+        public System.Windows.Forms.NumericUpDown FunctionPatternRatio;
+        private System.Windows.Forms.ComboBox VersionModuleBox;
+        private System.Windows.Forms.Label label11;
     }
 }
 

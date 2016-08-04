@@ -34,10 +34,12 @@ namespace QRPhotoMosaic.Method
         public static int hammingcount = 0;
 
         public static Matrix<float>[] Newfeatures4x4 = new Matrix<float>[16];
-        public static Matrix<float> FunctionFeatures4x4 = null;
+        public static Matrix<float> FunctionBlackFeatures4x4 = null;
+        public static Matrix<float> FunctionWhiteFeatures4x4 = null;
         public static Matrix<float>[] Distances = new Matrix<float>[4];
         public static Matrix<int>[] HammingIndices = new Matrix<int>[4];
-        public static Index kdtree_Patterns = null;
+        public static Index kdtree_Patterns_Black = null;
+        public static Index kdtree_Patterns_White = null;
         public static Index[] kdtrees = new Index[16];
         public static Dictionary<int, List<string>> usedDict = new Dictionary<int, List<string>>();
         public static Dictionary<int, List<int>> folderDict = new Dictionary<int, List<int>>();
@@ -323,17 +325,17 @@ namespace QRPhotoMosaic.Method
             }
         }
 
-        private static void OneLabQuery(Bitmap block, Matrix<float> query, int tileSize, int startX = 0, int startY = 0)
+        private static void OneLabQuery(Bitmap block, Matrix<float> query, int tileSize, float ratio = 0.0f, int startX = 0, int startY = 0)
         {
             ColorSpace cs = new ColorSpace();
             ColorSpace.Lab lab;
-            float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
             int subIdx = 0;
             int quater = tileSize / 4;
             int dq = quater * quater;
             int endX = startX + tileSize;
             int endY = startY + tileSize;
             double L = 0.0f, a = 0.0f, b = 0.0f;
+
             for (int y = startY; y < endY; y += quater)
             {
                 for (int x = startX; x < endX; x += quater)
@@ -360,14 +362,14 @@ namespace QRPhotoMosaic.Method
             }
         }
 
-        public static string SearchFunctionPatternsRGB(Bitmap block, int tileSize, int k)
+        public static string SearchFunctionPatternsRGB(Bitmap block, int tileSize, int k = 100)
         {
             Matrix<int> indices = new Matrix<int>(1, k);
             Matrix<float> dist = new Matrix<float>(1, k);
             Matrix<float> query = new Matrix<float>(1, 48);
             OneRGBQuery(block, query, tileSize);
-            kdtree_Patterns.KnnSearch(query, indices, dist, k, 64);
-            string[] names = System.IO.Directory.GetFiles(PathConfig.FunctionDarkPath);
+            kdtree_Patterns_Black.KnnSearch(query, indices, dist, k, 64);
+            string[] names = System.IO.Directory.GetFiles(PathConfig.FunctionBlackPath);
             for (int i = 0; i < k; ++i)
             {
                 int index = indices.Data[0, i];
@@ -380,14 +382,18 @@ namespace QRPhotoMosaic.Method
             return names[indices.Data[0, 0]];
         }
 
-        public static string SearchFunctionPatternsLab(Bitmap block, int tileSize, int k)
+        public static string SearchFunctionPatternsLab(Bitmap module, int tileSize, string path, int k = 100)
         {
             Matrix<int> indices = new Matrix<int>(1, k);
             Matrix<float> dist = new Matrix<float>(1, k);
             Matrix<float> query = new Matrix<float>(1, 48);
-            OneLabQuery(block, query, tileSize);
-            kdtree_Patterns.KnnSearch(query, indices, dist, k, 64);
-            string[] names = System.IO.Directory.GetFiles(PathConfig.FunctionDarkPath);
+            float ratio = Convert.ToSingle(MainForm.singleton.FunctionPatternRatio.Value);
+            OneLabQuery(module, query, tileSize, ratio);
+            if(path == PathConfig.FunctionBlackPath)
+                kdtree_Patterns_Black.KnnSearch(query, indices, dist, k, 64);
+            else if(path == PathConfig.FunctionWhitePath)
+                kdtree_Patterns_White.KnnSearch(query, indices, dist, k, 64);
+            string[] names = System.IO.Directory.GetFiles(path);
             for (int i = 0; i < k; ++i)
             {
                 int index = indices.Data[0, i];
@@ -418,7 +424,7 @@ namespace QRPhotoMosaic.Method
             float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
             //double ref_a = 500.0f * 25.0f / 29.0f;
             //double ref_b = 200.0f * 25.0f / 29.0f;
-            OneLabQuery(img, query, blockSize, xb, yb);
+            OneLabQuery(img, query, blockSize, ratio, xb, yb);
             #region Old Version
             /*
             for (int i = yb; i < yb + blockSize; i += quater)
@@ -601,6 +607,7 @@ namespace QRPhotoMosaic.Method
             int yb = y * blockSize;
             int blockIdx = 0;
             OneRGBQuery(img, query, blockSize, xb, yb);
+            #region Old Version
             /*
             for (int i = yb; i < yb + blockSize; i += quater)
             {
@@ -627,6 +634,7 @@ namespace QRPhotoMosaic.Method
                 }
             }
             */
+            #endregion
             kdtrees[kdIndex].KnnSearch(query, indices, dist, k, 64);
             if(isHamming && !isFunction)
             {

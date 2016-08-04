@@ -183,6 +183,8 @@ namespace QRPhotoMosaic
         /// </summary>
         private void Init()
         {
+            VersionModuleBox.SelectedIndex = 0;
+            FunctionPatternBox.SelectedIndex = 0;
             LevelComboBox.SelectedIndex = 0;
             SearchMethodComboBox.SelectedIndex = 0;
             ColorSpaceBox.SelectedIndex = 2;
@@ -323,6 +325,8 @@ namespace QRPhotoMosaic
                 creatingFolderPath = FolderComboBox.SelectedValue.ToString();
                 tiles.Clear();
             }
+            if (PhotomosaicPicBox.Image != null)
+                PhotomosaicPicBox.Image.Dispose();
 
             FLANN.hammingcheck = HammingCheck.Text;
             if (photomosaicImg != null)
@@ -335,6 +339,8 @@ namespace QRPhotoMosaic
             basicProcess.Canceled += CancelBtn_Click;
             basicProcess.ecLevel = QRECLevel;
             basicProcess.search = SearchMethodComboBox.Text;
+            basicProcess.functionPattern = this.FunctionPatternBox.Text;
+            basicProcess.versionModule = this.VersionModuleBox.Text;
             basicProcess.check = this.CheckInputComboBox.Text;
             basicProcess.space = this.ColorSpaceBox.Text;
             basicProcess.normalK = Convert.ToInt32(this.NormalK.Value);
@@ -572,7 +578,7 @@ namespace QRPhotoMosaic
             TileSizecomboBox.DataSource = PhotoMosaic.tileList;
             TileSizecomboBox.DisplayMember = "Size";
             TileSizecomboBox.ValueMember = "Value";
-            TileSizecomboBox.SelectedIndex = 0;
+            TileSizecomboBox.SelectedIndex = 1;
             //FolderComboBox.SelectedIndex = 3;
         }
 
@@ -650,6 +656,11 @@ namespace QRPhotoMosaic
         }
 
         private void DuplicateCount_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void VersionModuleBox_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

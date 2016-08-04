@@ -288,7 +288,7 @@ namespace QRPhotoMosaic.Method
         {
             FileStream file = File.Open(folder + "AvgColor.txt", FileMode.Open, FileAccess.Read);
             BinaryReader reader = new BinaryReader(file);
-            FLANN.FunctionFeatures4x4 = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder).Length, 48);
+            FLANN.FunctionBlackFeatures4x4 = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder).Length, 48);
             int tmp = Convert.ToInt32(reader.ReadByte());
 
             int count = 0;
@@ -296,7 +296,7 @@ namespace QRPhotoMosaic.Method
             {
                 for (int j = 0; j < 48; ++j)
                 {
-                    FLANN.FunctionFeatures4x4.Data[count, j] = (float)reader.ReadDouble();
+                    FLANN.FunctionBlackFeatures4x4.Data[count, j] = (float)reader.ReadDouble();
                 }
                 count++;
             }
@@ -304,25 +304,59 @@ namespace QRPhotoMosaic.Method
             reader.Close();
         }
 
-        public static void ReadFileFunctionLab(string folder)
+        public static void ReadFileFunctionLab(string folder, int luminance)
         {
             FileStream file = File.Open(folder + "AvgLab.txt", FileMode.Open, FileAccess.Read);
             BinaryReader reader = new BinaryReader(file);
-            FLANN.FunctionFeatures4x4 = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder).Length, 48);
-            int tmp = Convert.ToInt32(reader.ReadByte());
-
-            float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
-            int count = 0;
-            foreach (string tileName in System.IO.Directory.GetFiles(folder))
+            if (luminance < 1)
             {
-                for (int j = 0; j < 48;)
+                FLANN.FunctionBlackFeatures4x4 = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder).Length, 48);
+                int tmp = Convert.ToInt32(reader.ReadByte());
+                float ratio = Convert.ToSingle(MainForm.singleton.FunctionPatternRatio.Value);
+                //float ratio = 1.0f;
+                int count = 0;
+                foreach (string tileName in System.IO.Directory.GetFiles(folder))
                 {
-                    FLANN.FunctionFeatures4x4.Data[count, j++] = (float)reader.ReadDouble() * ratio;
-                    FLANN.FunctionFeatures4x4.Data[count, j++] = (float)reader.ReadDouble();
-                    FLANN.FunctionFeatures4x4.Data[count, j++] = (float)reader.ReadDouble();
+                    for (int j = 0; j < 48;)
+                    {
+                        FLANN.FunctionBlackFeatures4x4.Data[count, j++] = (float)reader.ReadDouble() * ratio;
+                        FLANN.FunctionBlackFeatures4x4.Data[count, j++] = (float)reader.ReadDouble();
+                        FLANN.FunctionBlackFeatures4x4.Data[count, j++] = (float)reader.ReadDouble();
+                    }
+                    count++;
                 }
-                count++;
             }
+            else
+            {
+                FLANN.FunctionWhiteFeatures4x4 = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder).Length, 48);
+                int tmp = Convert.ToInt32(reader.ReadByte());
+                float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
+                int count = 0;
+                foreach (string tileName in System.IO.Directory.GetFiles(folder))
+                {
+                    for (int j = 0; j < 48;)
+                    {
+                        FLANN.FunctionWhiteFeatures4x4.Data[count, j++] = (float)reader.ReadDouble() * ratio;
+                        FLANN.FunctionWhiteFeatures4x4.Data[count, j++] = (float)reader.ReadDouble();
+                        FLANN.FunctionWhiteFeatures4x4.Data[count, j++] = (float)reader.ReadDouble();
+                    }
+                    count++;
+                }
+            }
+            //int tmp = Convert.ToInt32(reader.ReadByte());
+
+            //float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
+            //int count = 0;
+            //foreach (string tileName in System.IO.Directory.GetFiles(folder))
+            //{
+            //    for (int j = 0; j < 48;)
+            //    {
+            //        FLANN.FunctionBlackFeatures4x4.Data[count, j++] = (float)reader.ReadDouble() * ratio;
+            //        FLANN.FunctionBlackFeatures4x4.Data[count, j++] = (float)reader.ReadDouble();
+            //        FLANN.FunctionBlackFeatures4x4.Data[count, j++] = (float)reader.ReadDouble();
+            //    }
+            //    count++;
+            //}
             file.Close();
             reader.Close();
         }
