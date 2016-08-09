@@ -84,6 +84,7 @@
             this.TileWorker = new System.ComponentModel.BackgroundWorker();
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
+            this.Experiment_FolderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FunctionPatternRatio)).BeginInit();
@@ -170,9 +171,9 @@
             this.label11.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label11.Location = new System.Drawing.Point(573, 765);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(186, 23);
+            this.label11.Size = new System.Drawing.Size(131, 23);
             this.label11.TabIndex = 56;
-            this.label11.Text = "Important Module";
+            this.label11.Text = "Info Module";
             // 
             // VersionModuleBox
             // 
@@ -448,7 +449,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(294, 488);
+            this.label1.Location = new System.Drawing.Point(315, 535);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(153, 23);
             this.label1.TabIndex = 36;
@@ -459,14 +460,15 @@
             this.SearchMethodComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SearchMethodComboBox.FormattingEnabled = true;
             this.SearchMethodComboBox.Items.AddRange(new object[] {
-            "Flann4x4CombinedMethod",
+            "Flann4x4CombinedMethod2:1",
+            "Flann4x4CombinedMethod1:1",
             "Flann4x4",
             "Full4x4",
             "Flann",
             "Full"});
-            this.SearchMethodComboBox.Location = new System.Drawing.Point(304, 527);
+            this.SearchMethodComboBox.Location = new System.Drawing.Point(304, 564);
             this.SearchMethodComboBox.Name = "SearchMethodComboBox";
-            this.SearchMethodComboBox.Size = new System.Drawing.Size(135, 31);
+            this.SearchMethodComboBox.Size = new System.Drawing.Size(289, 31);
             this.SearchMethodComboBox.TabIndex = 35;
             // 
             // SaveQRCodeBtn
@@ -894,6 +896,7 @@
         public System.Windows.Forms.NumericUpDown FunctionPatternRatio;
         private System.Windows.Forms.ComboBox VersionModuleBox;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.FolderBrowserDialog Experiment_FolderDialog;
     }
 }
 

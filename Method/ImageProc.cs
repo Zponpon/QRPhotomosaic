@@ -14,7 +14,6 @@ namespace QRPhotoMosaic.Method
             if (image == null)
                 return null;
             Bitmap ScaleImage = new Bitmap(image, size, size);
-            //GC.Collect();
             return ScaleImage;
         }
 
@@ -23,7 +22,6 @@ namespace QRPhotoMosaic.Method
             if (image == null)
                 return null;
             Bitmap ScaleImage = new Bitmap(image, width, height);
-            GC.Collect();
             return ScaleImage;
         }
 

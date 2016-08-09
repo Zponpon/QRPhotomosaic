@@ -18,5 +18,7 @@ namespace QRPhotoMosaic.Method
         public static string Classifymirflickr10000HammingRD = @"C:\Users\Zpon\Documents\GitHub\QRPhotomosaic\bin\Classifymirflickr100000_HammingRDown\";
         public static string FunctionBlackPath  = @"C:\Users\Zpon\Documents\GitHub\QRPhotomosaic\bin\FunctionPattern\0";
         public static string FunctionWhitePath = @"C:\Users\Zpon\Documents\GitHub\QRPhotomosaic\bin\FunctionPattern\1";
+        public static string batchFile = @"C:\Users\Zpon\Desktop\NewMethod\batch\";
+        public static string Classify2By1 = @"C:\Users\Zpon\Documents\GitHub\QRPhotomosaic\bin\Classifymirflickr1000000_2By1\";
     }
 }

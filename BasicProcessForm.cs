@@ -167,7 +167,7 @@ namespace QRPhotoMosaic
                         else if (space == "Lab" || space == "Mid4x4")
                             Tile.ReadFile4x4Lab(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
                     }
-                    else if (search == "Flann4x4CombinedMethod")
+                    else if (search == "Flann4x4CombinedMethod1:1")
                     {
                         if(space == "RGB")
                         {
@@ -186,6 +186,10 @@ namespace QRPhotoMosaic
                             Tile.ReadFile16FolderLab(MainForm.singleton.CreatingFolderPath);
                         }
                     }
+                    else if (search == "Flann4x4CombinedMethod2:1")
+                    {
+                        Tile.ReadFile8FolderLab(PathConfig.Classify2By1);
+                    }
                     else
                         Tile.ReadFile(MainForm.singleton.tiles, MainForm.singleton.tileSize, MainForm.singleton.CreatingFolderPath);
                     //if (tileSize == 0) return;
@@ -195,19 +199,19 @@ namespace QRPhotoMosaic
 
                     switch(search)
                     {
-                        case "Flann4x4CombinedMethod":
-                            
-                                MainForm.singleton.hammingcount = 0;
+                        case "Flann4x4CombinedMethod2:1":
+                            MainForm.singleton.hammingcount = 0;
                                 FLANN.hammingcount = 0;
                                 FLANN.hammingK = hammingK;
-                                //FLANN.noramlK = normalK;
+                                if (MainForm.singleton.result != null)
+                                    MainForm.singleton.result.Dispose();
                                 MainForm.singleton.info.GetQRCodeInfo(MainForm.singleton.info.QRmatrix, MainForm.singleton.info.QRVersion);
                                 if (space == "RGB")
                                 {
                                     pmMethod.versionModule = versionModule;
                                     pmMethod.functionPattern = functionPattern;
                                     MainForm.singleton.result
-                                    = pmMethod.GenerateByFlannCombine(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, normalK, "RGB", MainForm.singleton.info.QRmatrix);
+                                    = pmMethod.FlannCombineOneByOne(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, normalK, "RGB", MainForm.singleton.info.QRmatrix);
                                     MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(MainForm.singleton.result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);
 
                                     int w = MainForm.singleton.QRCodePictureBox.Width;
@@ -219,7 +223,41 @@ namespace QRPhotoMosaic
                                     pmMethod.versionModule = versionModule;
                                     pmMethod.functionPattern = functionPattern;
                                     MainForm.singleton.result
-                                    = pmMethod.GenerateByFlannCombine(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, normalK, "Lab", MainForm.singleton.info.QRmatrix);
+                                    = pmMethod.FlannCombineOneByOne(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, normalK, "Lab", MainForm.singleton.info.QRmatrix);
+                                    MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(MainForm.singleton.result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);
+
+                                    int w = MainForm.singleton.QRCodePictureBox.Width;
+                                    int h = MainForm.singleton.QRCodePictureBox.Height;
+                                    MainForm.singleton.QRCodeImage = ImageProc.ScaleImage(MainForm.singleton.QRBitmap, w, h);
+                                }
+                                break;
+                        case "Flann4x4CombinedMethod1:1":
+                            
+                                MainForm.singleton.hammingcount = 0;
+                                FLANN.hammingcount = 0;
+                                FLANN.hammingK = hammingK;
+                                if (MainForm.singleton.result != null)
+                                    MainForm.singleton.result.Dispose();
+                                //FLANN.noramlK = normalK;
+                                MainForm.singleton.info.GetQRCodeInfo(MainForm.singleton.info.QRmatrix, MainForm.singleton.info.QRVersion);
+                                if (space == "RGB")
+                                {
+                                    pmMethod.versionModule = versionModule;
+                                    pmMethod.functionPattern = functionPattern;
+                                    MainForm.singleton.result
+                                    = pmMethod.FlannCombineOneByOne(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, normalK, "RGB", MainForm.singleton.info.QRmatrix);
+                                    MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(MainForm.singleton.result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);
+
+                                    int w = MainForm.singleton.QRCodePictureBox.Width;
+                                    int h = MainForm.singleton.QRCodePictureBox.Height;
+                                    MainForm.singleton.QRCodeImage = ImageProc.ScaleImage(MainForm.singleton.QRBitmap, w, h);
+                                }
+                                else if(space == "Lab")
+                                {
+                                    pmMethod.versionModule = versionModule;
+                                    pmMethod.functionPattern = functionPattern;
+                                    MainForm.singleton.result
+                                    = pmMethod.FlannCombineOneByOne(worker, MainForm.singleton.masterBitmap, MainForm.singleton.tiles, MainForm.singleton.tileSize, version, normalK, "Lab", MainForm.singleton.info.QRmatrix);
                                     MainForm.singleton.ResultPicBoxImg = ImageProc.ScaleImage(MainForm.singleton.result, MainForm.singleton.ResultPicBox.Width, MainForm.singleton.ResultPicBox.Height);
 
                                     int w = MainForm.singleton.QRCodePictureBox.Width;
@@ -327,10 +365,12 @@ namespace QRPhotoMosaic
 
             if (MainForm.singleton.photomosaicImg != null || MainForm.singleton.ResultPicBox != null)
             {
+                
                 int w = MainForm.singleton.PhotomosaicPictureBox.Width;
                 int h = MainForm.singleton.PhotomosaicPictureBox.Height;
+                /*
                 MainForm.singleton.PhotoMosaicImage = ImageProc.ScaleImage(MainForm.singleton.photomosaicImg, w, h);
-
+                */
                 w = MainForm.singleton.QRCodePictureBox.Width;
                 h = MainForm.singleton.QRCodePictureBox.Height;
                 MainForm.singleton.QRCodeImage = ImageProc.ScaleImage(MainForm.singleton.QRBitmap, w, h);
