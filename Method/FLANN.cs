@@ -18,7 +18,7 @@ namespace QRPhotoMosaic.Method
 {
     public static class FLANN
     {
-        //public static int noramlK = 1;
+        #region Variable
         public static int hammingK = 1;
         public static int duplicate = 0;
         public static Matrix<float> features = null;
@@ -28,15 +28,10 @@ namespace QRPhotoMosaic.Method
         public static Matrix<float> Query = null;
         public static Matrix<float> Query4x4 = null;
         public static Matrix<int> Indices4x4 = null;
-        public static int testIdx = 0;
-        public static List<string> test = new List<string>();
         public static string hammingcheck = string.Empty;
         public static int hammingcount = 0;
-        public static List<int> moduleNum = new List<int>();
 
-        //public static Matrix<float>[] Newfeatures4x4 = new Matrix<float>[16];
         public static Matrix<float>[] Newfeatures4x4;
-        //public static Matrix<float>[] New8features4x4 = new Matrix<float>[8];
         public static Matrix<float> FunctionBlackFeatures4x4 = null;
         public static Matrix<float> FunctionWhiteFeatures4x4 = null;
         public static Matrix<float>[] Distances = new Matrix<float>[4];
@@ -44,11 +39,13 @@ namespace QRPhotoMosaic.Method
         public static Index kdtree_Patterns_Black = null;
         public static Index kdtree_Patterns_White = null;
         public static Index[] kdtrees = new Index[16];
-        public static Index[] kdtrees_2By1 = new Index[8];
+        public static Index[] kdtrees_1By2 = new Index[8];
         public static Dictionary<int, List<string>> usedDict = new Dictionary<int, List<string>>();
         public static Dictionary<int, List<int>> folderDict = new Dictionary<int, List<int>>();
-        public static List<string> usedList_2By1 = new List<string>();
+        public static List<string> usedList = new List<string>();
         public static List<string> functionList = new List<string>();
+        public static List<string> encodingFuncList = new List<string>();
+        #endregion
 
         public static void Search(Bitmap src, int version, int k)
         {
@@ -152,7 +149,6 @@ namespace QRPhotoMosaic.Method
             int v = (version * 4 + 17) + 1;
             int dstSize = v * v;
             float blockTotal = blockSize * blockSize;
-            int R = 0, G = 0, B = 0;
             double L = 0, a = 0, b = 0;
             double ref_a = 500.0f * 25.0f / 29.0f;
             double ref_b = 200.0f * 25.0f / 29.0f;
@@ -193,7 +189,6 @@ namespace QRPhotoMosaic.Method
                             query.Data[index, blockIdx++] = (float)L;
                             query.Data[index, blockIdx++] = (float)a;
                             query.Data[index, blockIdx++] = (float)b;
-                            //R = G = B = 0;
                             L = a = b = 0;
                         }
                     }
@@ -301,7 +296,7 @@ namespace QRPhotoMosaic.Method
             {
                 for (int i = 0; i < 8; ++i)
                 {
-                    kdtrees_2By1[i] = new Index(Newfeatures4x4[i], 5);
+                    kdtrees_1By2[i] = new Index(Newfeatures4x4[i], 5);
                 }
             }
         }
@@ -340,15 +335,18 @@ namespace QRPhotoMosaic.Method
             }
         }
 
-        private static void OneLabQuery(Bitmap block, Matrix<float> query, int tileSize, float ratio = 0.0f, int startX = 0, int startY = 0)
+        /// <summary>
+        /// Convert a query point to EmguCV matrix data type
+        /// </summary>
+        private static void OneLabQuery(Bitmap block, Matrix<float> query, int size, float ratio = 0.0f, int startX = 0, int startY = 0)
         {
             ColorSpace cs = new ColorSpace();
             ColorSpace.Lab lab;
             int subIdx = 0;
-            int quater = tileSize / 4;
+            int quater = size / 4;
             int dq = quater * quater;
-            int endX = startX + tileSize;
-            int endY = startY + tileSize;
+            int endX = startX + size;
+            int endY = startY + size;
             double L = 0.0f, a = 0.0f, b = 0.0f;
 
             for (int y = startY; y < endY; y += quater)
@@ -372,7 +370,7 @@ namespace QRPhotoMosaic.Method
                     query.Data[0, subIdx++] = (float)L * ratio;
                     query.Data[0, subIdx++] = (float)a;
                     query.Data[0, subIdx++] = (float)b;
-                    L = a = b = 0;
+                    L = a = b = 0.0f;
                 }
             }
         }
@@ -397,45 +395,82 @@ namespace QRPhotoMosaic.Method
             return names[indices.Data[0, 0]];
         }
 
-        public static string SearchFunctionPatternsLab(Bitmap module, int tileSize, string path, int k = 100)
+        /// <summary>
+        /// Search the tile image whose average luminance is close "WHITE OR BLACK".
+        /// </summary>
+        /// <returns></returns>
+        public static string SearchFunctionPatternsLab(Bitmap module, int size, string path, int k = 100, int x = -1, int y = -1, bool diff = false)
         {
             Matrix<int> indices = new Matrix<int>(1, k);
             Matrix<float> dist = new Matrix<float>(1, k);
             Matrix<float> query = new Matrix<float>(1, 48);
             float ratio = Convert.ToSingle(MainForm.singleton.FunctionPatternRatio.Value);
-            OneLabQuery(module, query, tileSize, ratio);
-            if(path == PathConfig.FunctionBlackPath)
+
+            if (x == -1 || y == -1)
+            {
+                OneLabQuery(module, query, size, ratio);
+            }
+            else if (x != -1 && y != -1)
+            {
+                OneLabQuery(module, query, size, ratio, x, y);
+            }
+
+
+            if (path == PathConfig.FunctionBlackPath)
+            {
                 kdtree_Patterns_Black.KnnSearch(query, indices, dist, k, 64);
-            else if(path == PathConfig.FunctionWhitePath)
+            }
+            else if (path == PathConfig.FunctionWhitePath)
+            {
                 kdtree_Patterns_White.KnnSearch(query, indices, dist, k, 64);
+            }
+
             string[] names = System.IO.Directory.GetFiles(path);
             for (int i = 0; i < k; ++i)
             {
                 int index = indices.Data[0, i];
-                if (!functionList.Contains(names[index]))
+                if (!diff)
                 {
-                    functionList.Add(names[index]);
-                    return names[index];
+                    if (!functionList.Contains(names[index]))
+                    {
+                        functionList.Add(names[index]);
+                        return names[index];
+                    }
+                }
+                else
+                {
+                    if (!encodingFuncList.Contains(names[index]))
+                    {
+                        encodingFuncList.Add(names[index]);
+                        return names[index];
+                    }
                 }
             }
+
+            if (diff)
+            {
+                duplicate++;
+            }
+
             return names[indices.Data[0, 0]];
         }
 
-        public static string Search4x4LabOther(Bitmap img, int x, int y, int blockSize, string[] names, int kdIndex, int k, bool isFunction, int[] folderbits, bool isHamming = false, float distance = -1.0f, int hammingBit = -1)
+        /// <summary>
+        /// Module : (Tile | Block) = 1 : 3
+        /// </summary>
+        /// <returns></returns>
+        public static string Search4x4Lab1By1(Bitmap img, int x, int y, int blockSize, string[] names, int kdIndex, int k, bool isFunction, int[] folderbits, bool isHamming = false, float distance = -1.0f, int hammingBit = -1)
         {
             int quater = blockSize / 4;
             int dq = quater * quater;
-            double l = 0, a = 0, b = 0;
             if (isHamming && !isFunction)
                 k = hammingK;
             Matrix<int> indices = new Matrix<int>(1, k);
             Matrix<float> dist = new Matrix<float>(1, k);
             Matrix<float> query = new Matrix<float>(1, 48);
             ColorSpace cs = new ColorSpace();
-            ColorSpace.Lab lab;
             int xb = x * blockSize;
             int yb = y * blockSize;
-            int blockIdx = 0;
             float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
             //double ref_a = 500.0f * 25.0f / 29.0f;
             //double ref_b = 200.0f * 25.0f / 29.0f;
@@ -520,6 +555,10 @@ namespace QRPhotoMosaic.Method
             return names[indices.Data[0, 0]];
         }
         
+        /// <summary>
+        /// Find hamming distance is one.
+        /// </summary>
+        /// <returns></returns>
         private static string HammingCode(Bitmap img, int x, int y, int blockSize, int kdIndex, int k, bool isFunction, int[] folderbits, float distance, string colorSpace)
         {
             string folder = string.Empty;
@@ -529,11 +568,13 @@ namespace QRPhotoMosaic.Method
             Dictionary<int, string[]> filesDict = new Dictionary<int, string[]>();
 
             #region HammingSearching
-            for (int bit = 0; bit < 4; ++bit)
+            //for (int bit = 0; bit < 4; ++bit)
+            for (int bit = 0; bit < 1; ++bit)
             {
                 if (folderbits[bit] == 1)
                 {
                     for (int i = 0; i < 4; ++i)
+                    //for (int i = 0; i < 1; ++i)
                     {
                         if (i == bit)
                         {
@@ -551,6 +592,7 @@ namespace QRPhotoMosaic.Method
                 else
                 {
                     for (int i = 0; i < 4; ++i)
+                    //for (int i = 0; i < 1; ++i)
                     {
                         if (i == bit)
                         {
@@ -566,42 +608,36 @@ namespace QRPhotoMosaic.Method
                     kdIndex_ = kdIndex + (int)Math.Pow(2, 3 - bit);
                 }
                 kdIdxs[bit] = kdIndex_;
+
                 string[] files = System.IO.Directory.GetFiles(MainForm.singleton.CreatingFolderPath + folder);
                 if (colorSpace == "RGB")
-                    Search4x4RGBOther(img, x, y, blockSize, files, kdIndex_, k, isFunction, folderbits_, true, distance, bit);
+                {
+                    Search4x4RGB1By1(img, x, y, blockSize, files, kdIndex_, k, isFunction, folderbits_, true, distance, bit);
+                }
                 else if (colorSpace == "Lab")
-                    Search4x4LabOther(img, x, y, blockSize, files, kdIndex_, k, isFunction, folderbits_, true, distance, bit);
+                {
+                    Search4x4Lab1By1(img, x, y, blockSize, files, kdIndex_, k, isFunction, folderbits_, true, distance, bit);
+                }
+
                 filesDict.Add(bit, files);
                 folder = string.Empty;
             }
             #endregion
 
             #region CheckUsedDictionary
-            int modNum = img.Width / y;
             float minDist = float.MaxValue;
             int minIdx = 0;
             for (int i = 0; i < Distances[0].Cols; ++i)
             {
-                for (int j = 0; j < 4; ++j)
+                for (int j = 0; j < Distances.Length; ++j)
                 {
-                    if(Distances[j].Data[0, i] < minDist)
+                    if(Distances[j] != null && Distances[j].Data[0, i] < minDist)
                     {
                         minDist = Distances[j].Data[0, i];
                         minIdx = j;
                     }
                 }
-                /*
-                if(minIdx == 0)
-                {
-                    int number = modNum - 41 - 1;
-                    if (moduleNum.Contains(number))
-                        return string.Empty;
-                }
-                else if(minIdx == 1)
-                {
 
-                }
-                */
                 int index = HammingIndices[minIdx].Data[0, i];
                 string name = filesDict[minIdx][index];
                 if(!usedDict.ContainsKey(kdIdxs[minIdx]))
@@ -622,11 +658,10 @@ namespace QRPhotoMosaic.Method
             return string.Empty;
         }
 
-        public static string Search4x4RGBOther(Bitmap img, int x, int y, int blockSize, string[] names, int kdIndex, int k, bool isFunction, int[] folderbits, bool isHamming = false, float distance = -1.0f, int hammingBit = -1)
+        public static string Search4x4RGB1By1(Bitmap img, int x, int y, int blockSize, string[] names, int kdIndex, int k, bool isFunction, int[] folderbits, bool isHamming = false, float distance = -1.0f, int hammingBit = -1)
         {
             int quater = blockSize / 4;
             int dq = quater * quater;
-            int R = 0, G = 0, B = 0;
             if (isHamming && !isFunction)
                 k = hammingK;
             Matrix<int> indices = new Matrix<int>(1, k);
@@ -634,7 +669,6 @@ namespace QRPhotoMosaic.Method
             Matrix<float> query = new Matrix<float>(1, 48);
             int xb = x * blockSize;
             int yb = y * blockSize;
-            int blockIdx = 0;
             int modNum = img.Width / blockSize;
             OneRGBQuery(img, query, blockSize, xb, yb);
             #region Old Version
@@ -724,29 +758,66 @@ namespace QRPhotoMosaic.Method
             return names[indices.Data[0, 0]];
         }
 
-        public static string Search4x4LabTwoByOne(Bitmap img, int tileSize, int x, int y, int bit, int luminance, int k)
+        /// <summary>
+        /// Module : (Tile | Block) = 1 : 3
+        /// </summary>
+        /// <returns></returns>
+        public static string Search4x4Lab1By2(Bitmap img, int blockSize, int x, int y, int bit, int luminance, int k, string[] tileImages)
         {
-            string path = PathConfig.Classify2By1 + bit.ToString() + luminance.ToString() + "\\";
-            string[] tileImages = Directory.GetFiles(path);
+            //string path = PathConfig.Classify2By1_1000000 + bit.ToString() + luminance.ToString() + "\\";
+            //string path = MainForm.singleton.CreatingFolderPath + bit.ToString() + luminance.ToString() + "\\";
+            //string[] tileImages = Directory.GetFiles(path);
             int kdIndex = bit * 2 + luminance;
             float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
             Matrix<int> indices = new Matrix<int>(1, k);
             Matrix<float> dist = new Matrix<float>(1, k);
             Matrix<float> query = new Matrix<float>(1, 48);
 
-            OneLabQuery(img, query, tileSize, ratio, x, y);
-            kdtrees_2By1[kdIndex].KnnSearch(query, indices, dist, k, 64);
+            OneLabQuery(img, query, blockSize, ratio, x, y);
+            kdtrees_1By2[kdIndex].KnnSearch(query, indices, dist, k, 64);
 
             for (int i = 0; i < indices.Cols; ++i)
             {
                 int index = indices.Data[0, i];
                 string tileImage = tileImages[index];
-                if(!usedList_2By1.Contains(tileImage))
+                if(!usedList.Contains(tileImage))
                 {
+                    usedList.Add(tileImage);
                     return tileImage;
                 }
             }
 
+            duplicate++;
+            return tileImages[indices.Data[0, 0]];
+        }
+
+        /// <summary>
+        /// Module : (Tile | Block) = 1 : 3
+        /// </summary>
+        /// <returns></returns>
+        public static string Search4x4Lab1By3(Bitmap img, int blockSize, int x, int y, int luminance, int k, string[] tileImages)
+        {
+            //string path = MainForm.singleton.CreatingFolderPath;
+            //string[] tileImages = Directory.GetFiles(path);
+            float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
+            Matrix<int> indices = new Matrix<int>(1, k);
+            Matrix<float> dist = new Matrix<float>(1, k);
+            Matrix<float> query = new Matrix<float>(1, 48);
+            OneLabQuery(img, query, blockSize, ratio, x, y);
+            kdtree.KnnSearch(query, indices, dist, k, 64);
+
+            for (int i = 0; i < indices.Cols; ++i)
+            {
+                int index = indices.Data[0, i];
+                string tileImage = tileImages[index];
+                if (!usedList.Contains(tileImage))
+                {
+                    usedList.Add(tileImage);
+                    return tileImage;
+                }
+            }
+
+            duplicate++;
             return tileImages[indices.Data[0, 0]];
         }
     }

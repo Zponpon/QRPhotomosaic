@@ -85,6 +85,7 @@
             this.EmbeddingWorker = new System.ComponentModel.BackgroundWorker();
             this.CreateWorker = new System.ComponentModel.BackgroundWorker();
             this.Experiment_FolderDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.FormatBox = new System.Windows.Forms.ComboBox();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FunctionPatternRatio)).BeginInit();
@@ -114,6 +115,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.FormatBox);
             this.tabPage1.Controls.Add(this.label11);
             this.tabPage1.Controls.Add(this.VersionModuleBox);
             this.tabPage1.Controls.Add(this.label10);
@@ -187,7 +189,6 @@
             this.VersionModuleBox.Name = "VersionModuleBox";
             this.VersionModuleBox.Size = new System.Drawing.Size(246, 31);
             this.VersionModuleBox.TabIndex = 55;
-            this.VersionModuleBox.SelectedIndexChanged += new System.EventHandler(this.VersionModuleBox_SelectedIndexChanged);
             // 
             // label10
             // 
@@ -343,7 +344,6 @@
             this.DuplicateCount.Size = new System.Drawing.Size(33, 12);
             this.DuplicateCount.TabIndex = 44;
             this.DuplicateCount.Text = "label6";
-            this.DuplicateCount.Click += new System.EventHandler(this.DuplicateCount_Click);
             // 
             // HammingCheck
             // 
@@ -460,8 +460,12 @@
             this.SearchMethodComboBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SearchMethodComboBox.FormattingEnabled = true;
             this.SearchMethodComboBox.Items.AddRange(new object[] {
-            "Flann4x4CombinedMethod2:1",
-            "Flann4x4CombinedMethod1:1",
+            //"Flann4x4CombinedMethod1:3",
+            //"Flann4x4CombinedMethod1:2",
+            //"Flann4x4CombinedMethod1:1",
+            "1:3",
+            "1:2",
+            "1:1",
             "Flann4x4",
             "Full4x4",
             "Flann",
@@ -807,6 +811,20 @@
             this.CreateWorker.WorkerReportsProgress = true;
             this.CreateWorker.WorkerSupportsCancellation = true;
             // 
+            // FormatBox
+            // 
+            this.FormatBox.Font = new System.Drawing.Font("Monaco", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormatBox.FormattingEnabled = true;
+            this.FormatBox.Items.AddRange(new object[] {
+            "Bmp",
+            "Jpeg",
+            "Png",
+            });
+            this.FormatBox.Location = new System.Drawing.Point(1381, 586);
+            this.FormatBox.Name = "FormatBox";
+            this.FormatBox.Size = new System.Drawing.Size(135, 31);
+            this.FormatBox.TabIndex = 57;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -897,6 +915,7 @@
         private System.Windows.Forms.ComboBox VersionModuleBox;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.FolderBrowserDialog Experiment_FolderDialog;
+        private System.Windows.Forms.ComboBox FormatBox;
     }
 }
 

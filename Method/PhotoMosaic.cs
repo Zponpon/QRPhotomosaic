@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Flann;
@@ -82,7 +83,7 @@ namespace QRPhotoMosaic.Method
             }
         }
 
-        private void ImportantModuleByTile(Bitmap src, Bitmap module, int tileSize, int startX, int startY, int endX, int endY, string space, string path)
+        private void ImportantModuleByTile1By1(Bitmap src, Bitmap module, int tileSize, int startX, int startY, int endX, int endY, string space, string path)
         {
             string name = string.Empty;
             if(space == "Lab")
@@ -135,9 +136,36 @@ namespace QRPhotoMosaic.Method
             return 64;
         }
 
-        private void ReplaceColor2By1(Bitmap img, int x, int y, int tileSize, bool value)
+        private void BitSwitch(int bit, int tileSize, int x, int y, out int x_, out int y_)
         {
-            int dt = tileSize * 2;
+            switch (bit)
+            {
+                case 0:
+                    x_ = x;
+                    y_ = y;
+                    break;
+                case 1:
+                    x_ = x + tileSize;
+                    y_ = y;
+                    break;
+                case 2:
+                    x_ = x + tileSize;
+                    y_ = y + tileSize;
+                    break;
+                case 3:
+                    x_ = x;
+                    y_ = y + tileSize;
+                    break;
+                default:
+                    x_ = x;
+                    y_ = y;
+                    break;
+            }
+        }
+
+        private void ReplaceColor(Bitmap img, int x, int y, int tileSize, bool value, int K = 2)
+        {
+            int dt = tileSize * K;
             if(value)
             {
                 for(int i = 0; i < dt; ++i)
@@ -156,6 +184,97 @@ namespace QRPhotoMosaic.Method
                     {
                         img.SetPixel(x + j, y + i, Color.White);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 2By1 = Module : Tile = 2 : 1
+        /// </summary>
+        private void ImportantModuleByTile1By2(Bitmap scaledSrc, int sx, int sy, Bitmap metaImg, int mx, int my, int tileSize, int blockSize, bool value) 
+        {
+            string path = (value) ? PathConfig.FunctionBlackPath : PathConfig.FunctionWhitePath;
+            for (int bit = 0; bit < 4; ++bit)
+            {
+                int fx, fy, nx, ny;
+
+                #region Bit Switch
+                switch (bit)
+                {
+                    case 0:
+                        nx = sx;
+                        ny = sy;
+                        fx = mx;
+                        fy = my;
+                        break;
+                    case 1:
+                        nx = sx + blockSize;
+                        ny = sy;
+                        fx = mx + tileSize;
+                        fy = my;
+                        break;
+                    case 2:
+                        nx = sx + blockSize;
+                        ny = sy + blockSize;
+                        fx = mx + tileSize;
+                        fy = my + tileSize;
+                        break;
+                    case 3:
+                        nx = sx;
+                        ny = sy + blockSize;
+                        fx = mx;
+                        fy = my + tileSize;
+                        break;
+                    default:
+                        nx = sx;
+                        ny = sy;
+                        fx = mx;
+                        fy = my;
+                        break;
+                }
+                #endregion
+
+                string tileName = FLANN.SearchFunctionPatternsLab(scaledSrc, blockSize, path, 350, nx, ny);
+                Image img = Image.FromFile(tileName);
+                Bitmap tile = img as Bitmap;
+                for (int i = 0; i < tileSize; ++i)
+                {
+                    for (int j = 0; j < tileSize; ++j)
+                    {
+                        metaImg.SetPixel(fx + j, fy + i, tile.GetPixel(j, i));
+                    }
+                }
+                img.Dispose();
+                tile.Dispose();
+            }
+        }
+        
+        /// <summary>
+        /// 1By3 = Tile : Module = 1 : 3
+        /// </summary>
+        private void ImportantModuleByTile1By3(Bitmap scaledSrc, int sx, int sy, Bitmap metaImg, int mx, int my, int tileSize, int blockSize, bool value)
+        {
+            string path = (value) ? PathConfig.FunctionBlackPath : PathConfig.FunctionWhitePath;
+           
+
+            for (int mY = 0; mY < 3; ++mY)
+            {
+                for(int mX = 0; mX < 3; ++mX)
+                {
+                    int x = mx + mX * tileSize;
+                    int y = my + mY * tileSize;
+                    string tileName = FLANN.SearchFunctionPatternsLab(scaledSrc, blockSize, path, 1000, sx, sy);
+                    Image img = Image.FromFile(tileName);
+                    Bitmap tile = img as Bitmap;
+                    for (int i = 0; i < tileSize; ++i)
+                    {
+                        for (int j = 0; j < tileSize; ++j)
+                        {
+                            metaImg.SetPixel(x + j, y + i, tile.GetPixel(j, i));
+                        }
+                    }
+                    img.Dispose();
+                    tile.Dispose();
                 }
             }
         }
@@ -286,103 +405,261 @@ namespace QRPhotoMosaic.Method
             return result;
         }
 
-        public Bitmap FlannCombineTwoByOne(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k, string space, BitMatrix QRMatrix)
+        /// <summary>
+        /// Tile : Module = 3 : 1
+        /// </summary>
+        /// <returns></returns>
+        public Bitmap FlannCombine1By3(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k, string space, BitMatrix QRMatrix)
         {
             int v = version * 4 + 17;
-            int metaSize = v * v * 2;
-            int blockSize = 8; // Temporary
-            int fourTileSize = 4 * tileSize;
-            //int px = 0, py = 0;
-            Bitmap newSrc = ImageProc.ScaleImage(src, v * blockSize * 2);
+            int blockSize = MainForm.singleton.BlockSize;
+            int scaledSize = v * blockSize * 3;
+            int metaSize = v * 3 * tileSize;
+            int tileSize_12 = 12 * tileSize;
+
+            string[] tileImages = Directory.GetFiles(MainForm.singleton.CreatingFolderPath);
+            Bitmap scaledSrc = new Bitmap(src, scaledSize, scaledSize);
             Bitmap metaImg = new Bitmap(metaSize, metaSize);
-            Bitmap result = new Bitmap(metaImg.Width + fourTileSize, metaImg.Height + fourTileSize);
-            //int AlignmentPatternLocation_X = MainForm.singleton.info.AlignmentPatternLocation_X * tileSize;
-            //int AlignmentPatternLocation_Y = MainForm.singleton.info.AlignmentPatternLocation_Y * tileSize;
+            // 64bits application, REASON: 32bits application does not have enough virtual memory.
+            Bitmap result = new Bitmap(metaSize + tileSize_12 * 2, metaSize + tileSize_12 * 2);
+
+            #region Determined Important Module
+            bool functionByTile = false;
+            if (functionPattern == "WB")
+            {
+                functionByTile = true;
+                if (FLANN.kdtree_Patterns_Black == null)
+                {
+                    Tile.ReadFileFunctionLab(PathConfig.FunctionBlackPath, 0);
+                    FLANN.kdtree_Patterns_Black = new Index(FLANN.FunctionBlackFeatures4x4, 5);
+                }
+                if (FLANN.kdtree_Patterns_White == null)
+                {
+                    Tile.ReadFileFunctionLab(PathConfig.FunctionWhitePath, 1);
+                    FLANN.kdtree_Patterns_White = new Index(FLANN.FunctionWhiteFeatures4x4, 5);
+                }
+            }
+            bool openInfoModule = false;
+            bool usingSpecialTile = false;
+            if (versionModule == "Normal" || versionModule == "SpecialTile")
+            {
+                openInfoModule = true;
+                if (versionModule == "SpecialTile")
+                    usingSpecialTile = true;
+            }
+            #endregion
 
             #region Replace QR Code
             for (int y = 0; y < QRMatrix.Height; ++y)
             {
-                for(int x = 0; x < QRMatrix.Width; ++x)
+                if (MainForm.singleton.isCancel)
+                    return null;
+                worker.ReportProgress(y * 70 / QRMatrix.Height + 10);
+                for (int x = 0; x < QRMatrix.Width; ++x)
                 {
-                    int px = tileSize * x;
-                    int py = tileSize * y;
-
+                    int px = tileSize * x * 3;
+                    int py = tileSize * y * 3;
+                    int sx = blockSize * x * 3;
+                    int sy = blockSize * y * 3;
                     #region Left Up Function Pattern
                     if (x < 8 && y < 8)
                     {
-                        ReplaceColor2By1(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        if (!functionByTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y], 3);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By3(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
                     }
                     #endregion
 
                     #region Right Up Function Pattern
-                    else if(x > QRMatrix.Width - 8 && y < 8)
+                    else if (x > QRMatrix.Width - 9 && y < 8)
                     {
-                        ReplaceColor2By1(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        if (!functionByTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y], 3);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By3(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
                     }
                     #endregion
 
                     #region Left Down Function Pattern
-                    else if(x < 8 && y > QRMatrix.Height - 8)
+                    else if (x < 8 && y > QRMatrix.Height - 9)
                     {
-                        ReplaceColor2By1(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        if (!functionByTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y], 3);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By3(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    #endregion
+
+                    #region Timing
+                    else if (y == 6 && x >= 8 && x < QRMatrix.Width - 8 && openInfoModule)
+                    {
+                        if (!usingSpecialTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y], 3);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By3(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    else if (x == 6 && y >= 8 && y < QRMatrix.Height - 8 && openInfoModule)
+                    {
+                        if (!usingSpecialTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y], 3);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By3(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    #endregion
+
+                    #region Version
+                    else if (y > QRMatrix.Height - 12 && y < QRMatrix.Height - 8 && x >= 0 && x <= 5 && openInfoModule)
+                    {
+                        if (!usingSpecialTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y], 3);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By3(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    else if (x > QRMatrix.Width - 12 && x < QRMatrix.Width - 8 && y >= 0 && y <= 5 && openInfoModule)
+                    {
+                        if (!usingSpecialTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y], 3);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By3(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    #endregion
+
+                    #region Format
+                    else if (((x == 8 && y < 8) || (y == 8 && x > QRMatrix.Width - 9) || (x == 8 && y > QRMatrix.Height - 9)) && openInfoModule)
+                    {
+                        if (!usingSpecialTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y], 3);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By3(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
                     }
                     #endregion
 
                     #region Alignment Pattern
-                        
+
                     else if (version > 1 && x >= alignments[version] && x < alignments[version] + 5
                    && y >= alignments[version] && y < alignments[version] + 5)
                     {
-                        ReplaceColor2By1(metaImg, px, py, tileSize, QRMatrix[x, y]);
-                    }
-                        
-                    #endregion
-
-                    else
-                    {
-                        int luminance = 0;
-                        if (QRMatrix[x, y])
+                        if (!functionByTile)
                         {
-                            luminance = 0;
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y], 3);
                         }
                         else
                         {
-                            luminance = 1;
-                        }
-                        for (int bit = 0; bit < 4; ++bit)
-                        {
-                            string tileName = FLANN.Search4x4LabTwoByOne(newSrc, tileSize, x, y, bit, luminance, 200);
-                            Image img = Image.FromFile(tileName);
-                            Bitmap tile = img as Bitmap;
-                            for (int i = 0; i < tileSize; ++i )
-                            {
-                                for(int j = 0; j < tileSize; ++j)
-                                {
-                                    Color pixel = tile.GetPixel(j, i);
-                                    metaImg.SetPixel(px, py, pixel);
-                                }
-                            }
-                            img.Dispose();
-                            tile.Dispose();
+                            ImportantModuleByTile1By3(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
                         }
                     }
+
+                    #endregion
+
+                    #region Embedding region
+                    else
+                    {
+                        int luminance = (QRMatrix[x, y]) ? 0 : 1;
+                        int bDex = 0;
+                        for (int mY = 0; mY < 3; ++mY)
+                        {
+                            for (int mX = 0; mX < 3; ++mX)
+                            {
+                                Image img = null;
+                                Bitmap tile = null;
+                                int bx = sx + mX * blockSize;
+                                int by = sy + mY * blockSize;
+                                int tx = px + mX * tileSize;
+                                int ty = py + mY * tileSize;
+                                if (bDex != 4)
+                                {
+                                    //string tileName = FLANN.Search4x4Lab1By3(scaledSrc, blockSize, nx, ny, luminance, 300, tileImages);
+                                    string tileName = FLANN.Search4x4Lab1By3(scaledSrc, blockSize, bx, by, luminance, 2000, tileImages);
+                                    img = Image.FromFile(tileName);
+                                    tile = img as Bitmap;
+                                    for (int i = 0; i < tileSize; ++i)
+                                    {
+                                        for (int j = 0; j < tileSize; ++j)
+                                        {
+                                            metaImg.SetPixel(tx + j, ty + i, tile.GetPixel(j, i));
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    string path = (QRMatrix[x, y]) ? PathConfig.FunctionBlackPath : PathConfig.FunctionWhitePath;
+                                    string tileName = FLANN.SearchFunctionPatternsLab(scaledSrc, blockSize, path, 1000, bx, by, true);
+                                    img = Image.FromFile(tileName);
+                                    tile = img as Bitmap;
+                                    for (int i = 0; i < tileSize; ++i)
+                                    {
+                                        for (int j = 0; j < tileSize; ++j)
+                                        {
+                                            metaImg.SetPixel(tx + j, ty + i, tile.GetPixel(j, i));
+                                        }
+                                    }
+                                }
+                                bDex++;
+
+                                if (img != null)
+                                {
+                                    img.Dispose();
+                                    tile.Dispose();
+                                }
+                            }
+                        }
+                    }
+                    #endregion
                 }
             }
             #endregion
 
             #region Add Quiet Zone
-            int startX = fourTileSize;
-            int startY = fourTileSize;
+            int startX = tileSize_12;
+            int startY = tileSize_12;
             int endX = startX + metaImg.Width;
             int endY = startY + metaImg.Height;
             for (int i = 0; i < result.Height; ++i)
             {
-                for (int j = 0; j < result.Width; ++j)
+                if (MainForm.singleton.isCancel)
+                    return null;
+                worker.ReportProgress(i * 20 / result.Height + 80);
+                for(int j = 0; j < result.Width; ++j)
                 {
+                    if (MainForm.singleton.isCancel)
+                        return null;
                     if (j >= startX && j < endX && i >= startY && i < endY)
                     {
-                        Color pixel = metaImg.GetPixel(j - startX, i - startY);
-                        result.SetPixel(j, i, pixel);
+                        //Color pixel = metaImg.GetPixel(j - startX, i - startY);
+                        result.SetPixel(j, i, metaImg.GetPixel(j - startX, i - startY));
                     }
                     else
                     {
@@ -391,39 +668,317 @@ namespace QRPhotoMosaic.Method
                 }
             }
             #endregion
-            newSrc.Dispose();
+
+            scaledSrc.Dispose();
             metaImg.Dispose();
+            FLANN.usedList.Clear();
+            FLANN.functionList.Clear();
+            GC.Collect();
             return result;
         }
 
-        public Bitmap FlannCombineOneByOne(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k, string space, BitMatrix QRMatrix)
+        /// <summary>
+        /// (Tile | Block) : Module = 1 : 2
+        /// </summary>
+        /// <returns></returns>
+        public Bitmap FlannCombine1By2(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k, string space, BitMatrix QRMatrix)
         {
+            int v = version * 4 + 17;
+            int blockSize = MainForm.singleton.BlockSize;
+            int scaledSize = v * blockSize * 2;
+            int metaSize = v * 2 * tileSize;
+            int eightTileSize = 8 * tileSize;
+            Bitmap scaledSrc = new Bitmap(src, scaledSize, scaledSize);
+            Bitmap metaImg = new Bitmap(metaSize, metaSize);
+
+            // 64bits application, REASON: 32bits application does not have enough virtual memory.
+            Bitmap result = new Bitmap(metaSize + eightTileSize * 2, metaSize + eightTileSize * 2);
+
+            Dictionary<string, string[]> loadingFolders = new Dictionary<string, string[]>();
+
+            #region Determined Important Module
+            bool functionByTile = false;
+            if (functionPattern == "WB")
+            {
+                functionByTile = true;
+                FLANN.functionList.Clear();
+                if (FLANN.kdtree_Patterns_Black == null)
+                {
+                    Tile.ReadFileFunctionLab(PathConfig.FunctionBlackPath, 0);
+                    FLANN.kdtree_Patterns_Black = new Index(FLANN.FunctionBlackFeatures4x4, 5);
+                }
+                if (FLANN.kdtree_Patterns_White == null)
+                {
+                    Tile.ReadFileFunctionLab(PathConfig.FunctionWhitePath, 1);
+                    FLANN.kdtree_Patterns_White = new Index(FLANN.FunctionWhiteFeatures4x4, 5);
+                }
+            }
+            bool openInfoModule = false;
+            bool usingSpecialTile = false;
+            if (versionModule == "Normal" || versionModule == "SpecialTile")
+            {
+                openInfoModule = true;
+                if (versionModule == "SpecialTile")
+                    usingSpecialTile = true;
+            }
+            #endregion
+
+            #region Meta Image
+            for (int y = 0; y < QRMatrix.Height; ++y)
+            {
+                if (MainForm.singleton.isCancel)
+                    return null;
+                worker.ReportProgress(y * 70 / QRMatrix.Height + 10);
+                for(int x = 0; x < QRMatrix.Width; ++x)
+                {
+                    if (MainForm.singleton.isCancel)
+                        return null;
+                    int px = tileSize * x * 2;
+                    int py = tileSize * y * 2;
+                    int sx = blockSize * x * 2;
+                    int sy = blockSize * y * 2;
+                    #region Left Up Function Pattern
+                    if (x < 8 && y < 8)
+                    {
+                        if (!functionByTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By2(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    #endregion
+
+                    #region Right Up Function Pattern
+                    else if(x > QRMatrix.Width - 9 && y < 8)
+                    {
+                        if (!functionByTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By2(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    #endregion
+
+                    #region Left Down Function Pattern
+                    else if(x < 8 && y > QRMatrix.Height - 9)
+                    {
+                        if (!functionByTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By2(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    #endregion
+
+                    #region Timing
+                    else if (y == 6 && x >= 8 && x < QRMatrix.Width - 8 && openInfoModule)
+                    {
+                        if (!usingSpecialTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By2(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    else if (x == 6 && y >= 8 && y < QRMatrix.Height - 8 && openInfoModule)
+                    {
+                        if (!usingSpecialTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By2(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    #endregion
+
+                    #region Version
+                    else if (y > QRMatrix.Height - 12 && y < QRMatrix.Height - 8 && x >= 0 && x <= 5 && openInfoModule)
+                    {
+                        if (!usingSpecialTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By2(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    else if (x > QRMatrix.Width - 12 && x < QRMatrix.Width - 8 && y >= 0 && y <= 5 && openInfoModule)
+                    {
+                        if (!usingSpecialTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By2(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    #endregion
+
+                    #region Format
+                    else if (((x == 8 && y < 8) || (y == 8 && x > QRMatrix.Width - 9) || (x == 8 && y > QRMatrix.Height - 9)) && openInfoModule)
+                    {
+                        if (!usingSpecialTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By2(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                    #endregion
+
+                    #region Alignment Pattern
+
+                    else if (version > 1 && x >= alignments[version] && x < alignments[version] + 5
+                   && y >= alignments[version] && y < alignments[version] + 5)
+                    {
+                        if (!functionByTile)
+                        {
+                            ReplaceColor(metaImg, px, py, tileSize, QRMatrix[x, y]);
+                        }
+                        else
+                        {
+                            ImportantModuleByTile1By2(scaledSrc, sx, sy, metaImg, px, py, tileSize, blockSize, QRMatrix[x, y]);
+                        }
+                    }
+                        
+                    #endregion
+
+                    #region Embedding region
+                    else
+                    {
+                        int luminance = (QRMatrix[x, y]) ? 0 : 1;
+                        int mx = 0, my = 0, nx = 0, ny = 0, cornerBit = 0;
+                        for (int bit = 0; bit < 4; ++bit)
+                        {
+                            #region Bit switch
+                            switch (bit)
+                            {
+                                case 0:
+                                    nx = sx;
+                                    ny = sy;
+                                    mx = px;
+                                    my = py;
+                                    cornerBit = 2;
+                                    break;
+                                case 1:
+                                    nx = sx + blockSize;
+                                    ny = sy;
+                                    mx = px + tileSize;
+                                    my = py;
+                                    cornerBit = 3;
+                                    break;
+                                case 2:
+                                    nx = sx + blockSize;
+                                    ny = sy + blockSize;
+                                    mx = px + tileSize;
+                                    my = py + tileSize;
+                                    cornerBit = 0;
+                                    break;
+                                case 3:
+                                    nx = sx;
+                                    ny = sy + blockSize;
+                                    mx = px;
+                                    my = py + tileSize;
+                                    cornerBit = 1;
+                                    break;
+                            }
+                            #endregion
+                            string path = MainForm.singleton.CreatingFolderPath + cornerBit.ToString() + luminance.ToString() + "\\";
+                            string[] tileImages = null;
+                            if(!loadingFolders.ContainsKey(path))
+                            {
+                                tileImages = Directory.GetFiles(path);
+                                loadingFolders.Add(path, tileImages);
+                            }
+                            else
+                            {
+                                tileImages = loadingFolders[path];
+                            }
+
+                            // TEST : k = 200
+                            k = 200;
+                            string tileName = FLANN.Search4x4Lab1By2(scaledSrc, blockSize, nx, ny, cornerBit, luminance, k, tileImages);
+                            Image img = Image.FromFile(tileName);
+                            Bitmap tile = img as Bitmap;
+                            for (int i = 0; i < tileSize; ++i )
+                            {
+                                for(int j = 0; j < tileSize; ++j)
+                                {
+                                    metaImg.SetPixel(mx + j, my + i, tile.GetPixel(j, i));
+                                }
+                            }
+                            img.Dispose();
+                            tile.Dispose();
+                        }
+                    }
+                    #endregion
+                }
+            }
+            #endregion
+
+            #region Add Quiet Zone
+            int startX = eightTileSize;
+            int startY = eightTileSize;
+            int endX = startX + metaImg.Width;
+            int endY = startY + metaImg.Height;
+            for (int i = 0; i < result.Height; ++i)
+            {
+                if (MainForm.singleton.isCancel)
+                    return null;
+                worker.ReportProgress(i * 20 / result.Height + 80);
+                for (int j = 0; j < result.Width; ++j)
+                {
+                    if (MainForm.singleton.isCancel)
+                        return null;
+                    if (j >= startX && j < endX && i >= startY && i < endY)
+                    {
+                        result.SetPixel(j, i, metaImg.GetPixel(j - startX, i - startY));
+                    }
+                    else
+                    {
+                        result.SetPixel(j, i, Color.White);
+                    }
+                }
+            }
+            #endregion
+            scaledSrc.Dispose();
+            metaImg.Dispose();
+            FLANN.usedList.Clear();
+            loadingFolders.Clear();
+            GC.Collect();
+
+            return result;
+        }
+
+        public Bitmap FlannCombine1By1(BackgroundWorker worker, Bitmap src, List<Tile> tiles, int tileSize, int version, int k, string space, BitMatrix QRMatrix)
+        {
+            Dictionary<string, string[]> loadingFolders = new Dictionary<string, string[]>();
             BitMatrix matrix = new BitMatrix(QRMatrix.Width + 2, QRMatrix.Height + 2);
             int v = (version * 4 + 17) + 1;
             int metaSize = v * tileSize;
             
-            int blockSize = 0;
-            
-            if (src.Width > src.Height)
-            {
-                int scale = src.Width / v;
-                blockSize = GetBlockSize(scale);
-            }
-            else
-            {
-                int scale = src.Height / v;
-                blockSize = GetBlockSize(scale);
-            }
-            
-            //blockSize = MainForm.singleton.BlockSize;
+            int blockSize = MainForm.singleton.BlockSize;
             Bitmap newSrc = ImageProc.ScaleImage(src, v * blockSize);
-            //Bitmap newSrc = ImageProc.ScaleImage(src, v * 8);
-            //string newSrcName = "..\\ScaleImage\\" + "_" + version.ToString() + ".jpg";
-            //System.IO.FileStream file = System.IO.File.Open(newSrcName, FileMode.OpenOrCreate, FileAccess.Write);
-            //newSrc.Save(file, System.Drawing.Imaging.ImageFormat.Jpeg);
-            int w = MainForm.singleton.PhotomosaicPictureBox.Width;
-            int h = MainForm.singleton.PhotomosaicPictureBox.Height;
-            MainForm.singleton.PhotoMosaicImage = ImageProc.ScaleImage(newSrc, w, h);
+            //int w = MainForm.singleton.PhotomosaicPictureBox.Width;
+            //int h = MainForm.singleton.PhotomosaicPictureBox.Height;
+            //MainForm.singleton.PhotoMosaicImage = ImageProc.ScaleImage(newSrc, w, h);
             Bitmap metaImg = new Bitmap(metaSize, metaSize);
             int halftile = tileSize / 2;
             int AlignmentPatternLocation_X = MainForm.singleton.info.AlignmentPatternLocation_X * tileSize;
@@ -450,7 +1005,8 @@ namespace QRPhotoMosaic.Method
             #endregion
 
             worker.ReportProgress(20);
-            #region Replace Meta Result
+
+            #region Replace Meta Image
             int[] folderbits = { 0, 0, 0, 0 };
             int bitX = 0, bitY = 0;
             for (int y = 0; y < matrix.Height - 1; ++y)
@@ -494,14 +1050,25 @@ namespace QRPhotoMosaic.Method
                     
                     string folder = folderbits[0].ToString() + folderbits[1].ToString() + folderbits[2].ToString()
                         + folderbits[3].ToString();
-                    string[] names = System.IO.Directory.GetFiles(MainForm.singleton.CreatingFolderPath + folder);
+                    string[] names = null;
+                    string path = MainForm.singleton.CreatingFolderPath + folder;
+                    if(!loadingFolders.ContainsKey(path))
+                    {
+                        names = System.IO.Directory.GetFiles(path);
+                        loadingFolders.Add(path, names);
+                    }
+                    else
+                    {
+                        names = loadingFolders[path];
+                    }
+                    //string[] names = System.IO.Directory.GetFiles(MainForm.singleton.CreatingFolderPath + folder);
                     string name = string.Empty;
                     if(space == "RGB")
                         //name = FLANN.Search4x4RGBOther(newSrc, x, y, MainForm.singleton.BlockSize, names, kdIndex, k, isFunction, folderbits);
-                        name = FLANN.Search4x4RGBOther(newSrc, x, y, blockSize, names, kdIndex, k, isFunction, folderbits);
+                        name = FLANN.Search4x4RGB1By1(newSrc, x, y, blockSize, names, kdIndex, k, isFunction, folderbits);
                     else if(space == "Lab")
                         //name = FLANN.Search4x4LabOther(newSrc, x, y, MainForm.singleton.BlockSize, names, kdIndex, k, isFunction, folderbits);
-                        name = FLANN.Search4x4LabOther(newSrc, x, y, blockSize, names, kdIndex, k, isFunction, folderbits);
+                        name = FLANN.Search4x4Lab1By1(newSrc, x, y, blockSize, names, kdIndex, k, isFunction, folderbits);
 
                     Image img = Image.FromFile(name);
                     Bitmap tile = img as Bitmap;
@@ -608,7 +1175,8 @@ namespace QRPhotoMosaic.Method
             for (int y = 0; y < QRMatrix.Height; ++y)
             {
                 if (MainForm.singleton.isCancel) return null;
-                worker.ReportProgress(y * 10 / QRMatrix.Height + 70);
+                //worker.ReportProgress(y * 10 / QRMatrix.Height + 70);
+                worker.ReportProgress(y * 60 / QRMatrix.Height + 20);
                 for (int x = 0; x < QRMatrix.Width; ++x)
                 {
                     Bitmap module = new Bitmap(tileSize, tileSize);
@@ -902,11 +1470,11 @@ namespace QRPhotoMosaic.Method
                     }
                     if(isBlack)
                     {
-                        ImportantModuleByTile(metaImg, module, tileSize, startX, startY, endX, endY, space, PathConfig.FunctionBlackPath);
+                        ImportantModuleByTile1By1(metaImg, module, tileSize, startX, startY, endX, endY, space, PathConfig.FunctionBlackPath);
                     }
                     else if(isWhite)
                     {
-                        ImportantModuleByTile(metaImg, module, tileSize, startX, startY, endX, endY, space, PathConfig.FunctionWhitePath);
+                        ImportantModuleByTile1By1(metaImg, module, tileSize, startX, startY, endX, endY, space, PathConfig.FunctionWhitePath);
                     }
                     module.Dispose();
                 }
@@ -941,6 +1509,7 @@ namespace QRPhotoMosaic.Method
             matrix.clear();
             metaImg.Dispose();
             newSrc.Dispose();
+            loadingFolders.Clear();
             GC.Collect();
             return result;
         }

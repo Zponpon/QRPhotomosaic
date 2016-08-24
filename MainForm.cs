@@ -184,6 +184,7 @@ namespace QRPhotoMosaic
         private void Init()
         {
             //FolderComboBox.SelectedIndex = 1;
+            FormatBox.SelectedIndex = 0;
             VersionModuleBox.SelectedIndex = 0;
             FunctionPatternBox.SelectedIndex = 1;
             LevelComboBox.SelectedIndex = 3;
@@ -208,8 +209,9 @@ namespace QRPhotoMosaic
             BasicProcessForm.calcTileSize = Convert.ToInt32(numericUpDown1.Value);
             this.Text = "Photomosaic with embedded QR Code Application";
             //QRCodeContentBox.Text = "http://www.cse.yzu.edu.tw/";'
-            QRCodeContentBox.Text = "https://iamchucky.github.io/PttChrome/index.html";
+            //QRCodeContentBox.Text = "https://iamchucky.github.io/PttChrome/index.html";
             //QRCodeContentBox.Text = "The copyright of this photo, http://magdeleine.co/browse/";
+            QRCodeContentBox.Text = "https://www.cse.yzu.edu.tw/research/learning";
         }
 
         private void EmbeddingEventRegister()
@@ -266,7 +268,7 @@ namespace QRPhotoMosaic
         private void SaveMosaicBtn_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Bitmap Image|*.bmp|JPeg Image|*.jpg";
+            saveFileDialog.Filter = "JPeg Image|*.jpg|Bitmap Image|*.bmp";
             saveFileDialog.Title = "Save an Image File";
             saveFileDialog.ShowDialog();
             if (saveFileDialog.FileName == "")
@@ -300,7 +302,15 @@ namespace QRPhotoMosaic
             System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
             //Bitmap savePic = ImageProc.ScaleImage(result, result.Width, result.Height);
             //savePic.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
-            result.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            
+            //result.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            //result.Save(fs, System.Drawing.Imaging.ImageFormat.Png);
+            if(FormatBox.Text =="Bmp")
+                result.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+            else if(FormatBox.Text == "Png")
+                result.Save(fs, System.Drawing.Imaging.ImageFormat.Png);
+            else if (FormatBox.Text == "Jpeg")
+                result.Save(fs, System.Drawing.Imaging.ImageFormat.Jpeg);
             saveFileDialog.Dispose();
             //savePic.Dispose();
             fs.Close();
@@ -312,8 +322,6 @@ namespace QRPhotoMosaic
         /// <summary>
         /// At MainForm tab page1.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void QRAndPhotmosaicBtn_Click(object sender, EventArgs e)
         {
             //if (this.PhotomosaicPicBox.Image != null)
@@ -356,7 +364,9 @@ namespace QRPhotoMosaic
             basicProcess.hammingK = Convert.ToInt32(this.HammingK.Value);
             tileSize = TileSize;
             //BlockSize = Convert.ToInt32(BlockcomboBox.SelectedValue);
+            //BlockSize = 16;
             BlockSize = 8;
+            //BlockSize = 4;
             basicProcess.Show();
             //stopWatch.Start();
             GC.Collect();
@@ -664,15 +674,7 @@ namespace QRPhotoMosaic
             TileWorker.RunWorkerAsync();
         }
 
-        private void DuplicateCount_Click(object sender, EventArgs e)
-        {
 
-        }
-
-        private void VersionModuleBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
         /*
         private void button1_Click(object sender, EventArgs e)
         {

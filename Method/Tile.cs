@@ -58,6 +58,25 @@ namespace QRPhotoMosaic.Method
                 },*/
                 new TileType
                 {
+                    Name = "MirFlickr_100000_1By3",
+                    Folder = PathConfig.Classify1By3_100000
+                },
+                new TileType
+                {
+                    Name = "MirFlickr_1000000_1By3",
+                    Folder = PathConfig.Classify1By3_1000000
+                },
+                new TileType 
+                {
+                    Name = "MirFlickr_1000000_1By2",
+                    Folder = PathConfig.Classify1By2_1000000
+                },
+                new TileType{
+                    Name = "MirFlickr_100000_1By2",
+                    Folder = PathConfig.Classify1By2_100000
+                },
+                new TileType
+                {
                     Name = "MirFlickr_100000",
                     Folder = PathConfig.Classifymirflickr100000
                 },
@@ -145,7 +164,6 @@ namespace QRPhotoMosaic.Method
 
         public void CalcNonDivTileAvgLab4x4(int s)
         {
-            int r = 0, g = 0, b = 0;
             double L = 0, A = 0, B = 0;
             ColorSpace cs = new ColorSpace();
             ColorSpace.Lab lab = new ColorSpace.Lab();
@@ -478,6 +496,34 @@ namespace QRPhotoMosaic.Method
             {
                 Console.WriteLine(e.Message);
             }
+        }
+
+        public static void ReadFile4x4Lab_1By3(string folder)
+        {
+            BinaryReader reader = null;
+            FileStream file = null;
+            if(folder == PathConfig.Classify1By3_1000000)
+                file = File.Open("..//..//Classifymirflickr_1000000_1By3AvgLab.txt", FileMode.Open, FileAccess.Read);
+            else if(folder == PathConfig.Classify1By3_100000)
+                file = File.Open("..//..//Classifymirflickr_100000_1By3AvgLab.txt", FileMode.Open, FileAccess.Read);
+            reader = new BinaryReader(file);
+            int tmp = Convert.ToInt32(reader.ReadByte());
+            FLANN.features4x4 = new Emgu.CV.Matrix<float>(System.IO.Directory.GetFiles(folder).Length, 48);
+            int count = 0;
+            float ratio = Convert.ToSingle(MainForm.singleton.RatioNumber.Value);
+            foreach (string tileName in System.IO.Directory.GetFiles(folder))
+            {
+                for (int j = 0; j < 48; )
+                {
+                    FLANN.features4x4.Data[count, j++] = (float)reader.ReadDouble() * ratio;
+                    FLANN.features4x4.Data[count, j++] = (float)reader.ReadDouble();
+                    FLANN.features4x4.Data[count, j++] = (float)reader.ReadDouble();
+                }
+                count++;
+            }
+            FLANN.kdtree = new Emgu.CV.Flann.Index(FLANN.features4x4);
+            reader.Close();
+            file.Close();
         }
 
         public static void ReadFile4x4Lab(List<Tile> tiles, int tileSize, string folder)
